@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1100</width>
-    <height>774</height>
+    <width>1138</width>
+    <height>824</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -76,8 +76,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>865</width>
-            <height>680</height>
+            <width>903</width>
+            <height>730</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -96,7 +96,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+              <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</iconset>
              </property>
              <property name="autoRaise">
@@ -119,7 +119,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+              <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</iconset>
              </property>
              <property name="autoRaise">
@@ -148,7 +148,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+              <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/mActionFileOpen.svg</normaloff>:/plugins/eco_cont/icons/mActionFileOpen.svg</iconset>
              </property>
              <property name="autoRaise">
@@ -171,7 +171,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+              <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
              </property>
              <property name="autoRaise">
@@ -185,7 +185,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+              <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/frFlag.svg</normaloff>:/plugins/eco_cont/icons/frFlag.svg</iconset>
              </property>
              <property name="checkable">
@@ -205,7 +205,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+              <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/enFlag.svg</normaloff>:/plugins/eco_cont/icons/enFlag.svg</iconset>
              </property>
              <property name="checkable">
@@ -244,7 +244,7 @@
               </size>
              </property>
              <property name="currentIndex">
-              <number>4</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="paramsTab">
               <attribute name="title">
@@ -406,6 +406,720 @@
                 </widget>
                </item>
               </layout>
+             </widget>
+             <widget class="QWidget" name="landuseTab">
+              <attribute name="title">
+               <string>2 - Occupation du sol</string>
+              </attribute>
+              <widget class="QLabel" name="label_3">
+               <property name="geometry">
+                <rect>
+                 <x>40</x>
+                 <y>20</y>
+                 <width>141</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Occupation du sol</string>
+               </property>
+              </widget>
+              <widget class="QFrame" name="selectionLayerFrame_2">
+               <property name="geometry">
+                <rect>
+                 <x>40</x>
+                 <y>40</y>
+                 <width>501</width>
+                 <height>86</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>65</height>
+                </size>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_18">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="selectionLayerLabel_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>1 - Couche</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="selectionOpenLayerLabel_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>67</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Ouvrir couche</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="selectionLayerLabel_6">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>138</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>Sélectionner couche</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1" colspan="2">
+                 <widget class="QgsFileWidget" name="selectionInLayer_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1" colspan="2">
+                 <widget class="QgsMapLayerComboBox" name="selectionInLayerCombo_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>60</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QTableView" name="landuseView">
+               <property name="geometry">
+                <rect>
+                 <x>40</x>
+                 <y>150</y>
+                 <width>511</width>
+                 <height>311</height>
+                </rect>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>300</width>
+                 <height>100</height>
+                </size>
+               </property>
+               <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+               </property>
+               <property name="sortingEnabled">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </widget>
+             <widget class="QWidget" name="tab">
+              <attribute name="title">
+               <string>3 - Autres données</string>
+              </attribute>
+              <widget class="QFrame" name="selectionLayerFrame_3">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>50</y>
+                 <width>501</width>
+                 <height>86</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>65</height>
+                </size>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_23">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="selectionLayerLabel_4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>1 - Couche</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="selectionOpenLayerLabel_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>67</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Ouvrir couche</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="selectionLayerLabel_7">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>138</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>Sélectionner couche</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1" colspan="2">
+                 <widget class="QgsFileWidget" name="selectionInLayer_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1" colspan="2">
+                 <widget class="QgsMapLayerComboBox" name="selectionInLayerCombo_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>60</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QFrame" name="frame_23">
+               <property name="geometry">
+                <rect>
+                 <x>40</x>
+                 <y>160</y>
+                 <width>238</width>
+                 <height>99</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="selectionLayerLabel_8">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>2 - Sélection</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="selectionExprLabel_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>52</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Expression</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QgsFieldExpressionWidget" name="selectionExpr_3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="selectionExprLabel_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>52</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Tampon</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QgsFieldExpressionWidget" name="selectionExpr_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="selectionExprLabel_4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>52</width>
+                    <height>13</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Sélection fragmentante</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="checkBox">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QFrame" name="selectionViewFrame_2">
+               <property name="geometry">
+                <rect>
+                 <x>40</x>
+                 <y>280</y>
+                 <width>611</width>
+                 <height>271</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_24">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>0</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>6</number>
+                </property>
+                <item row="1" column="2" alignment="Qt::AlignHCenter">
+                 <widget class="QCheckBox" name="selectionRunSelectionMode_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Appliquer seulement aux lignes sélectionnées</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1" colspan="2" alignment="Qt::AlignHCenter">
+                 <widget class="QFrame" name="frame_9">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_10">
+                   <property name="spacing">
+                    <number>200</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QPushButton" name="selectionRun_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="layoutDirection">
+                      <enum>Qt::LeftToRight</enum>
+                     </property>
+                     <property name="text">
+                      <string>Lancer les sélections</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../BioDispersal/resources.qrc">
+                       <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="0" column="1" colspan="2">
+                 <widget class="QTableView" name="selectionView_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>300</width>
+                    <height>100</height>
+                   </size>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QFrame" name="selectArrowsFrame_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>50</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Raised</enum>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <item>
+                    <widget class="QToolButton" name="selectionUp_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>25</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Promouvoir la sélection</string>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../BioDispersal/resources.qrc">
+                       <normaloff>:/plugins/eco_cont/icons/up-arrow.png</normaloff>:/plugins/eco_cont/icons/up-arrow.png</iconset>
+                     </property>
+                     <property name="autoRaise">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QToolButton" name="selectionDown_2">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>25</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Rétrograder la sélection</string>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="../BioDispersal/resources.qrc">
+                       <normaloff>:/plugins/eco_cont/icons/down-arrow.png</normaloff>:/plugins/eco_cont/icons/down-arrow.png</iconset>
+                     </property>
+                     <property name="autoRaise">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QToolButton" name="selectionRemove_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Supprimer les lignes sélectionnées</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../BioDispersal/resources.qrc">
+                    <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
+                  </property>
+                  <property name="autoRaise">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
              <widget class="QWidget" name="selectionTab">
               <attribute name="title">
@@ -988,7 +1702,7 @@
                               <string>Enregistrer sélection</string>
                              </property>
                              <property name="icon">
-                              <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                              <iconset resource="../BioDispersal/resources.qrc">
                                <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
                              </property>
                             </widget>
@@ -1128,7 +1842,7 @@
                                <string/>
                               </property>
                               <property name="icon">
-                               <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                               <iconset resource="../BioDispersal/resources.qrc">
                                 <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                               </property>
                               <property name="autoRaise">
@@ -1240,7 +1954,7 @@
                                <string/>
                               </property>
                               <property name="icon">
-                               <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                               <iconset resource="../BioDispersal/resources.qrc">
                                 <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                               </property>
                               <property name="autoRaise">
@@ -1367,7 +2081,7 @@
                            <string>Lancer les sélections</string>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                           </property>
                          </widget>
@@ -1436,7 +2150,7 @@
                            <string/>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/up-arrow.png</normaloff>:/plugins/eco_cont/icons/up-arrow.png</iconset>
                           </property>
                           <property name="autoRaise">
@@ -1465,7 +2179,7 @@
                            <string/>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/down-arrow.png</normaloff>:/plugins/eco_cont/icons/down-arrow.png</iconset>
                           </property>
                           <property name="autoRaise">
@@ -1491,7 +2205,7 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                        </property>
                        <property name="autoRaise">
@@ -1637,7 +2351,7 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                        </property>
                        <property name="autoRaise">
@@ -1669,7 +2383,7 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</iconset>
                        </property>
                        <property name="autoRaise">
@@ -1768,7 +2482,7 @@
                            <string/>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/up-arrow.png</normaloff>:/plugins/eco_cont/icons/up-arrow.png</iconset>
                           </property>
                           <property name="autoRaise">
@@ -1803,7 +2517,7 @@
                            <string/>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/down-arrow.png</normaloff>:/plugins/eco_cont/icons/down-arrow.png</iconset>
                           </property>
                           <property name="autoRaise">
@@ -1900,7 +2614,7 @@
                         <string>Fusionner</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                        </property>
                       </widget>
@@ -2068,7 +2782,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                      <iconset resource="../BioDispersal/resources.qrc">
                        <normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</iconset>
                      </property>
                      <property name="autoRaise">
@@ -2097,7 +2811,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                      <iconset resource="../BioDispersal/resources.qrc">
                        <normaloff>:/plugins/eco_cont/icons/mActionFileOpen.svg</normaloff>:/plugins/eco_cont/icons/mActionFileOpen.svg</iconset>
                      </property>
                      <property name="autoRaise">
@@ -2126,7 +2840,7 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                      <iconset resource="../BioDispersal/resources.qrc">
                        <normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</iconset>
                      </property>
                      <property name="autoRaise">
@@ -2215,7 +2929,7 @@
                         <string>Produire les couches de friction</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                        </property>
                       </widget>
@@ -2722,7 +3436,7 @@
                             <string>...</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                            <iconset resource="../BioDispersal/resources.qrc">
                              <normaloff>:/plugins/eco_cont/icons/symbologyAdd.svg</normaloff>:/plugins/eco_cont/icons/symbologyAdd.svg</iconset>
                            </property>
                            <property name="autoRaise">
@@ -2745,7 +3459,7 @@
                             <string>...</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                            <iconset resource="../BioDispersal/resources.qrc">
                              <normaloff>:/plugins/eco_cont/icons/symbologyRemove.svg</normaloff>:/plugins/eco_cont/icons/symbologyRemove.svg</iconset>
                            </property>
                            <property name="autoRaise">
@@ -2838,7 +3552,7 @@
                             <string>...</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                            <iconset resource="../BioDispersal/resources.qrc">
                              <normaloff>:/plugins/eco_cont/icons/symbologyAdd.svg</normaloff>:/plugins/eco_cont/icons/symbologyAdd.svg</iconset>
                            </property>
                            <property name="autoRaise">
@@ -2855,7 +3569,7 @@
                             <string>...</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                            <iconset resource="../BioDispersal/resources.qrc">
                              <normaloff>:/plugins/eco_cont/icons/symbologyRemove.svg</normaloff>:/plugins/eco_cont/icons/symbologyRemove.svg</iconset>
                            </property>
                            <property name="autoRaise">
@@ -2954,7 +3668,7 @@
                            <string>Enregistrer pondération</string>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
                           </property>
                          </widget>
@@ -3017,7 +3731,7 @@
                            <string>...</string>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                           </property>
                           <property name="autoRaise">
@@ -3137,7 +3851,7 @@
                            <string>Pondérer les couches de friction</string>
                           </property>
                           <property name="icon">
-                           <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                           <iconset resource="../BioDispersal/resources.qrc">
                             <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                           </property>
                          </widget>
@@ -3613,7 +4327,7 @@
                         <string>Enregistrer dispersion</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
                        </property>
                       </widget>
@@ -3688,7 +4402,7 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                        </property>
                        <property name="autoRaise">
@@ -3786,7 +4500,7 @@
                         <string>Lancer la modélisation</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                        <iconset resource="../BioDispersal/resources.qrc">
                          <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                        </property>
                       </widget>
@@ -3853,7 +4567,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                    <iconset resource="../BioDispersal/resources.qrc">
                      <normaloff>:/plugins/eco_cont/icons/debug_icon/mActionAnnotation.svg</normaloff>:/plugins/eco_cont/icons/debug_icon/mActionAnnotation.svg</iconset>
                    </property>
                    <property name="checkable">
@@ -3873,7 +4587,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                    <iconset resource="../BioDispersal/resources.qrc">
                      <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
                    </property>
                    <property name="autoRaise">
@@ -3890,7 +4604,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">
+                    <iconset resource="../BioDispersal/resources.qrc">
                      <normaloff>:/plugins/eco_cont/icons/iconClearConsole.svg</normaloff>:/plugins/eco_cont/icons/iconClearConsole.svg</iconset>
                    </property>
                    <property name="autoRaise">
@@ -4013,7 +4727,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">:/plugins/eco_cont/icons/logoIrstea.png</pixmap>
+         <pixmap resource="../BioDispersal/resources.qrc">:/plugins/eco_cont/icons/logoIrstea.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -4038,7 +4752,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc">:/plugins/eco_cont/icons/logoTetis.png</pixmap>
+         <pixmap resource="../BioDispersal/resources.qrc">:/plugins/eco_cont/icons/logoTetis.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -4093,7 +4807,7 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/BioDispersal/resources.qrc"/>
+  <include location="../BioDispersal/resources.qrc"/>
  </resources>
  <connections/>
 </ui>
