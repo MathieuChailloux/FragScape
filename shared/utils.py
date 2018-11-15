@@ -32,6 +32,8 @@ import html
 import platform
 import glob
 
+from PyQt5.QtWidgets import QFileDialog
+
 file_dir = os.path.dirname(__file__)
 if file_dir not in sys.path:
     sys.path.append(file_dir)

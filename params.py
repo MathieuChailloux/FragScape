@@ -30,10 +30,10 @@ from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QHeaderView
 
-import utils
-import qgsUtils
-import qgsTreatments
-import abstract_model
+from .shared import utils
+from .shared import qgsUtils
+from .shared import qgsTreatments
+from .shared import abstract_model
 
 # Meff global parameters
 
@@ -110,7 +110,7 @@ class ParamsModel(QAbstractTableModel):
         path = normalizePath(path)
         utils.info("Setting territory layer to " + str(path))
         self.territoryLayer = path
-        self.layoutChanged.emit()
+        #self.layoutChanged.emit()
         
     def setCrs(self,crs):
         utils.info("Setting extent CRS to " + crs.description())
@@ -153,7 +153,7 @@ class ParamsModel(QAbstractTableModel):
         xmlStr = indent + "<ParamsModel"
         if self.workspace:
             xmlStr += " workspace=\"" + str(self.workspace) + "\""
-        if self.extentLayer:
+        if self.territoryLayer:
             xmlStr += " territoryLayer=\"" + str(self.territoryLayer) + "\""
         xmlStr += "/>"
         return xmlStr

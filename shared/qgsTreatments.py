@@ -30,8 +30,8 @@ import sys
 import subprocess
 import processing
 
-import utils
-import qgsUtils
+from . import utils
+from . import qgsUtils
 
 nodata_val = '-9999'
 
@@ -76,14 +76,15 @@ def initGdalCommands():
         utils.debug("gdal_merge command set to " + str(gdal_merge_cmd))
     else:
         utils.user_error("Could not find gdal_merge command")
-    if os.path.isfile(gdal_rasterize_cmd):
-        utils.debug("gdal_rasterize command set to " + str(gdal_rasterize_cmd))
-    else:
-        utils.user_error("Could not find gdal_rasterize command")
-    if os.path.isfile(gdal_warp_cmd):
-        utils.debug("gdalwarp command set to " + str(gdal_warp_cmd))
-    else:
-        utils.user_error("Could not find gdalwarp command")
+    if utils.platform_sys in ['Linux','Darwin']:
+        if os.path.isfile(gdal_rasterize_cmd):
+            utils.debug("gdal_rasterize command set to " + str(gdal_rasterize_cmd))
+        else:
+            utils.user_error("Could not find gdal_rasterize command")
+        if os.path.isfile(gdal_warp_cmd):
+            utils.debug("gdalwarp command set to " + str(gdal_warp_cmd))
+        else:
+            utils.user_error("Could not find gdalwarp command")
         
 
 def applyProcessingAlg(provider,alg_name,parameters):

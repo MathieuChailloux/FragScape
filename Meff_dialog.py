@@ -25,6 +25,7 @@
 import os
 import sys
 import traceback
+from io import StringIO
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
@@ -34,6 +35,7 @@ from qgis.gui import QgsFileWidget
 
 from .shared import utils
 from .shared import progress
+from .shared import config_parsing
 from . import params
 from .shared import log
 from . import tabs
@@ -58,6 +60,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def initTabs(self):
         paramsConnector = params.ParamsConnector(self)
+        params.params = paramsConnector.model
         logConnector = log.LogConnector(self)
         progressConnector = progress.ProgressConnector(self)
         progress.progressConnector = progressConnector
@@ -171,7 +174,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         utils.info("Meff model saved into file '" + fname + "'")
         
     def saveModelAsAction(self):
-        fname = params.saveFileDialog(parent=self,msg="Sauvegarder le projet sous",filter="*.xml")
+        fname = utils.saveFileDialog(parent=self,msg="Sauvegarder le projet sous",filter="*.xml")
         if fname:
             self.saveModelAs(fname)
         
@@ -185,12 +188,12 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     def loadModel(self,fname):
         utils.debug("loadModel " + str(fname))
         utils.checkFileExists(fname)
-        setConfigModels(self.models)
+        config_parsing.setConfigModels(self.models)
         params.params.projectFile = fname
-        parseConfig(fname)
+        config_parsing.parseConfig(fname)
         utils.info("Meff model loaded from file '" + fname + "'")
         
     def loadModelAction(self):
-        fname = params.openFileDialog(parent=self,msg="Ouvrir le projet",filter="*.xml")
+        fname = utils.openFileDialog(parent=self,msg="Ouvrir le projet",filter="*.xml")
         if fname:
             self.loadModel(fname)

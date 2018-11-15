@@ -21,6 +21,9 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os.path
+import sys
+
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
@@ -29,11 +32,9 @@ from PyQt5.QtWidgets import QAction
 from .resources import *
 # Import the code for the dialog
 from .Meff_dialog import MeffDialog
-import qgsTreatments
-import os.path
-import sys
+from .shared import utils
+from .shared import qgsTreatments
 
-import utils
 from qgis.utils import qgis_excepthook
 
 

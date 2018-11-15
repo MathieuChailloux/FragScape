@@ -24,10 +24,10 @@
 
 import os
 
-import utils
-#import helps
 from PyQt5.QtCore import QUrl, QFile, QIODevice, QTextStream
 from PyQt5.QtGui import QTextDocument
+
+from .shared import utils
 
 class TabItem:
 
@@ -49,6 +49,7 @@ class TabItem:
 paramsTabItem = TabItem(0,"Paramètres","paramsHelp")
 landuseTabItem = TabItem(1,"Occupation du sol","landuseHelp")
 fragmTabItem = TabItem(2,"Fragm","fragmHelp")
+resTabItem = TabItem(2,"Résultats","resHelp")
 logTabItem = TabItem(3,"Journal","logHelp")
         
 class TabConnector:
@@ -57,6 +58,7 @@ class TabConnector:
         self.tabs = [paramsTabItem,
                      landuseTabItem,
                      fragmTabItem,
+                     resTabItem,
                      logTabItem]
         self.dlg = dlg
         self.curr_tab = 0
