@@ -87,29 +87,6 @@
            </sizepolicy>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <item row="0" column="1">
-            <widget class="QToolButton" name="saveProjectAs">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>Enregistrer le projet BioDispersal sous</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</iconset>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="0">
             <widget class="QToolButton" name="openProject">
              <property name="sizePolicy">
@@ -139,38 +116,28 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="5">
-            <widget class="QToolButton" name="langEn">
+           <item row="0" column="1">
+            <widget class="QToolButton" name="saveProjectAs">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
-              <string>English</string>
+              <string>Enregistrer le projet BioDispersal sous</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
               <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/enFlag.svg</normaloff>:/plugins/eco_cont/icons/enFlag.svg</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
+               <normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
              </property>
             </widget>
-           </item>
-           <item row="0" column="4">
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>790</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="0" column="2">
             <widget class="QToolButton" name="saveProject">
@@ -212,6 +179,19 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="4">
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>790</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="6">
             <widget class="QToolButton" name="langFr">
              <property name="text">
@@ -229,8 +209,28 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="5">
+            <widget class="QToolButton" name="langEn">
+             <property name="toolTip">
+              <string>English</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../BioDispersal/resources.qrc">
+               <normaloff>:/plugins/eco_cont/icons/enFlag.svg</normaloff>:/plugins/eco_cont/icons/enFlag.svg</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0" colspan="7">
-            <widget class="QTabWidget" name="tabWidget">
+            <widget class="QTabWidget" name="mTabWidget">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>2</horstretch>

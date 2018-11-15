@@ -29,7 +29,12 @@ from PyQt5.QtWidgets import QAction
 from .resources import *
 # Import the code for the dialog
 from .Meff_dialog import MeffDialog
+import qgsTreatments
 import os.path
+import sys
+
+import utils
+from qgis.utils import qgis_excepthook
 
 
 class Meff:
@@ -170,6 +175,10 @@ class Meff:
             text=self.tr(u'Mesh Effective Size'),
             callback=self.run,
             parent=self.iface.mainWindow())
+            
+        self.dlg.initTabs()
+        self.dlg.initGui()
+        self.dlg.connectComponents()
 
 
     def unload(self):
@@ -179,14 +188,25 @@ class Meff:
                 self.tr(u'&Mesh Effective Size'),
                 action)
             self.iface.removeToolBarIcon(action)
+        # Exceptions hook 
+        utils.print_func = print
+        sys.excepthook = qgis_excepthook
+        if self.dlg:
+            self.dlg.initializeGlobals()
         # remove the toolbar
         del self.toolbar
 
 
     def run(self):
         """Run method that performs all the real work"""
+        self.dlg = MeffDialog()
+        self.dlg.initTabs()
+        self.dlg.initLog()
+        self.dlg.initGui()
+        self.dlg.connectComponents()
         # show the dialog
         self.dlg.show()
+        qgsTreatments.initGdalCommands()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
