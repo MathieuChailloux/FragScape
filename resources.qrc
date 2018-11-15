@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/plugins/Meff" >
         <file>icon.png</file>
+        <file>icons/vector_grid.svg</file>
     </qresource>
 </RCC>
