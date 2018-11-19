@@ -37,6 +37,7 @@ from .shared import utils
 from .shared import progress
 from .shared import config_parsing
 from . import params
+from . import landuse
 from .shared import log
 from . import tabs
 
@@ -61,12 +62,14 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     def initTabs(self):
         paramsConnector = params.ParamsConnector(self)
         params.params = paramsConnector.model
+        self.landuseConnector = landuse.LanduseConnector(self)
         logConnector = log.LogConnector(self)
         progressConnector = progress.ProgressConnector(self)
         progress.progressConnector = progressConnector
         tabConnector = tabs.TabConnector(self)
         self.connectors = {"Params" : paramsConnector,
                            "Log" : logConnector,
+                           "Landuse" : self.landuseConnector,
                            "Progress" : progressConnector,
                            "Tabs" : tabConnector}
         self.recomputeModels()
@@ -154,7 +157,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     
     # Recompute self.models in case they have been reloaded
     def recomputeModels(self):
-        self.models = {"ParamsModel" : params.params}
+        self.models = {"ParamsModel" : params.params,
+                        "LanduseModel" : self.landuseConnector.model}
         
         # Return XML string describing project
     def toXML(self):
