@@ -72,7 +72,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
                            "Landuse" : self.landuseConnector,
                            "Progress" : progressConnector,
                            "Tabs" : tabConnector}
-        self.recomputeModels()
+        self.recomputeParsers()
         
     def initGui(self):
         for k, tab in self.connectors.items():
@@ -155,23 +155,22 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         about_dlg.show()
         
     
-    # Recompute self.models in case they have been reloaded
-    def recomputeModels(self):
-        self.models = {"ParamsModel" : params.params,
-                        "LanduseModel" : self.landuseConnector.model}
+    # Recompute self.parsers in case they have been reloaded
+    def recomputeParsers(self):
+        self.parsers = [params.params,self.landuseConnector]
         
         # Return XML string describing project
     def toXML(self):
-        xmlStr = "<ModelConfig>\n"
-        for k, m in self.models.items():
-            xmlStr += m.toXML() + "\n"
-        xmlStr += "</ModelConfig>\n"
+        xmlStr = "<MeffConfig>\n"
+        for parser in self.parsers:
+            xmlStr += parser.toXML() + "\n"
+        xmlStr += "</MeffConfig>\n"
         utils.debug("Final xml : \n" + xmlStr)
         return xmlStr
 
     # Save project to 'fname'
     def saveModelAs(self,fname):
-        self.recomputeModels()
+        self.recomputeParsers()
         xmlStr = self.toXML()
         params.params.projectFile = fname
         utils.writeFile(fname,xmlStr)
@@ -192,7 +191,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     def loadModel(self,fname):
         utils.debug("loadModel " + str(fname))
         utils.checkFileExists(fname)
-        config_parsing.setConfigModels(self.models)
+        config_parsing.setConfigParsers(self.parsers)
         params.params.projectFile = fname
         config_parsing.parseConfig(fname)
         utils.info("Meff model loaded from file '" + fname + "'")

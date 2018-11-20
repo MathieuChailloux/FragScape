@@ -370,13 +370,18 @@ class DictModel(AbstractGroupModel):
             self.fields.remove(fieldname)
         self.layoutChanged.emit()
         
-    def toXML(self,indent=" "):
-        utils.debug("toXML " + self.__class__.__name__)
-        xmlStr = indent + "<" + self.__class__.__name__ + ">\n"
+    def toXML(self,indent=" ",modelParams=None):
+        utils.debug("toXML " + self.parser_name)
+        xmlStr = indent + "<" + self.parser_name
+        if modelParams:
+            for k,v in modelParams.items():
+                xmlStr += " " + str(k).replace('"','&quot;')
+                xmlStr += "=\"" + str(v).replace('"','&quot;') + "\""
+        xmlStr += ">\n"
         for i in self.items:
             xmlStr += i.toXML(indent=indent + " ") + "\n"
-        xmlStr += indent + "</" + self.__class__.__name__ + ">"
-        return xmlStr    
+        xmlStr += indent + "</" + self.parser_name + ">"
+        return xmlStr
     
 # AbstractConnector connects a view and a model
 class AbstractConnector:
@@ -479,4 +484,3 @@ class AbstractConnector:
                 self.view.selectRow(row + 1)
         else:
             utils.warn("Several rows selected, please select only one")
-        

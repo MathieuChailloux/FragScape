@@ -73,11 +73,27 @@ def getVectorFilters():
     
 def getRasterFilters():
     return QgsProviderRegistry.instance().fileRasterFilters()
-        
+       
+def getLayerByName(fname):
+    map_layers = QgsProject.instance().mapLayersByName(fname)
+    utils.debug("map_layers : " + str(map_layers))
+    for layer in map_layers:
+        utils.debug("layer : " + str(layer))
+        layer_path = pathOfLayer(layer)
+        if layer_path == fname:
+            return layer
+    else:
+        return None
+       
+def isLayerLoaded(fname):
+    return (getLayerByName(fname) != None)
+       
 # Opens vector layer from path.
 # If loadProject is True, layer is added to QGIS project
 def loadVectorLayer(fname,loadProject=False):
     utils.checkFileExists(fname)
+    if isLayerLoaded(fname):
+        return getLayerByName(fname)
     layer = QgsVectorLayer(fname, layerNameOfPath(fname), "ogr")
     extension = os.path.splitext(fname)[1]
     if layer == None:
@@ -96,6 +112,8 @@ def loadVectorLayer(fname,loadProject=False):
 # If loadProject is True, layer is added to QGIS project
 def loadRasterLayer(fname,loadProject=False):
     utils.checkFileExists(fname)
+    if isLayerLoaded(fname):
+        return getLayerByName(fname)
     rlayer = QgsRasterLayer(fname, layerNameOfPath(fname))
     if not rlayer.isValid():
         utils.user_error("Invalid raster layer '" + fname + "'")

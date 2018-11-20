@@ -25,13 +25,8 @@
 from qgis.core import QgsMapLayerProxyModel
 from PyQt5 import QtGui, QtCore, QtWidgets
 from .shared import utils, abstract_model, qgsUtils
+from . import params
 
-class LanduseItem(abstract_model.DictItem):
-
-    def __init__(self,val,isNatural=False):
-        dict = {"value" : val, "isNatural" : isNatural}
-        super().__init__(dict)
-        
 # Code snippet from https://stackoverflow.com/questions/17748546/pyqt-column-of-checkboxes-in-a-qtableview
 class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
     """
@@ -129,22 +124,49 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         return QtCore.QRect(check_box_point, check_box_rect.size())
 
 
+class LanduseFieldItem(abstract_model.DictItem):
+
+    def __init__(self,val,isNatural=False):
+        dict = {"value" : val, "isNatural" : isNatural}
+        super().__init__(dict)
+        
+        
 class LanduseModel(abstract_model.DictModel):
 
     def __init__(self):
+        self.parser_name = "Landuse"
         self.landuseLayer = None
         self.landuseField = None
         fields = ["value","isNatural"]
         super().__init__(self,fields)
-        
+                
+    def mkItemFromDict(self,dict):
+        utils.debug("dict : " + str(dict))
+        v = dict["value"]
+        i = dict["isNatural"]
+        return LanduseFieldItem(v,i)
         
     def applyItems(self):
         pass
+        
+    def toXML(self,indent=" "):
+        if not self.landuseLayer:
+            utils.warn("No layer selected")
+            return ""
+        if not self.landuseField:
+            utils.warn("No field selected")
+            return ""
+        layerRelPath = params.normalizePath(qgsUtils.pathOfLayer(self.landuseLayer))
+        modelParams = { "layer" : layerRelPath, "field" : self.landuseField }
+        xmlStr = super().toXML(indent,modelParams)
+        return xmlStr
+
         
 class LanduseConnector(abstract_model.AbstractConnector):
 
     def __init__(self,dlg):
         self.dlg = dlg
+        self.parser_name = "Landuse"
         self.dlg.landuseView.setItemDelegateForColumn(1,CheckBoxDelegate(self.dlg.landuseView))
         landuse_model = LanduseModel()
         super().__init__(landuse_model,self.dlg.landuseView)
@@ -162,6 +184,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
     def setLayer(self,layer):
         utils.debug("setLayer")
         self.dlg.landuseFieldCombo.setLayer(layer)
+        self.model.landuseLayer = layer
     
     def loadLayer(self,path):
         utils.debug("loadLayer")
@@ -178,8 +201,28 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.model.items = []
         for fieldVal in fieldVals:
             utils.debug("fieldVal : " + str(fieldVal))
-            item = LanduseItem(fieldVal,False)
+            item = LanduseFieldItem(fieldVal,False)
+            self.model.addItem(item)
+        self.model.landuseField = fieldname
+        self.model.layoutChanged.emit()
+        
+
+    def fromXMLAttribs(self,attribs):
+        attrib_fields = ["layer", "field"]
+        utils.checkFields(attrib_fields,attribs.keys())
+        abs_layer = params.getOrigPath(attribs["layer"])
+        self.loadLayer(abs_layer)
+        self.dlg.landuseFieldCombo.setField(attribs["field"])
+        
+    def fromXMLRoot(self,root):
+        self.fromXMLAttribs(root.attrib)
+        self.model.items = []
+        for parsed_item in root:
+            dict = parsed_item.attrib
+            item = self.model.mkItemFromDict(dict)
             self.model.addItem(item)
         self.model.layoutChanged.emit()
         
+    def toXML(self):
+        return self.model.toXML()
     

@@ -27,50 +27,72 @@ import utils
 
 import xml.etree.ElementTree as ET
 
-config_models = None
+# config_models = None
+config_parsers = None
 
-def setConfigModels(model_dict):
-    global config_models
-    config_models = model_dict
+# def setConfigModels(model_dict):
+    # global config_models
+    # config_models = model_dict
+def setConfigParsers(parsers):
+    global config_parsers
+    config_parsers = parsers
 
+def getParserByName(name):
+    for parser in config_parsers:
+        if parser.parser_name == name:
+            return parser
+    utils.internal_error("No parser named " + str(name))
+
+# def parseConfig(config_file):
+    # utils.info("Parsing configuration from file '" + str(config_file) + "'")
+    # tree = ET.parse(config_file)
+    # root = tree.getroot()
+    # for model in root:
+        # parseModel(model)
+    # utils.info("Configuration parsing successful")
 def parseConfig(config_file):
     utils.info("Parsing configuration from file '" + str(config_file) + "'")
     tree = ET.parse(config_file)
     root = tree.getroot()
-    for model in root:
-        parseModel(model)
+    for parser in root:
+        parseModel(parser)
     utils.info("Configuration parsing successful")
 
 # Parse model from XML root.
 # Updates models stored in 'config_models'.
-# If 'new_model' is True, groups models are instanciated (called in fusion context)
-def parseModel(model_root,new_model=False):
-    global config_models, mk_item
-    model_tag = model_root.tag
-    utils.debug("parseModel " + str(model_tag))
-    utils.debug("config_models " + str(config_models))
-    if model_tag not in config_models:
-        utils.user_error("Unknown Model '" + model_tag + "'")
-    model = config_models[model_tag]
-    try:
-        utils.debug("cas 1")
-        utils.debug("config_models " + str(config_models))
-        if model_tag == "FusionModel":
-            model.testFunc(model_root)
-            model.fromXMLRoot(model_root)
-            utils.debug("config_models " + str(config_models))
-        else:
-            model.fromXMLRoot(model_root)
-            utils.debug("config_models " + str(config_models))
-        return model
-    except AttributeError:
-        utils.debug("cas 2")
-        for item in model_root:
-            utils.debug("iter")
-            dict = item.attrib
-            fields = dict.keys()
-            item = model.mkItemFromDict(dict)
-            model.addItem(item)
-        model.layoutChanged.emit()
-        return model
+# def parseModel(model_root):
+    # global config_models, mk_item
+    # model_tag = model_root.tag
+    # utils.debug("parseModel " + str(model_tag))
+    # utils.debug("config_models " + str(config_models))
+    # if model_tag not in config_models:
+        # utils.user_error("Unknown Model '" + model_tag + "'")
+    # model = config_models[model_tag]
+    # try:
+        # utils.debug("cas 1")
+        # utils.debug("config_models " + str(config_models))
+        # model.fromXMLRoot(model_root)
+        # return model
+    # except AttributeError:
+        # utils.debug("cas 2")
+        # model.fromXMLAttribs(root.attrib)
+        # for item in model_root:
+            # utils.debug("iter")
+            # dict = item.attrib
+            # fields = dict.keys()
+            # item = model.mkItemFromDict(dict)
+            # model.addItem(item)
+        # model.layoutChanged.emit()
+        # return model
+# Parse model from XML root.
+# Updates parsers stored in 'config_parsers'.
+def parseModel(parser_root):
+    global config_parsers, mk_item
+    parser_tag = parser_root.tag
+    utils.debug("parse " + str(parser_tag))
+    utils.debug("config_parsers " + str(config_parsers))
+    parser = getParserByName(parser_tag)
+    utils.debug("cas 1")
+    utils.debug("config_parsers " + str(config_parsers))
+    parser.fromXMLRoot(parser_root)
         

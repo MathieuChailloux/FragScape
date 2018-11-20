@@ -204,7 +204,7 @@ def checkFields(ref_fields,fields):
     if ref_fields != fields:
         for rf in ref_fields:
             if rf not in fields:
-                user_error("Missing field '" + rf + "'")
+                user_error("Missing field '" + rf + "' in " + str(fields))
              
 def checkDictField(item,fieldname,prefix=None):
     if prefix == None:

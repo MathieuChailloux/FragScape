@@ -99,6 +99,7 @@ def getTerritoryLayer():
 class ParamsModel(QAbstractTableModel):
 
     def __init__(self):
+        self.parser_name = "Params"
         self.workspace = None
         self.territoryLayer = None
         self.projectFile = ""
@@ -150,7 +151,7 @@ class ParamsModel(QAbstractTableModel):
         self.layoutChanged.emit()
     
     def toXML(self,indent=""):
-        xmlStr = indent + "<ParamsModel"
+        xmlStr = indent + "<" + self.parser_name
         if self.workspace:
             xmlStr += " workspace=\"" + str(self.workspace) + "\""
         if self.territoryLayer:
