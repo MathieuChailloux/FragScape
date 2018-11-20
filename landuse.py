@@ -22,8 +22,9 @@
  ***************************************************************************/
 """
 
+from qgis.core import QgsMapLayerProxyModel
 from PyQt5 import QtGui, QtCore, QtWidgets
-from .shared import abstract_model
+from .shared import utils, abstract_model, qgsUtils
 
 class LanduseItem(abstract_model.DictItem):
 
@@ -147,9 +148,32 @@ class LanduseConnector(abstract_model.AbstractConnector):
         super().__init__(landuse_model,self.dlg.landuseView)
         
     def initGui(self):
-        pass
+        self.dlg.landuseLayerCombo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.dlg.landuseLayer.setFilter(qgsUtils.getVectorFilters())
         
     def connectComponents(self):
         super().connectComponents()
+        self.dlg.landuseLayerCombo.layerChanged.connect(self.setLayer)
+        self.dlg.landuseLayer.fileChanged.connect(self.loadLayer)
+        self.dlg.landuseFieldCombo.fieldChanged.connect(self.loadField)
+        
+    def setLayer(self,layer):
+        utils.debug("setLayer")
+        self.dlg.landuseFieldCombo.setLayer(layer)
+    
+    def loadLayer(self,path):
+        utils.debug("loadLayer")
+        loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
+        self.setLayer(loaded_layer)
+        self.dlg.landuseLayerCombo.setLayer(loaded_layer)
+        
+    def loadField(self,fieldname):
+        utils.debug("loadField")
+        curr_layer = self.dlg.landuseLayerCombo.currentLayer()
+        if not curr_layer:
+            utils.internal_error("No layer selected in landuse tab")
+        fieldVals = qgsUtils.getLayerFieldUniqueValues(curr_layer,fieldname)
+        for fieldVal in fieldVals:
+            utils.debug("fieldVal : " + str(fieldVal))
         
     

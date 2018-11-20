@@ -55,7 +55,7 @@ def initGdalCommands():
     elif utils.platform_sys == 'Darwin':
         gdal_path = '/Library/Frameworks/GDAL.framework'
         gdal_calc_cmd = 'gdal_calc.py'
-        gdal_rasterize_cmd = 'gdalrasterize'
+        gdal_rasterize_cmd = 'gdal_rasterize'
         gdal_warp_cmd = 'gdalwarp'
         gdal_merge_cmd = 'gdal_merge.py'
         if not os.path.isfile(gdal_calc_cmd):
@@ -68,15 +68,23 @@ def initGdalCommands():
             gdal_warp_cmd = utils.findFileFromDir(gdal_path,'gdalwarp')
     else:
         utils.internal_error("Unexpected system : " + str(utils.platform_sys))
-    if os.path.isfile(gdal_calc_cmd):
-        utils.debug("gdal_calc command set to " + str(gdal_calc_cmd))
-    else:
-        utils.user_error("Could not find gdal_calc command")
-    if os.path.isfile(gdal_merge_cmd):
-        utils.debug("gdal_merge command set to " + str(gdal_merge_cmd))
-    else:
-        utils.user_error("Could not find gdal_merge command")
+    # if os.path.isfile(gdal_calc_cmd):
+        # utils.debug("gdal_calc command set to " + str(gdal_calc_cmd))
+    # else:
+        # utils.user_error("Could not find gdal_calc command")
+    # if os.path.isfile(gdal_merge_cmd):
+        # utils.debug("gdal_merge command set to " + str(gdal_merge_cmd))
+    # else:
+        # utils.user_error("Could not find gdal_merge command")
     if utils.platform_sys in ['Linux','Darwin']:
+        if os.path.isfile(gdal_calc_cmd):
+            utils.debug("gdal_calc command set to " + str(gdal_calc_cmd))
+        else:
+            utils.user_error("Could not find gdal_calc command")
+        if os.path.isfile(gdal_merge_cmd):
+            utils.debug("gdal_merge command set to " + str(gdal_merge_cmd))
+        else:
+            utils.user_error("Could not find gdal_merge command")
         if os.path.isfile(gdal_rasterize_cmd):
             utils.debug("gdal_rasterize command set to " + str(gdal_rasterize_cmd))
         else:

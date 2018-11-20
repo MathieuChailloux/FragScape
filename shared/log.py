@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-import utils
+from . import utils
 
 class LogConnector:
     

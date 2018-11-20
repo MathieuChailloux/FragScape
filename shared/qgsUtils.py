@@ -218,3 +218,13 @@ def transformBoundingBox(in_rect,in_crs,out_crs):
     out_rect = transformator.transformBoundingBox(in_rect)
     return out_rect
     
+    
+def getLayerFieldUniqueValues(layer,fieldname):
+    path = pathOfLayer(layer)
+    fieldnames = layer.fields().names()
+    if fieldname not in fieldnames:
+        utils.internal_error("No field named '" + fieldname + "' in layer " + path)
+    field_values = set()
+    for f in layer.getFeatures():
+        field_values.add(f[fieldname])
+    return field_values
