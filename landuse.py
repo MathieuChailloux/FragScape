@@ -53,28 +53,29 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         Paint a checkbox without the label.
         '''
 
-        checked = index.data().toBool()
-        check_box_style_option = QtGui.QStyleOptionButton()
+        checked = bool(index.data())
+        check_box_style_option = QtWidgets.QStyleOptionButton()
 
-        if (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
-            check_box_style_option.state |= QtGui.QStyle.State_Enabled
+        #if (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
+        if (index.flags() & QtCore.Qt.ItemIsEditable):
+            check_box_style_option.state |= QtWidgets.QStyle.State_Enabled
         else:
-            check_box_style_option.state |= QtGui.QStyle.State_ReadOnly
+            check_box_style_option.state |= QtWidgets.QStyle.State_ReadOnly
 
         if checked:
-            check_box_style_option.state |= QtGui.QStyle.State_On
+            check_box_style_option.state |= QtWidgets.QStyle.State_On
         else:
-            check_box_style_option.state |= QtGui.QStyle.State_Off
+            check_box_style_option.state |= QtWidgets.QStyle.State_Off
 
         check_box_style_option.rect = self.getCheckBoxRect(option)
 
         # this will not run - hasFlag does not exist
         #if not index.model().hasFlag(index, QtCore.Qt.ItemIsEditable):
-            #check_box_style_option.state |= QtGui.QStyle.State_ReadOnly
+            #check_box_style_option.state |= QtWidgets.QStyle.State_ReadOnly
 
-        check_box_style_option.state |= QtGui.QStyle.State_Enabled
+        check_box_style_option.state |= QtWidgets.QStyle.State_Enabled
 
-        QtGui.QApplication.style().drawControl(QtGui.QStyle.CE_CheckBox, check_box_style_option, painter)
+        QtWidgets.QApplication.style().drawControl(QtWidgets.QStyle.CE_CheckBox, check_box_style_option, painter)
 
     def editorEvent(self, event, model, option, index):
         '''
@@ -83,8 +84,9 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         Key_Space or Key_Select and this cell is editable. Otherwise do nothing.
         '''
         utils.debug('Check Box editor Event detected : ')
-        utils.debug(event.type())
-        if not (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
+        utils.debug(str(event.type()))
+        #if not (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
+        if not (index.flags() & QtCore.Qt.ItemIsEditable):
             return False
 
         utils.debug('Check Box editor Event detected : passed first check')
@@ -111,13 +113,13 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         The user wanted to change the old state in the opposite.
         '''
         utils.debug('SetModelData')
-        newValue = not index.data().toBool()
+        newValue = not bool(index.data())
         utils.debug('New Value : {0}'.format(newValue))
         model.setData(index, newValue, QtCore.Qt.EditRole)
 
     def getCheckBoxRect(self, option):
-        check_box_style_option = QtGui.QStyleOptionButton()
-        check_box_rect = QtGui.QApplication.style().subElementRect(QtGui.QStyle.SE_CheckBoxIndicator, check_box_style_option, None)
+        check_box_style_option = QtWidgets.QStyleOptionButton()
+        check_box_rect = QtWidgets.QApplication.style().subElementRect(QtWidgets.QStyle.SE_CheckBoxIndicator, check_box_style_option, None)
         check_box_point = QtCore.QPoint (option.rect.x() +
                             option.rect.width() / 2 -
                             check_box_rect.width() / 2,
@@ -173,7 +175,11 @@ class LanduseConnector(abstract_model.AbstractConnector):
         if not curr_layer:
             utils.internal_error("No layer selected in landuse tab")
         fieldVals = qgsUtils.getLayerFieldUniqueValues(curr_layer,fieldname)
+        self.model.items = []
         for fieldVal in fieldVals:
             utils.debug("fieldVal : " + str(fieldVal))
+            item = LanduseItem(fieldVal,False)
+            self.model.addItem(item)
+        self.model.layoutChanged.emit()
         
     
