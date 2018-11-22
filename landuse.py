@@ -157,7 +157,7 @@ class LanduseModel(abstract_model.DictModel):
     def mkSelectionExpr(self):
         expr = ""
         for item in self.items:
-            if item.dict["isNatural"] == "True":
+            if item.dict["isNatural"]:
                 if expr != "":
                     expr += " + "
                 field_val = item.dict["value"].replace("'","''")
@@ -166,10 +166,13 @@ class LanduseModel(abstract_model.DictModel):
         return expr
         
     def applyItems(self):
+        params.checkWorkspaceInit()
         self.checkLayerSelected()
         self.checkFieldSelected()
         in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
         expr = self.mkSelectionExpr()
+        if not expr:
+            utils.user_error("No expression selected : TODO select everything")
         selectionResLayer = params.mkOutputFile("landuseSelection.shp")
         dissolveLayer = params.mkOutputFile("landuseSelectionDissolve.shp")
         progress.progressFeedback.setProgressText("Landuse entities selection")
