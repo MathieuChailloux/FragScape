@@ -147,12 +147,16 @@ class LanduseModel(abstract_model.DictModel):
         i = dict["isNatural"]
         return LanduseFieldItem(v,i)
         
-    def mkSelectionExpr(self):
-        expr = ""
+    def checkLayerSelected(self):
         if not self.landuseLayer:
             utils.user_error("No layer selected")
+            
+    def checkFieldSelected(self):
         if not self.landuseField:
             utils.user_error("No field selected")
+        
+    def mkSelectionExpr(self):
+        expr = ""
         for item in self.items:
             if item.dict["isNatural"] == "True":
                 if expr != "":
@@ -163,11 +167,15 @@ class LanduseModel(abstract_model.DictModel):
         return expr
         
     def applyItems(self):
+        self.checkLayerSelected()
+        self.checkFieldSelected()
         in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
         expr = self.mkSelectionExpr()
-        out_layer = params.mkOutputFile("landuseSelection.shp")
+        selectionResLayer = params.mkOutputFile("landuseSelection.shp")
+        dissolveLayer = params.mkOutputFile("landuseSelectionDissolve.shp")
         progress.progressFeedback.setProgressText("Landuse entities selection")
-        qgsTreatments.extractByExpression(in_layer,expr,out_layer)
+        qgsTreatments.extractByExpression(in_layer,expr,selectionResLayer)
+        qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:

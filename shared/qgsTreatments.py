@@ -152,6 +152,15 @@ def extractByExpression(in_layer,expr,out_layer):
                    'OUTPUT' : out_layer }
     applyProcessingAlg("qgis","extractbyexpression",parameters)
     
+def dissolveLayer(in_layer,out_layer):
+    utils.checkFileExists(in_layer)
+    qgsUtils.removeVectorLayer(out_layer)
+    parameters = { 'FIELD' : [],
+                   'INPUT' : in_layer,
+                   'OUTPUT' : out_layer }
+    applyProcessingAlg("qgis","dissolve",parameters)
+    
+    
 # Apply rasterization on field 'field' of vector layer 'in_path'.
 # Output raster layer in 'out_path'.
 # Resolution set to 25 if not given.
