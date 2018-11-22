@@ -48,7 +48,8 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         Paint a checkbox without the label.
         '''
 
-        checked = bool(index.data())
+        #checked = bool(index.data())
+        checked = index.data() == "True"
         check_box_style_option = QtWidgets.QStyleOptionButton()
 
         #if (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
