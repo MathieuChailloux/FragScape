@@ -47,9 +47,16 @@ def typeIsNumeric(t):
 
 # Delete raster file and associated xml file
 def removeRaster(path):
+    if isLayerLoaded(path):
+        utils.user_error("Layer " + str(path) + " is already loaded in QGIS, please remove it")
     utils.removeFile(path)
     aux_name = path + ".aux.xml"
     utils.removeFile(aux_name)
+            
+def removeVectorLayer(path):
+    if isLayerLoaded(path):
+        utils.user_error("Layer " + str(path) + " is already loaded in QGIS, please remove it")
+    utils.removeFile(path)
     
 # Returns path from QgsMapLayer
 def pathOfLayer(l):
@@ -74,9 +81,10 @@ def getVectorFilters():
 def getRasterFilters():
     return QgsProviderRegistry.instance().fileRasterFilters()
        
-def getLayerByName(fname):
-    map_layers = QgsProject.instance().mapLayersByName(fname)
-    utils.debug("map_layers : " + str(map_layers))
+def getLayerByFilename(fname):
+    #map_layers = QgsProject.instance().mapLayersByName(fname)
+    map_layers = QgsProject.instance().mapLayers().values()
+    utils.debug("map_layers(" + fname + ") : " + str(map_layers))
     for layer in map_layers:
         utils.debug("layer : " + str(layer))
         layer_path = pathOfLayer(layer)
@@ -86,14 +94,14 @@ def getLayerByName(fname):
         return None
        
 def isLayerLoaded(fname):
-    return (getLayerByName(fname) != None)
+    return (getLayerByFilename(fname) != None)    
        
 # Opens vector layer from path.
 # If loadProject is True, layer is added to QGIS project
 def loadVectorLayer(fname,loadProject=False):
     utils.checkFileExists(fname)
     if isLayerLoaded(fname):
-        return getLayerByName(fname)
+        return getLayerByFilename(fname)
     layer = QgsVectorLayer(fname, layerNameOfPath(fname), "ogr")
     extension = os.path.splitext(fname)[1]
     if layer == None:
@@ -134,7 +142,7 @@ def loadLayer(fname,loadProject=False):
     
 # Retrieve layer loaded in QGIS project from name
 def getLoadedLayerByName(name):
-    layers = QgsProject.instance().mapLayersByName('my layer name')
+    layers = QgsProject.instance().mapLayersByName('name')
     nb_layers = len(layers)
     if nb_layers == 0:
         utils.warn("No layer named '" + name + "' found")

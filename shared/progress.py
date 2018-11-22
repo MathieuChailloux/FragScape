@@ -22,13 +22,17 @@
  ***************************************************************************/
 """
 
-import utils
-import qgsUtils
 import time
+
+from qgis.core import QgsProcessingFeedback
+
+from . import utils
+from . import qgsUtils
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
 progressConnector = None
+progressFeedback = None
 
 @pyqtSlot(int)
 def catchProgress(n):
@@ -92,3 +96,48 @@ class ProgressSection(utils.Section):
         super().end_section()
         progressConnector.progressEnd.emit()
         
+class ProgressFeedback(QgsProcessingFeedback):
+    
+    def __init__(self,dlg):
+        self.dlg = dlg
+        self.progressBar = dlg.progressBar
+        super().__init__()
+        
+    def pushCommandInfo(self,msg):
+        utils.info(msg)
+        
+    def pushConsoleInfo(self,msg):
+        utils.info(msg)
+        
+    def pushDebugInfo(self,msg):
+        utils.debug(msg)
+        
+    def pushInfo(self,msg):
+        utils.info(msg)
+        
+    def reportError(error,fatalError):
+        utils.internal_error("reportError : " + str(error))
+        
+    def setProgressText(self,text):
+        utils.info("setProgressTest")
+        self.dlg.lblProgress.setText(text)
+        
+    def setProgress(self,value):
+        utils.debug("setProgress " + str(value))
+        self.progressBar.setValue(value)
+        
+    def setPercentage(self,percentage):
+        utils.info("setperc")
+        #utils.internal_error("percentage : " + str(percentage))
+        
+    def focusLogTab(self):
+        self.dlg.mTabWidget.setCurrentWidget(self.dlg.logTab)
+        self.dlg.txtLog.verticalScrollBar().setValue(self.dlg.txtLog.verticalScrollBar().maximum())
+        
+    def endJob(self):
+        self.setProgress(100)
+        self.focusLogTab()
+        
+    def connectComponents(self):
+        self.progressChanged.connect(self.setProgress)
+    

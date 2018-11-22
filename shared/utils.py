@@ -118,6 +118,12 @@ def joinPath(p1,p2):
     res = pp1.joinpath(p2)
     return res.as_posix()
     
+def createSubdir(par_dir,name):
+    path = joinPath(par_dir,name)
+    if not os.path.isdir(path):
+        info("Creating directory '" + path + "'")
+        os.makedirs(path)
+        
 
 def checkFileExists(fname,prefix=""):
     path = pathlib.Path(fname)

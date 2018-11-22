@@ -33,13 +33,13 @@ from PyQt5.QtCore import QTranslator, qVersion, QCoreApplication
 
 from qgis.gui import QgsFileWidget
 
-from .shared import utils
-from .shared import progress
-from .shared import config_parsing
-from . import params
-from . import landuse
-from .shared import log
-from . import tabs
+from .shared import utils, progress, config_parsing, log, qgsTreatments
+#from .shared import progress
+#from .shared import config_parsing
+from . import params, landuse, tabs
+#from . import landuse
+#from .shared import log
+#from . import tabs
 
 #from MeffAbout_dialog import MeffAboutDialog
 
@@ -90,11 +90,12 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
             traceback.print_tb(tracebackobj, None, tbinfofile)
             tbinfofile.seek(0)
             tbinfo = tbinfofile.read()
-            errmsg = str(excType) + " : " + str(excValue)
+            errmsg = str(excType.__name__) + " : " + str(excValue)
             separator = '-' * 80
-            sections = [separator, errmsg, separator]
-            utils.debug(str(sections))
-            msg = '\n'.join(sections)
+            #sections = [separator, errmsg, separator]
+            #utils.debug(str(sections))
+            msg = separator + "\n" + errmsg + "\n" + separator
+            #msg = '\n'.join(sections)
             utils.debug(str(msg))
             final_msg = tbinfo + "\n" + msg
             utils.error_msg(final_msg,prefix="Unexpected error")
@@ -113,6 +114,10 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         self.langEn.clicked.connect(self.switchLangEn)
         self.langFr.clicked.connect(self.switchLangFr)
         self.aboutButton.clicked.connect(self.openHelpDialog)
+        progressFeedback = progress.ProgressFeedback(self)
+        progressFeedback.connectComponents()
+        progress.progressFeedback = progressFeedback
+        #qgsTreatments.setProgressFeedback(progressFeedback)
         sys.excepthook = self.bioDispHook
         
     # Initialize or re-initialize global variables.

@@ -30,8 +30,7 @@ import sys
 import subprocess
 import processing
 
-from . import utils
-from . import qgsUtils
+from . import utils, qgsUtils, progress
 
 nodata_val = '-9999'
 
@@ -39,6 +38,9 @@ gdal_calc_cmd = None
 gdal_merge_cmd = None
 gdal_rasterize_cmd = None
 gdal_warp_cmd = None
+
+progressBar = None
+#progressFeedback = None
 
 def initGdalCommands():
     global gdal_calc_cmd, gdal_merge_cmd, gdal_rasterize_cmd, gdal_warp_cmd
@@ -94,16 +96,29 @@ def initGdalCommands():
         else:
             utils.user_error("Could not find gdalwarp command")
         
-
+def setProgressBar(progress_bar):
+    global progressBar
+    progressBar = progress_bar     
+    
+# def setProgressFeedback(progress_feedback):
+    # global progressFeedback
+    # progressFeedback = progress_feedback      
+        
 def applyProcessingAlg(provider,alg_name,parameters):
-    feedback = QgsProcessingFeedback()
+    # global progressFeedback
+    # if progressFeedback:
+        # utils.debug("feedback : " + progressFeedback.__class__.__name__)
+    #feedback = QgsProcessingFeedback()
+    #feedback.setProgress(progressBar)
     utils.debug("parameters : " + str(parameters))
     try:
         complete_name = provider + ":" + alg_name
-        utils.debug("Calling processing algorithm '" + complete_name)
-        res = processing.run(complete_name,parameters,feedback=feedback)
-        utils.debug(str(res["output"]))
+        utils.debug("Calling processing algorithm '" + complete_name + "'")
+        res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
         utils.debug ("call to " + alg_name + " successful")
+        progress.progressFeedback.endJob()
+        if "output" in res:
+            utils.debug("output = " + str(res["output"]))
     except Exception as e:
         utils.warn ("Failed to call " + alg_name + " : " + str(e))
         raise e
@@ -129,8 +144,13 @@ def applyGrassAlg(parameters,alg_name):
         # utils.debug("End run " + alg_name)
         
 
-def applySelection(in_layer,expr,out_layer):
-    pass
+def extractByExpression(in_layer,expr,out_layer):
+    utils.checkFileExists(in_layer)
+    qgsUtils.removeVectorLayer(out_layer)
+    parameters = { 'EXPRESSION' : expr,
+                   'INPUT' : in_layer,
+                   'OUTPUT' : out_layer }
+    applyProcessingAlg("qgis","extractbyexpression",parameters)
     
 # Apply rasterization on field 'field' of vector layer 'in_path'.
 # Output raster layer in 'out_path'.

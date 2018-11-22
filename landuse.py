@@ -24,7 +24,7 @@
 
 from qgis.core import QgsMapLayerProxyModel
 from PyQt5 import QtGui, QtCore, QtWidgets
-from .shared import utils, abstract_model, qgsUtils
+from .shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
 from . import params
 
 # Code snippet from https://stackoverflow.com/questions/17748546/pyqt-column-of-checkboxes-in-a-qtableview
@@ -140,15 +140,34 @@ class LanduseModel(abstract_model.DictModel):
         self.landuseField = None
         fields = ["value","isNatural"]
         super().__init__(self,fields)
-                
+                        
     def mkItemFromDict(self,dict):
         utils.debug("dict : " + str(dict))
         v = dict["value"]
         i = dict["isNatural"]
         return LanduseFieldItem(v,i)
         
+    def mkSelectionExpr(self):
+        expr = ""
+        if not self.landuseLayer:
+            utils.user_error("No layer selected")
+        if not self.landuseField:
+            utils.user_error("No field selected")
+        for item in self.items:
+            if item.dict["isNatural"] == "True":
+                if expr != "":
+                    expr += " + "
+                field_val = item.dict["value"].replace("'","''")
+                expr += "(\"" + self.landuseField + "\" = '" + field_val + "')"
+        utils.debug("selectionExpr = " + expr)
+        return expr
+        
     def applyItems(self):
-        pass
+        in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
+        expr = self.mkSelectionExpr()
+        out_layer = params.mkOutputFile("landuseSelection.shp")
+        progress.progressFeedback.setProgressText("Landuse entities selection")
+        qgsTreatments.extractByExpression(in_layer,expr,out_layer)
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
@@ -181,9 +200,10 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.landuseLayer.fileChanged.connect(self.loadLayer)
         self.dlg.landuseFieldCombo.fieldChanged.connect(self.loadField)
+        self.dlg.landuseRun.clicked.connect(self.model.applyItems)
         
     def setLayer(self,layer):
-        utils.debug("setLayer")
+        utils.debug("setLayer " + str(layer.type))
         self.dlg.landuseFieldCombo.setLayer(layer)
         self.model.landuseLayer = layer
     

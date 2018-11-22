@@ -94,6 +94,10 @@ def getPathFromLayerCombo(combo):
 def getTerritoryLayer():
     return getOrigPath(params.territoryLayer)
 
+def mkOutputFile(name):
+    checkWorkspaceInit()
+    new_path = utils.joinPath(params.workspace,name)
+    return new_path
         
 #class ParamsModel(abstract_model.AbstractGroupModel):
 class ParamsModel(QAbstractTableModel):
@@ -136,6 +140,7 @@ class ParamsModel(QAbstractTableModel):
         utils.info("Workspace directory set to '" + norm_path)
         if not os.path.isdir(norm_path):
             utils.user_error("Directory '" + norm_path + "' does not exist")
+        utils.createSubdir(norm_path,"outputs")
     
     def fromXMLRoot(self,root):
         dict = root.attrib
