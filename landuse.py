@@ -48,8 +48,7 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         Paint a checkbox without the label.
         '''
 
-        #checked = bool(index.data())
-        checked = index.data() == "True"
+        checked = bool(index.data())
         check_box_style_option = QtWidgets.QStyleOptionButton()
 
         #if (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
@@ -144,7 +143,7 @@ class LanduseModel(abstract_model.DictModel):
     def mkItemFromDict(self,dict):
         utils.debug("dict : " + str(dict))
         v = dict["value"]
-        i = dict["isNatural"]
+        i = (dict["isNatural"] == "True")
         return LanduseFieldItem(v,i)
         
     def checkLayerSelected(self):
