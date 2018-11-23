@@ -119,11 +119,13 @@ def applyProcessingAlg(provider,alg_name,parameters):
         progress.progressFeedback.endJob()
         if "output" in res:
             utils.debug("output = " + str(res["output"]))
+            return res["output"]
     except Exception as e:
         utils.warn ("Failed to call " + alg_name + " : " + str(e))
         raise e
     finally:  
         utils.debug("End run " + alg_name)
+        return None
 
 def applyGrassAlg(parameters,alg_name):
     applyProcessingAlg("grass7",alg_name,parameters)
@@ -145,21 +147,39 @@ def applyGrassAlg(parameters,alg_name):
         
 
 def extractByExpression(in_layer,expr,out_layer):
-    utils.checkFileExists(in_layer)
+    #utils.checkFileExists(in_layer)
     qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'EXPRESSION' : expr,
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    applyProcessingAlg("qgis","extractbyexpression",parameters)
+    res = applyProcessingAlg("qgis","extractbyexpression",parameters)
+    return res
     
 def dissolveLayer(in_layer,out_layer):
-    utils.checkFileExists(in_layer)
+    #utils.checkFileExists(in_layer)
     qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'FIELD' : [],
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    applyProcessingAlg("qgis","dissolve",parameters)
+    res = applyProcessingAlg("qgis","dissolve",parameters)
+    return res
     
+def applyBufferFromExpr(in_layer,expr,out_layer):
+    #utils.checkFileExists(in_layer)
+    qgsUtils.removeVectorLayer(out_layer)
+    parameters = { 'DISSOLVE' : False,
+                   'DISTANCE' : QgsProperty.fromExpression(expr),
+                   'INPUT' : in_layer,
+                   'OUTPUT' : out_layer,
+                   'END_CAP_STYLE' : 0,
+                   'JOIN_STYLE' : 0,
+                   'MITER_LIMIT' : 2,
+                   'SEGMENTS' : 5 }
+    res = applyProcessingAlg("qgis","buffer",parameters)
+    return res
+    
+def applyDifference(in_layer,diff_layer,out_layer):
+    pass
     
 # Apply rasterization on field 'field' of vector layer 'in_path'.
 # Output raster layer in 'out_path'.

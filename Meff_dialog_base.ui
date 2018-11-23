@@ -813,7 +813,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1" colspan="2">
-                   <widget class="QgsFileWidget" name="selectionInLayer">
+                   <widget class="QgsFileWidget" name="fragmInLayer">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -826,10 +826,16 @@
                       <height>13</height>
                      </size>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16</height>
+                     </size>
+                    </property>
                    </widget>
                   </item>
                   <item row="1" column="1" colspan="2">
-                   <widget class="QgsMapLayerComboBox" name="selectionInLayerCombo">
+                   <widget class="QgsMapLayerComboBox" name="fragmInLayerCombo">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -840,6 +846,12 @@
                      <size>
                       <width>60</width>
                       <height>13</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16</height>
                      </size>
                     </property>
                    </widget>
@@ -888,7 +900,7 @@
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="QLabel" name="selectionExprLabel_2">
+                   <widget class="QLabel" name="fragmExprLabel">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -907,7 +919,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="selectionExpr">
+                   <widget class="QgsFieldExpressionWidget" name="fragmExpr">
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
@@ -923,7 +935,7 @@
                    </widget>
                   </item>
                   <item row="2" column="0">
-                   <widget class="QLabel" name="selectionExprLabel_3">
+                   <widget class="QLabel" name="fragmBufferLabel">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -942,7 +954,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="selectionBuffer">
+                   <widget class="QgsFieldExpressionWidget" name="fragmBuffer">
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
@@ -958,7 +970,30 @@
                    </widget>
                   </item>
                   <item row="3" column="0">
-                   <widget class="QLabel" name="selectionExprLabel_4">
+                   <widget class="QLabel" name="label_6">
+                    <property name="text">
+                     <string>Identifiant</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLineEdit" name="fragmName">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>13</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="fragmIsFragm">
                     <property name="enabled">
                      <bool>true</bool>
                     </property>
@@ -979,8 +1014,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
-                   <widget class="QCheckBox" name="selectFragmBox">
+                  <item row="4" column="1">
+                   <widget class="QCheckBox" name="fragmCheckbox">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -1065,7 +1100,7 @@
                       <number>9</number>
                      </property>
                      <item>
-                      <widget class="QPushButton" name="selectionRun_3">
+                      <widget class="QPushButton" name="fragmAdd">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -1088,7 +1123,7 @@
                    </widget>
                   </item>
                   <item row="1" column="0" colspan="2">
-                   <widget class="QTableView" name="selectionView">
+                   <widget class="QTableView" name="fragmView">
                     <property name="minimumSize">
                      <size>
                       <width>300</width>
@@ -1107,7 +1142,7 @@
                    </widget>
                   </item>
                   <item row="2" column="0">
-                   <widget class="QToolButton" name="selectionRemove_2">
+                   <widget class="QToolButton" name="fragmRemove">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1143,7 +1178,7 @@
                     <property name="frameShadow">
                      <enum>QFrame::Raised</enum>
                     </property>
-                    <widget class="QCheckBox" name="selectionRunSelectionMode_2">
+                    <widget class="QCheckBox" name="fragmRunSelectionMode">
                      <property name="geometry">
                       <rect>
                        <x>280</x>
@@ -1207,7 +1242,7 @@
                       <number>0</number>
                      </property>
                      <item>
-                      <widget class="QPushButton" name="selectionRun_2">
+                      <widget class="QPushButton" name="fragmRun">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                          <horstretch>0</horstretch>

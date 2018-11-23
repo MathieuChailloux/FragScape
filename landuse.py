@@ -27,6 +27,8 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from .shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
 from . import params
 
+landuseModel = None
+
 # Code snippet from https://stackoverflow.com/questions/17748546/pyqt-column-of-checkboxes-in-a-qtableview
 class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
     """
@@ -153,6 +155,12 @@ class LanduseModel(abstract_model.DictModel):
     def checkFieldSelected(self):
         if not self.landuseField:
             utils.user_error("No field selected")
+            
+    def getSelectionLayer(self):
+        return params.mkOutputFile("landuseSelection.shp")
+            
+    def getDissolveLayer(self):
+        return params.mkOutputFile("landuseSelectionDissolve.shp")
         
     def mkSelectionExpr(self):
         expr = ""
@@ -173,10 +181,11 @@ class LanduseModel(abstract_model.DictModel):
         expr = self.mkSelectionExpr()
         if not expr:
             utils.user_error("No expression selected : TODO select everything")
-        selectionResLayer = params.mkOutputFile("landuseSelection.shp")
-        dissolveLayer = params.mkOutputFile("landuseSelectionDissolve.shp")
+        selectionResLayer = self.getSelectionLayer()
+        dissolveLayer = self.getDissolveLayer()
         progress.progressFeedback.setProgressText("Landuse entities selection")
         qgsTreatments.extractByExpression(in_layer,expr,selectionResLayer)
+        progress.progressFeedback.setProgressText("Landuse selection dissolve")
         qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
         
     def toXML(self,indent=" "):
