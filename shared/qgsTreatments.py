@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsProcessingFeedback, QgsProject
+from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty
 import gdal
 
 import os.path
@@ -117,15 +117,17 @@ def applyProcessingAlg(provider,alg_name,parameters):
         res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
         utils.debug ("call to " + alg_name + " successful")
         progress.progressFeedback.endJob()
-        if "output" in res:
-            utils.debug("output = " + str(res["output"]))
-            return res["output"]
+        utils.debug("res = " + str(res))
+        if "OUTPUT" in res:
+            utils.debug("output = " + str(res["OUTPUT"]))
+            return res["OUTPUT"]
+        else:
+            return None
     except Exception as e:
         utils.warn ("Failed to call " + alg_name + " : " + str(e))
         raise e
     finally:  
         utils.debug("End run " + alg_name)
-        return None
 
 def applyGrassAlg(parameters,alg_name):
     applyProcessingAlg("grass7",alg_name,parameters)
@@ -148,16 +150,33 @@ def applyGrassAlg(parameters,alg_name):
 
 def extractByExpression(in_layer,expr,out_layer):
     #utils.checkFileExists(in_layer)
-    qgsUtils.removeVectorLayer(out_layer)
+    if out_layer:
+        qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'EXPRESSION' : expr,
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
     res = applyProcessingAlg("qgis","extractbyexpression",parameters)
     return res
     
+def selectByExpression(in_layer,expr):
+    parameters = { 'EXPRESSION' : expr,
+                   'INPUT' : in_layer,
+                   'METHOD' : 0 }
+    res = applyProcessingAlg("qgis","selectbyexpression",parameters)
+    return res
+    
+def saveSelectedAttributes(in_layer,out_layer):
+    parameters = { 'INPUT' : in_layer,
+                   'OUTPUT' : out_layer }
+    res = applyProcessingAlg("qgis","saveselectedfeatures",parameters)
+    return res
+                   
+    
+    
 def dissolveLayer(in_layer,out_layer):
     #utils.checkFileExists(in_layer)
-    qgsUtils.removeVectorLayer(out_layer)
+    if out_layer:
+        qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'FIELD' : [],
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
@@ -166,7 +185,8 @@ def dissolveLayer(in_layer,out_layer):
     
 def applyBufferFromExpr(in_layer,expr,out_layer):
     #utils.checkFileExists(in_layer)
-    qgsUtils.removeVectorLayer(out_layer)
+    if out_layer:
+        qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'DISSOLVE' : False,
                    'DISTANCE' : QgsProperty.fromExpression(expr),
                    'INPUT' : in_layer,

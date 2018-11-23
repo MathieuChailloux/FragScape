@@ -100,8 +100,8 @@ def isLayerLoaded(fname):
 # If loadProject is True, layer is added to QGIS project
 def loadVectorLayer(fname,loadProject=False):
     utils.checkFileExists(fname)
-    if isLayerLoaded(fname):
-        return getLayerByFilename(fname)
+    #if isLayerLoaded(fname):
+    #    return getLayerByFilename(fname)
     layer = QgsVectorLayer(fname, layerNameOfPath(fname), "ogr")
     extension = os.path.splitext(fname)[1]
     if layer == None:

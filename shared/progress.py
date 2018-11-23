@@ -115,7 +115,7 @@ class ProgressFeedback(QgsProcessingFeedback):
     def pushInfo(self,msg):
         utils.info(msg)
         
-    def reportError(error,fatalError):
+    def reportError(self,error):
         utils.internal_error("reportError : " + str(error))
         
     def setProgressText(self,text):

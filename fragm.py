@@ -23,9 +23,10 @@
 """
 
 from qgis.core import QgsProject, QgsMapLayerProxyModel
+from processing import QgsProcessingUtils
 
 from .shared import utils, abstract_model, qgsUtils, qgsTreatments
-from . import params
+from . import params, landuse
 
 fragm_fields = ["in_layer","expr","buffer","name"]
 
@@ -56,10 +57,29 @@ class FragmModel(abstract_model.DictModel):
         return item
         
     def applyItems(self,indexes):
+        landuseFragmPath = params.mkOutputFile("landuseFragm.gpkg")
+        qgsUtils.removeVectorFile(landuseFragmPath)
         for item in self.items:
-            selectionLayer = qgsTreatments.extractByExpression(item.dict["in_layer"],item.dict["expr"],None)
-            QgsProject.instance().addMapLayer(selectionLayer)
-            #bufferLayer = qgsTreatments.applyBufferFromExpr(selectionLayer,item.dict["buffer"],None)
+            in_layer_path = params.getOrigPath(item.dict["in_layer"])
+            name = item.dict["name"]
+            #qgsTreatments.selectByExpression(in_layer_path,item.dict["expr"])
+            selectionPath = QgsProcessingUtils.generateTempFilename(name)
+            utils.debug(selectionPath)
+            #selectionLayer = qgsTreatments.saveSelectedAttributes(in_layer_path,selectionPath)
+            selectionLayer = qgsTreatments.extractByExpression(in_layer_path,item.dict["expr"],selectionPath)
+            utils.debug("selectionNLayer = " + str(selectionLayer))
+            qgsUtils.loadVectorLayer(selectionLayer,loadProject=True)
+            bufferPath = QgsProcessingUtils.generateTempFilename(name + "_buf")
+            bufferLayer = qgsTreatments.applyBufferFromExpr(selectionLayer,item.dict["buffer"],bufferPath)
+            qgsUtils.loadVectorLayer(bufferLayer,loadProject=True)
+            if os.path.isfile(landuseFragmPath):
+                landuseDiffPath = landuseFragmPath
+            else:
+                landuseDiffPath = landuse.landuseModel.landuseLayer
+            if not landuseDiffPath:
+                assert(False)
+            diffPath = QgsProcessingUtils.generateTempFilename(name + "_diff")
+            diffLayer = qgsTreatments.applyDifference()
             
     def fromXMLRoot(self,root):
         utils.debug("fromXML")
@@ -114,7 +134,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         name = self.dlg.fragmName.text()
         if not name:
             utils.user_error("Empty name")
-        item = FragmItem(in_layer_path,expr,buffer,None)
+        item = FragmItem(in_layer_path,expr,buffer,name)
         return item
         
         
