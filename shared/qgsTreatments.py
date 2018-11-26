@@ -22,7 +22,8 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty
+from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty, QgsFeature, QgsFeatureRequest, QgsField
+from PyQt5.QtCore import QVariant
 import gdal
 
 import os.path
@@ -148,6 +149,35 @@ def applyGrassAlg(parameters,alg_name):
         # utils.debug("End run " + alg_name)
         
 
+def selectGeomByExpression(in_layer,expr,out_path,out_name):
+    qgsUtils.removeVectorLayer(out_path)
+    out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
+    orig_field = QgsField("Origin", QVariant.String)
+    utils.debug("fields1 = " + str(out_layer.fields().names()))
+    out_layer.dataProvider().addAttributes([orig_field])
+    utils.debug("fields2 = " + str(out_layer.fields().names()))
+    out_layer.updateFields()
+    utils.debug("fields3 = " + str(out_layer.fields().names()))
+    fields = out_layer.fields()
+    utils.debug("fields4 = " + str(fields.names()))
+    out_provider = out_layer.dataProvider()
+    in_name = in_layer.name()
+    if expr:
+        feats = in_layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
+    else:
+        feats = in_layer.getFeatures(QgsFeatureRequest())
+    for f in feats:
+        geom = f.geometry()
+        utils.debug("fields5 = " + str(out_layer.fields().names()))
+        new_f = QgsFeature(fields)
+        new_f.setGeometry(geom)
+        new_f["Origin"] = in_layer.name()
+        res = out_provider.addFeature(new_f)
+        if not res:
+            internal_error("addFeature failed")
+    out_layer.updateExtents()
+    qgsUtils.writeVectorLayer(out_layer,out_path)
+        
 def extractByExpression(in_layer,expr,out_layer):
     #utils.checkFileExists(in_layer)
     if out_layer:
@@ -171,7 +201,11 @@ def saveSelectedAttributes(in_layer,out_layer):
     res = applyProcessingAlg("qgis","saveselectedfeatures",parameters)
     return res
                    
-    
+def multiToSingleGeom(in_layer,out_layer):
+    parameters = { 'INPUT' : in_layer,
+                   'OUTPUT' : out_layer }
+    res = applyProcessingAlg("qgis","multiparttosingleparts",parameters)
+    return res
     
 def dissolveLayer(in_layer,out_layer):
     #utils.checkFileExists(in_layer)
@@ -198,8 +232,20 @@ def applyBufferFromExpr(in_layer,expr,out_layer):
     res = applyProcessingAlg("qgis","buffer",parameters)
     return res
     
+def mergeVectorLayers(in_layers,crs,out_layer):
+    parameters = { 'CRS' : crs,
+                   'LAYERS' : in_layers,
+                   'OUTPUT' : out_layer }
+    res = applyProcessingAlg("qgis","mergevectorlayers",parameters)
+    return res
+                   
+    
 def applyDifference(in_layer,diff_layer,out_layer):
-    pass
+    parameters = { 'INPUT' : in_layer,
+                   'OUTPUT' : out_layer,
+                   'OVERLAY' : diff_layer }
+    res = applyProcessingAlg("qgis","difference",parameters)
+    return res
     
 # Apply rasterization on field 'field' of vector layer 'in_path'.
 # Output raster layer in 'out_path'.

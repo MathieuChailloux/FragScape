@@ -229,6 +229,18 @@ def writeShapefile(layer,outfname):
     else:
         utils.user_error("Unable to create shapefile '" + outfname + "' : " + str(error_msg))
     
+
+# Writes file from existing QgsMapLayer
+def writeVectorLayer(layer,outfname):
+    utils.debug("[writeVectorLayer] " + outfname + " from " + str(layer))
+    if os.path.isfile(outfname):
+        os.remove(outfname)
+    (error, error_msg) = QgsVectorFileWriter.writeAsVectorFormat(layer,outfname,'utf-8',destCRS=layer.sourceCrs())
+    if error == QgsVectorFileWriter.NoError:
+        utils.info("File '" + outfname + "' succesfully created")
+    else:
+        utils.user_error("Unable to create file '" + outfname + "' : " + str(error_msg))
+    
 # Return bounding box coordinates as a list
 def coordsOfExtentPath(extent_path):
     layer = loadLayer(extent_path)
@@ -254,3 +266,27 @@ def getLayerFieldUniqueValues(layer,fieldname):
     for f in layer.getFeatures():
         field_values.add(f[fieldname])
     return field_values
+
+# Geopackages 'fid'
+def getMaxFid(layer):
+    max = 1
+    for f in layer.getFeatures():
+        id = f["fid"]
+        id = f.id()
+        if id > max:
+            max = id
+    return max
+    
+def normFids(layer):
+    max_fid = 1
+    feats = layer.getFeatures()
+    layer.startEditing()
+    for f in feats:
+        utils.debug("new fid(" + str(f.id()) + ") = " + str(max_fid))
+        layer.changeAttributeValue(f.id(),0,max_fid)
+        #f.setId(max_fid)
+        max_fid += 1
+    layer.commitChanges()
+        
+        
+    

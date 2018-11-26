@@ -115,7 +115,7 @@ class ProgressFeedback(QgsProcessingFeedback):
     def pushInfo(self,msg):
         utils.info(msg)
         
-    def reportError(self,error):
+    def reportError(self,error,fatalError=False):
         utils.internal_error("reportError : " + str(error))
         
     def setProgressText(self,text):
@@ -123,7 +123,7 @@ class ProgressFeedback(QgsProcessingFeedback):
         self.dlg.lblProgress.setText(text)
         
     def setProgress(self,value):
-        utils.debug("setProgress " + str(value))
+        #utils.debug("setProgress " + str(value))
         self.progressBar.setValue(value)
         
     def setPercentage(self,percentage):

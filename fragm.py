@@ -22,6 +22,8 @@
  ***************************************************************************/
 """
 
+import os.path
+
 from qgis.core import QgsProject, QgsMapLayerProxyModel
 from processing import QgsProcessingUtils
 
@@ -38,13 +40,34 @@ class FragmItem(abstract_model.DictItem):
                 "buffer" : buffer,
                 "name" : name}
         super().__init__(dict)
-        
+        self.selectionLayer = None
+        self.bufferLayer = None
         
     def applyItem(self):
         pass
         
     def equals(self,other):
         return (self.dict["name"] == other.dict["name"])
+        
+    def getSelectionLayer(self):
+        if not self.selectionLayer:
+            name = self.dict["name"]
+            self.selectionLayer = QgsProcessingUtils.generateTempFilename(name + ".gpkg")
+        return self.selectionLayer
+       
+    def getBufferLayer(self):
+        if not self.bufferLayer:
+            name = self.dict["name"]
+            self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
+        return self.bufferLayer
+        
+    def instantiateSelectionLayer(self):
+        out_path = self.getSelectionLayer()
+        qgsUtils.removeVectorLayer(out_path)
+        in_layer_path = self.dict["in_layer"]
+        in_layer = qgsUtils.loadVectorLayer(in_layer_path)
+        selection_layer = qgsUtils.createLayerFromExisting(in_layer,self.dict["name"])
+        return selection_layer
         
 class FragmModel(abstract_model.DictModel):
     
@@ -56,30 +79,52 @@ class FragmModel(abstract_model.DictModel):
         item = FragmItem(dict["in_layer"],dict["expr"],dict["buffer"],dict["name"])
         return item
         
+    def getFragmLayer(self):
+        return QgsProcessingUtils.generateTempFilename("fragm.gpkg")
+        
+    def getLanduseFragmLayer(self):
+        return params.mkOutputFile("landuseFragm.gpkg")
+        
+    def getFinalLayer(self):
+        return params.mkOutputFile("landuseFragmSingleGeom.gpkg")
+        
     def applyItems(self,indexes):
-        landuseFragmPath = params.mkOutputFile("landuseFragm.gpkg")
-        qgsUtils.removeVectorFile(landuseFragmPath)
         for item in self.items:
             in_layer_path = params.getOrigPath(item.dict["in_layer"])
+            in_layer = qgsUtils.loadVectorLayer(in_layer_path)
             name = item.dict["name"]
-            #qgsTreatments.selectByExpression(in_layer_path,item.dict["expr"])
-            selectionPath = QgsProcessingUtils.generateTempFilename(name)
-            utils.debug(selectionPath)
-            #selectionLayer = qgsTreatments.saveSelectedAttributes(in_layer_path,selectionPath)
-            selectionLayer = qgsTreatments.extractByExpression(in_layer_path,item.dict["expr"],selectionPath)
-            utils.debug("selectionNLayer = " + str(selectionLayer))
-            qgsUtils.loadVectorLayer(selectionLayer,loadProject=True)
-            bufferPath = QgsProcessingUtils.generateTempFilename(name + "_buf")
-            bufferLayer = qgsTreatments.applyBufferFromExpr(selectionLayer,item.dict["buffer"],bufferPath)
+            selectionPath = item.getSelectionLayer()
+            qgsTreatments.selectGeomByExpression(in_layer,item.dict["expr"],selectionPath,name)
+            #selectionLayer = qgsTreatments.extractByExpression(in_layer_path,item.dict["expr"],selectionPath)
+            #utils.debug("selectionNLayer = " + str(selectionLayer))
+            qgsUtils.loadVectorLayer(selectionPath,loadProject=True)
+            bufferPath = item.getBufferLayer()
+            utils.debug("bufferPath = " + str(bufferPath))
+            bufferLayer = qgsTreatments.applyBufferFromExpr(selectionPath,item.dict["buffer"],bufferPath)
             qgsUtils.loadVectorLayer(bufferLayer,loadProject=True)
-            if os.path.isfile(landuseFragmPath):
-                landuseDiffPath = landuseFragmPath
-            else:
-                landuseDiffPath = landuse.landuseModel.landuseLayer
-            if not landuseDiffPath:
-                assert(False)
-            diffPath = QgsProcessingUtils.generateTempFilename(name + "_diff")
-            diffLayer = qgsTreatments.applyDifference()
+        # Fragmentation layers merge
+        buf_layers = [item.getBufferLayer() for item in self.items]
+        fragmPath = self.getFragmLayer()
+        qgsUtils.removeVectorLayer(fragmPath)
+        fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,'memory:')
+        utils.debug("fragm_layer : " + str(fragm_layer))
+        QgsProject.instance().addMapLayer(fragm_layer)
+        #qgsUtils.writeVectorLayer(fragm_layer,fragmPath)
+        #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)
+        #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)
+        # Landuse /fragm difference
+        landuseLayer = landuse.landuseModel.getDissolveLayer()
+        landuseFragmPath = self.getLanduseFragmLayer()
+        qgsUtils.removeVectorLayer(landuseFragmPath)
+        qgsTreatments.applyDifference(landuseLayer,fragm_layer,landuseFragmPath)
+        qgsUtils.loadVectorLayer(landuseFragmPath,loadProject=True)
+        # Multi to single geom
+        singleGeomPath = self.getFinalLayer()
+        singleGeomLayer = qgsTreatments.multiToSingleGeom(landuseFragmPath,'memory:')
+        qgsUtils.normFids(singleGeomLayer)
+        qgsUtils.writeVectorLayer(singleGeomLayer,singleGeomPath)
+        #QgsProject.instance().addMapLayer(singleGeomLayer)
+        qgsUtils.loadVectorLayer(singleGeomPath,loadProject=True)
             
     def fromXMLRoot(self,root):
         utils.debug("fromXML")

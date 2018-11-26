@@ -60,9 +60,11 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         self.setupUi(self)
 
     def initTabs(self):
+        global landuseModel
         paramsConnector = params.ParamsConnector(self)
         params.params = paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self)
+        landuse.landuseModel = self.landuseConnector.model
         self.fragmConnector = fragm.FragmConnector(self)
         logConnector = log.LogConnector(self)
         progressConnector = progress.ProgressConnector(self)
