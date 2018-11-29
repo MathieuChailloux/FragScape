@@ -32,6 +32,8 @@ from . import params, landuse
 
 fragm_fields = ["in_layer","expr","buffer","name"]
 
+fragmModel = None
+
 class FragmItem(abstract_model.DictItem):
 
     def __init__(self,in_layer,expr,buffer,name):
@@ -108,7 +110,6 @@ class FragmModel(abstract_model.DictModel):
         qgsUtils.removeVectorLayer(fragmPath)
         fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,'memory:')
         utils.debug("fragm_layer : " + str(fragm_layer))
-        QgsProject.instance().addMapLayer(fragm_layer)
         #qgsUtils.writeVectorLayer(fragm_layer,fragmPath)
         #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)
         #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)

@@ -36,7 +36,7 @@ from qgis.gui import QgsFileWidget
 from .shared import utils, progress, config_parsing, log, qgsTreatments
 #from .shared import progress
 #from .shared import config_parsing
-from . import params, landuse, tabs, fragm
+from . import params, landuse, tabs, fragm, reporting
 #from . import landuse
 #from .shared import log
 #from . import tabs
@@ -66,6 +66,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         self.landuseConnector = landuse.LanduseConnector(self)
         landuse.landuseModel = self.landuseConnector.model
         self.fragmConnector = fragm.FragmConnector(self)
+        fragm.fragmModel = self.fragmConnector.model
+        self.reportingConnector = reporting.ReportingConnector(self)
         logConnector = log.LogConnector(self)
         progressConnector = progress.ProgressConnector(self)
         progress.progressConnector = progressConnector
@@ -74,6 +76,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
                            "Log" : logConnector,
                            "Landuse" : self.landuseConnector,
                            "Fragm" : self.fragmConnector,
+                           "Reporting" : self.reportingConnector,
                            "Progress" : progressConnector,
                            "Tabs" : tabConnector}
         self.recomputeParsers()
@@ -166,7 +169,9 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     
     # Recompute self.parsers in case they have been reloaded
     def recomputeParsers(self):
-        self.parsers = [params.params,self.landuseConnector,self.fragmConnector.model]
+        self.parsers = [params.params,self.landuseConnector,
+                        self.fragmConnector.model,
+                        self.reportingConnector]
         
         # Return XML string describing project
     def toXML(self):

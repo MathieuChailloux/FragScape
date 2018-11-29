@@ -80,6 +80,9 @@ def getVectorFilters():
     
 def getRasterFilters():
     return QgsProviderRegistry.instance().fileRasterFilters()
+    
+def isGeopackage(path):
+    return path.endswith(".gpkg")
        
 def getLayerByFilename(fname):
     #map_layers = QgsProject.instance().mapLayersByName(fname)
@@ -100,8 +103,8 @@ def isLayerLoaded(fname):
 # If loadProject is True, layer is added to QGIS project
 def loadVectorLayer(fname,loadProject=False):
     utils.checkFileExists(fname)
-    #if isLayerLoaded(fname):
-    #    return getLayerByFilename(fname)
+    if isLayerLoaded(fname):
+       return getLayerByFilename(fname)
     layer = QgsVectorLayer(fname, layerNameOfPath(fname), "ogr")
     extension = os.path.splitext(fname)[1]
     if layer == None:
@@ -240,7 +243,7 @@ def writeVectorLayer(layer,outfname):
         utils.info("File '" + outfname + "' succesfully created")
     else:
         utils.user_error("Unable to create file '" + outfname + "' : " + str(error_msg))
-    
+        
 # Return bounding box coordinates as a list
 def coordsOfExtentPath(extent_path):
     layer = loadLayer(extent_path)

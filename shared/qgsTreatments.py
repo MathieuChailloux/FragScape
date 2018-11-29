@@ -153,13 +153,9 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
     qgsUtils.removeVectorLayer(out_path)
     out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
     orig_field = QgsField("Origin", QVariant.String)
-    utils.debug("fields1 = " + str(out_layer.fields().names()))
     out_layer.dataProvider().addAttributes([orig_field])
-    utils.debug("fields2 = " + str(out_layer.fields().names()))
     out_layer.updateFields()
-    utils.debug("fields3 = " + str(out_layer.fields().names()))
     fields = out_layer.fields()
-    utils.debug("fields4 = " + str(fields.names()))
     out_provider = out_layer.dataProvider()
     in_name = in_layer.name()
     if expr:
@@ -177,6 +173,9 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
             internal_error("addFeature failed")
     out_layer.updateExtents()
     qgsUtils.writeVectorLayer(out_layer,out_path)
+    
+def joinToReportingLayer(init_layer,reporting_layer,out_name):
+    init_pr = init_layer.dataProvider()
         
 def extractByExpression(in_layer,expr,out_layer):
     #utils.checkFileExists(in_layer)
@@ -200,6 +199,11 @@ def saveSelectedAttributes(in_layer,out_layer):
                    'OUTPUT' : out_layer }
     res = applyProcessingAlg("qgis","saveselectedfeatures",parameters)
     return res
+    
+def cloneLayer(layer):
+    layer.selectAll()
+    clone_layer = saveSelectedAttributes(layer,'memory:')
+    return clone_layer
                    
 def multiToSingleGeom(in_layer,out_layer):
     parameters = { 'INPUT' : in_layer,
