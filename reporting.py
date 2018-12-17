@@ -50,6 +50,9 @@ class ReportingModel(abstract_model.DictModel):
     def getIntersectionLayerPath(self):
         return params.mkOutputFile("reportingIntersection.gpkg")
         
+    def getReportingResultsLayerPath(self):
+        return params.mkOutputFile("reportingResults.gpkg")
+        
     def createIntersectionLayer(self):
         path = self.getIntersectionLayerPath()
         qgsUtils.removeVectorLayer(path)
@@ -107,10 +110,48 @@ class ReportingModel(abstract_model.DictModel):
         qgsUtils.loadVectorLayer(intersection_path,loadProject=True)
         
     def computeResults(self):
-        pass
+        intersection_path = self.getIntersectionLayerPath()
+        utils.checkFileExists(intersection_path)
+        intersection_layer = qgsUtils.loadVectorLayer(intersection_path)
+        reporting_layer = self.layer
+        #utils.checkFileExists(reporting_path)
+        #reporting_layer = qgsUtils.loadVectorLayer(reporting_path)
+        results_path = self.outLayer
+        qgsUtils.removeVectorLayer(results_path)
+        results_layer = qgsUtils.createLayerFromExisting(reporting_layer,results_path)
+        report_id_field = QgsField("report_id", QVariant.Int)
+        nb_patches_field = QgsField("nb_patches", QVariant.Int)
+        area_field = QgsField("area_sq", QVariant.Double)
+        area_cbc_field = QgsField("area_cbc", QVariant.Double)
+        fields = [report_id_field,nb_patches_field,area_field,area_cbc_field]
+        results_layer.dataProvider().addAttributes(fields)
+        results_layer.updateFields()
+        total_area = 0
+        for report_feat in reporting_layer.getFeatures():
+            report_geom = report_feat.geometry()
+            new_f = QgsFeature(results_layer.fields())
+            new_f.setGeometry(report_geom)
+            new_f["report_id"] = report_feat["fid"]
+            new_f["nb_patches"] = 0
+            new_f["area_sq"] = 0
+            new_f["area_cbc"] = 0
+            intersecting_feats = [f for f in intersection_layer.getFeatures() if f["report_id"] == report_feat["fid"]]
+            for inter_feat in intersecting_feats:
+                new_f["nb_patches"] += 1
+                new_f["area_sq"] += pow(inter_feat["area"],2)
+                new_f["area_cbc"] += inter_feat["area"] * inter_feat["report_area"]
+            res = results_layer.dataProvider().addFeature(new_f)
+            if not res:
+                internal_error("addFeature failed")
+            results_layer.updateExtents()
+        qgsUtils.writeVectorLayer(results_layer,results_path)
+        qgsUtils.loadVectorLayer(results_path,loadProject=True)
+                
+            
             
     def runReporting(self):
         self.computeIntersections()
+        self.computeResults()
         
     def toXML(self,indent=" "):
         if not self.layer:
@@ -153,6 +194,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         utils.debug("loadLayer")
         loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
         self.dlg.reportingLayerCombo.setLayer(loaded_layer)
+        self.model.layer = loaded_layer
         #self.setLayer(loaded_layer)
    
     def fromXMLAttribs(self,attribs):
