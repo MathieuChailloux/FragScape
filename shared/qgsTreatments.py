@@ -174,8 +174,11 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
     out_layer.updateExtents()
     qgsUtils.writeVectorLayer(out_layer,out_path)
     
-def joinToReportingLayer(init_layer,reporting_layer,out_name):
+def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
+    
     init_pr = init_layer.dataProvider()
+    out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
+    
         
 def extractByExpression(in_layer,expr,out_layer):
     #utils.checkFileExists(in_layer)

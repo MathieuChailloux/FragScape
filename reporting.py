@@ -22,8 +22,9 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsMapLayerProxyModel
+from qgis.core import QgsMapLayerProxyModel, QgsField, QgsFeature
 from qgis.gui import QgsFileWidget
+from PyQt5.QtCore import QVariant
 from processing import QgsProcessingUtils
 
 from .shared import utils, abstract_model, qgsUtils
@@ -46,12 +47,34 @@ class ReportingModel(abstract_model.DictModel):
     def mkIntersectionLayer(self):
         pass
         
+    def getIntersectionLayerPath(self):
+        return params.mkOutputFile("reportingIntersection.gpkg")
+        
+    def createIntersectionLayer(self):
+        path = self.getIntersectionLayerPath()
+        qgsUtils.removeVectorLayer(path)
+        landuseFragmPath = fragm.fragmModel.getFinalLayer()
+        landuseFragmlayer = qgsUtils.loadVectorLayer(landuseFragmPath)
+        layer = qgsUtils.createLayerFromExisting(landuseFragmlayer,"reportingIntersection")
+        #fid_field = QgsField("Origin", QVariant.Int)
+        patch_id_field = QgsField("patch_id", QVariant.Int)
+        report_id_field = QgsField("report_id", QVariant.Int)
+        area = QgsField("area", QVariant.Double)
+        report_area = QgsField("report_area", QVariant.Double)
+        fields = [patch_id_field,report_id_field,area,report_area]
+        layer.dataProvider().addAttributes(fields)
+        layer.updateFields()
+        print("fieldnames = " + str(layer.fields().names()))
+        return layer
+        
     def computeIntersections(self):
         landuseFragmPath = fragm.fragmModel.getFinalLayer()
         landuseFragmlayer = qgsUtils.loadVectorLayer(landuseFragmPath)
         #reporting_layer = qgsUtils.loadVectorLayer(self.layer)
         reporting_layer = self.layer
-        intersection_layer = qgsUtils.createLayerFromExisting(reporting_layer,"reportingIntersection.gpkg")
+        intersection_layer = self.createIntersectionLayer()
+        print("fieldnames = " + str(intersection_layer.fields().names()))
+        intersection_fields = intersection_layer.fields()
         utils.debug("fields = " + str(intersection_layer.fields().names()))
         for f in landuseFragmlayer.getFeatures():
             f_geom = f.geometry()
@@ -67,8 +90,24 @@ class ReportingModel(abstract_model.DictModel):
                     intersection_area2 = pow(intersection_area,2)
                     f_area_cbc = intersection_area * (f_area - intersection_area)
                     patches_area_sum += f_area_cbc
+                    new_f = QgsFeature(intersection_fields)
+                    new_f["patch_id"] = f.id()
+                    new_f["report_id"] = report_feat.id()
+                    new_f["area"] = f_area
+                    new_f["report_area"] = report_area
+                    new_f.setGeometry(f_geom)
+                    res = intersection_layer.dataProvider().addFeature(new_f)
+                    if not res:
+                        internal_error("addFeature failed")
+                    intersection_layer.updateExtents()
             coh = patches_area_sum / f_area
             utils.debug("coh = " + str(coh))
+        intersection_path = self.getIntersectionLayerPath()
+        qgsUtils.writeVectorLayer(intersection_layer,intersection_path)
+        qgsUtils.loadVectorLayer(intersection_path,loadProject=True)
+        
+    def computeResults(self):
+        pass
             
     def runReporting(self):
         self.computeIntersections()
