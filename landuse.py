@@ -156,11 +156,14 @@ class LanduseModel(abstract_model.DictModel):
         if not self.landuseField:
             utils.user_error("No field selected")
             
+    def getClipLayer(self):
+        return params.mkOutputFile("landuseClip.gpkg")
+            
     def getSelectionLayer(self):
-        return params.mkOutputFile("landuseSelection.shp")
+        return params.mkOutputFile("landuseSelection.gpkg")
             
     def getDissolveLayer(self):
-        return params.mkOutputFile("landuseSelectionDissolve.shp")
+        return params.mkOutputFile("landuseSelectionDissolve.gpkg")
         
     def mkSelectionExpr(self):
         expr = ""
@@ -174,19 +177,23 @@ class LanduseModel(abstract_model.DictModel):
         return expr
         
     def applyItems(self):
+        progress.progressFeedback.beginSection("Landuse classification")
         params.checkWorkspaceInit()
         self.checkLayerSelected()
         self.checkFieldSelected()
         in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
+        territory_layer = params.getTerritoryLayer()
         expr = self.mkSelectionExpr()
         if not expr:
             utils.user_error("No expression selected : TODO select everything")
         selectionResLayer = self.getSelectionLayer()
         dissolveLayer = self.getDissolveLayer()
-        progress.progressFeedback.setProgressText("Landuse entities selection")
-        qgsTreatments.extractByExpression(in_layer,expr,selectionResLayer)
-        progress.progressFeedback.setProgressText("Landuse selection dissolve")
-        qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
+        clipLayer = self.getClipLayer()
+        qgsTreatments.applyVectorClip(in_layer,territory_layer,clipLayer)
+        qgsTreatments.extractByExpression(clipLayer,expr,selectionResLayer)
+        dissolved = qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
+        qgsUtils.loadLayer(dissolved,loadProject=True)
+        progress.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:

@@ -27,7 +27,7 @@ import os.path
 from qgis.core import QgsProject, QgsMapLayerProxyModel
 from processing import QgsProcessingUtils
 
-from .shared import utils, abstract_model, qgsUtils, qgsTreatments
+from .shared import utils, abstract_model, qgsUtils, qgsTreatments, progress
 from . import params, landuse
 
 fragm_fields = ["in_layer","expr","buffer","name"]
@@ -85,12 +85,14 @@ class FragmModel(abstract_model.DictModel):
         return QgsProcessingUtils.generateTempFilename("fragm.gpkg")
         
     def getLanduseFragmLayer(self):
-        return params.mkOutputFile("landuseFragm.gpkg")
+        return QgsProcessingUtils.generateTempFilename("landuseFragm.gpkg")
         
     def getFinalLayer(self):
         return params.mkOutputFile("landuseFragmSingleGeom.gpkg")
         
     def applyItems(self,indexes):
+        fragmMsg = "Application of fragmentation data to landuse"
+        progress.progressFeedback.beginSection(fragmMsg)
         for item in self.items:
             in_layer_path = params.getOrigPath(item.dict["in_layer"])
             in_layer = qgsUtils.loadVectorLayer(in_layer_path)
@@ -126,6 +128,7 @@ class FragmModel(abstract_model.DictModel):
         qgsUtils.writeVectorLayer(singleGeomLayer,singleGeomPath)
         #QgsProject.instance().addMapLayer(singleGeomLayer)
         qgsUtils.loadVectorLayer(singleGeomPath,loadProject=True)
+        progress.progressFeedback.endSection()
             
     def fromXMLRoot(self,root):
         utils.debug("fromXML")

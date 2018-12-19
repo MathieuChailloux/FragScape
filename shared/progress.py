@@ -44,7 +44,7 @@ def catchProgressEnd():
     utils.debug("Progress End")
     progressConnector.dlg.progressBar.setValue(100)
     progressConnector.focusLogTab()
-
+    
 class ProgressConnector(QObject):
 
     progressSignal = pyqtSignal('int')
@@ -101,6 +101,7 @@ class ProgressFeedback(QgsProcessingFeedback):
     def __init__(self,dlg):
         self.dlg = dlg
         self.progressBar = dlg.progressBar
+        self.sectionText = ""
         super().__init__()
         
     def pushCommandInfo(self,msg):
@@ -118,9 +119,25 @@ class ProgressFeedback(QgsProcessingFeedback):
     def reportError(self,error,fatalError=False):
         utils.internal_error("reportError : " + str(error))
         
-    def setProgressText(self,text):
+    def beginSection(self,txt):
+        self.sectionText = txt
+        self.setProgressText(txt)
+        
+    def endSection(self):
+        if self.sectionText:
+            self.setSubText("DONE")
+            
+    def setSubText(self,txt):
+        self.setProgressText(self.sectionText,txt)
+        
+    def setProgressText(self,text,subText=""):
         utils.info("setProgressTest")
-        self.dlg.lblProgress.setText(text)
+        msg = text
+        if msg:
+            msg += "...  "
+        if subText:
+            msg += subText
+        self.dlg.lblProgress.setText(msg)
         
     def setProgress(self,value):
         #utils.debug("setProgress " + str(value))

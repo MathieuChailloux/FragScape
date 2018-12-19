@@ -123,6 +123,7 @@ def createSubdir(par_dir,name):
     if not os.path.isdir(path):
         info("Creating directory '" + path + "'")
         os.makedirs(path)
+    return path
         
 
 def checkFileExists(fname,prefix=""):

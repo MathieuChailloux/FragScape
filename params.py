@@ -96,7 +96,7 @@ def getTerritoryLayer():
 
 def mkOutputFile(name):
     checkWorkspaceInit()
-    new_path = utils.joinPath(params.workspace,name)
+    new_path = utils.joinPath(params.outputDir,name)
     return new_path
         
 #class ParamsModel(abstract_model.AbstractGroupModel):
@@ -105,6 +105,7 @@ class ParamsModel(QAbstractTableModel):
     def __init__(self):
         self.parser_name = "Params"
         self.workspace = None
+        self.outputDir = None
         self.territoryLayer = None
         self.projectFile = ""
         self.crs = defaultCrs
@@ -140,7 +141,7 @@ class ParamsModel(QAbstractTableModel):
         utils.info("Workspace directory set to '" + norm_path)
         if not os.path.isdir(norm_path):
             utils.user_error("Directory '" + norm_path + "' does not exist")
-        utils.createSubdir(norm_path,"outputs")
+        self.outputDir = utils.createSubdir(norm_path,"outputs")
     
     def fromXMLRoot(self,root):
         dict = root.attrib

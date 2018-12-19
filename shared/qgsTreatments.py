@@ -209,6 +209,7 @@ def cloneLayer(layer):
     return clone_layer
                    
 def multiToSingleGeom(in_layer,out_layer):
+    progress.progressFeedback.setSubText("Multi to single geometry")
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
     res = applyProcessingAlg("qgis","multiparttosingleparts",parameters)
@@ -216,6 +217,7 @@ def multiToSingleGeom(in_layer,out_layer):
     
 def dissolveLayer(in_layer,out_layer):
     #utils.checkFileExists(in_layer)
+    progress.progressFeedback.setSubText("Dissolve " + str(in_layer))
     if out_layer:
         qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'FIELD' : [],
@@ -226,6 +228,7 @@ def dissolveLayer(in_layer,out_layer):
     
 def applyBufferFromExpr(in_layer,expr,out_layer):
     #utils.checkFileExists(in_layer)
+    progress.progressFeedback.setSubText("Buffer (" + str(expr) + ") on " + str(out_layer))
     if out_layer:
         qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'DISSOLVE' : False,
@@ -240,6 +243,7 @@ def applyBufferFromExpr(in_layer,expr,out_layer):
     return res
     
 def mergeVectorLayers(in_layers,crs,out_layer):
+    progress.progressFeedback.setSubText("Merge vector layers")
     parameters = { 'CRS' : crs,
                    'LAYERS' : in_layers,
                    'OUTPUT' : out_layer }
@@ -248,10 +252,19 @@ def mergeVectorLayers(in_layers,crs,out_layer):
                    
     
 def applyDifference(in_layer,diff_layer,out_layer):
+    progress.progressFeedback.setSubText("Difference")
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'OVERLAY' : diff_layer }
     res = applyProcessingAlg("qgis","difference",parameters)
+    return res  
+    
+def applyVectorClip(in_layer,clip_layer,out_layer):
+    progress.progressFeedback.setSubText("Clip")
+    parameters = { 'INPUT' : in_layer,
+                   'OUTPUT' : out_layer,
+                   'OVERLAY' : clip_layer }
+    res = applyProcessingAlg("qgis","clip",parameters)
     return res
     
 # Apply rasterization on field 'field' of vector layer 'in_path'.
