@@ -29,6 +29,8 @@ import gdal
 import os.path
 import sys
 import subprocess
+import time
+
 import processing
 
 from . import utils, qgsUtils, progress
@@ -114,9 +116,13 @@ def applyProcessingAlg(provider,alg_name,parameters):
     utils.debug("parameters : " + str(parameters))
     try:
         complete_name = provider + ":" + alg_name
-        utils.debug("Calling processing algorithm '" + complete_name + "'")
+        utils.info("Calling processing algorithm '" + complete_name + "'")
+        start_time = time.time()
         res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
-        utils.debug ("call to " + alg_name + " successful")
+        end_time = time.time()
+        diff_time = end_time - start_time
+        utils.debug("call to " + alg_name + " successful"
+                    + ", performed in " + str(diff_time) + " seconds")
         progress.progressFeedback.endJob()
         utils.debug("res = " + str(res))
         if "OUTPUT" in res:

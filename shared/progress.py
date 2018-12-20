@@ -102,6 +102,7 @@ class ProgressFeedback(QgsProcessingFeedback):
         self.dlg = dlg
         self.progressBar = dlg.progressBar
         self.sectionText = ""
+        self.sectionHeader = "********"
         super().__init__()
         
     def pushCommandInfo(self,msg):
@@ -122,16 +123,21 @@ class ProgressFeedback(QgsProcessingFeedback):
     def beginSection(self,txt):
         self.sectionText = txt
         self.setProgressText(txt)
+        self.start_time = time.time()
+        utils.info(self.sectionHeader + " BEGIN : " + txt)
         
     def endSection(self):
         if self.sectionText:
             self.setSubText("DONE")
+        self.end_time = time.time()
+        diff_time = self.end_time - self.start_time
+        utils.info(self.sectionHeader + " END : " + self.sectionText + " in " + str(diff_time) + " seconds")
+        self.sectionText = ""
             
     def setSubText(self,txt):
         self.setProgressText(self.sectionText,txt)
         
     def setProgressText(self,text,subText=""):
-        utils.info("setProgressTest")
         msg = text
         if msg:
             msg += "...  "

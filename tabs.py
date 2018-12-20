@@ -49,8 +49,8 @@ class TabItem:
 paramsTabItem = TabItem(0,"Paramètres","paramsHelp")
 landuseTabItem = TabItem(1,"Occupation du sol","landuseHelp")
 fragmTabItem = TabItem(2,"Fragm","fragmHelp")
-resTabItem = TabItem(2,"Résultats","resHelp")
-logTabItem = TabItem(3,"Journal","logHelp")
+resTabItem = TabItem(3,"Résultats","resHelp")
+logTabItem = TabItem(4,"Journal","logHelp")
         
 class TabConnector:
     

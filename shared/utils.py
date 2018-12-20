@@ -139,7 +139,7 @@ def checkFileExists(fname,prefix=""):
         
 def removeFile(path):
     if os.path.isfile(path):
-        info("Deleting existing file '" + path + "'")
+        debug("Deleting existing file '" + path + "'")
         os.remove(path)
     
 def writeFile(fname,str):
