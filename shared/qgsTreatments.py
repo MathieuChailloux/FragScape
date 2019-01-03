@@ -101,11 +101,7 @@ def initGdalCommands():
         
 def setProgressBar(progress_bar):
     global progressBar
-    progressBar = progress_bar     
-    
-# def setProgressFeedback(progress_feedback):
-    # global progressFeedback
-    # progressFeedback = progress_feedback      
+    progressBar = progress_bar
         
 def applyProcessingAlg(provider,alg_name,parameters):
     # global progressFeedback
@@ -137,23 +133,7 @@ def applyProcessingAlg(provider,alg_name,parameters):
         utils.debug("End run " + alg_name)
 
 def applyGrassAlg(parameters,alg_name):
-    applyProcessingAlg("grass7",alg_name,parameters)
-# def applyGrassAlg(parameters,alg_name):
-    # feedback = QgsProcessingFeedback()
-    # if 'GRASS_REGION_CELLSIZE_PARAMETER' not in parameters:
-        # parameters['GRASS_REGION_CELLSIZE_PARAMETER'] = 25
-    # utils.debug("parameters : " + str(parameters))
-    # try:
-        # res = processing.run("grass7:" + alg_name,parameters,feedback=feedback)
-        # utils.debug(str(feedback))
-        # utils.debug(str(res["output"]))
-        # utils.debug ("call to " + alg_name + " successful")
-    # except Exception as e:
-        # utils.warn ("Failed to call " + alg_name + " : " + str(e))
-        # raise e
-    # finally:  
-        # utils.debug("End run " + alg_name)
-        
+    applyProcessingAlg("grass7",alg_name,parameters)        
 
 def selectGeomByExpression(in_layer,expr,out_path,out_name):
     qgsUtils.removeVectorLayer(out_path)
@@ -181,7 +161,6 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
     qgsUtils.writeVectorLayer(out_layer,out_path)
     
 def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
-    
     init_pr = init_layer.dataProvider()
     out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
     
