@@ -117,7 +117,7 @@ def applyProcessingAlg(provider,alg_name,parameters):
         res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
         end_time = time.time()
         diff_time = end_time - start_time
-        utils.debug("call to " + alg_name + " successful"
+        utils.info("Call to " + alg_name + " successful"
                     + ", performed in " + str(diff_time) + " seconds")
         progress.progressFeedback.endJob()
         utils.debug("res = " + str(res))
@@ -136,6 +136,8 @@ def applyGrassAlg(parameters,alg_name):
     applyProcessingAlg("grass7",alg_name,parameters)        
 
 def selectGeomByExpression(in_layer,expr,out_path,out_name):
+    utils.info("Calling 'selectGeomByExpression' algorithm")
+    start_time = time.time()
     qgsUtils.removeVectorLayer(out_path)
     out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
     orig_field = QgsField("Origin", QVariant.String)
@@ -150,7 +152,6 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
         feats = in_layer.getFeatures(QgsFeatureRequest())
     for f in feats:
         geom = f.geometry()
-        utils.debug("fields5 = " + str(out_layer.fields().names()))
         new_f = QgsFeature(fields)
         new_f.setGeometry(geom)
         new_f["Origin"] = in_layer.name()
@@ -159,6 +160,10 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
             internal_error("addFeature failed")
     out_layer.updateExtents()
     qgsUtils.writeVectorLayer(out_layer,out_path)
+    end_time = time.time()
+    diff_time = end_time - start_time
+    utils.info("Call to " + alg_name + " successful"
+               + ", performed in " + str(diff_time) + " seconds")
     
 def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
     init_pr = init_layer.dataProvider()

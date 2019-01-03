@@ -23,7 +23,8 @@
 """
 
 import os
-import pathlib
+#import pathlib
+from pathlib import Path
 
 from qgis.gui import *
 from qgis.core import *
@@ -88,10 +89,14 @@ def getLayerByFilename(fname):
     #map_layers = QgsProject.instance().mapLayersByName(fname)
     map_layers = QgsProject.instance().mapLayers().values()
     utils.debug("map_layers(" + fname + ") : " + str(map_layers))
+    fname_parts = Path(fname).parts
+    utils.debug("fname_parts = " + str(fname_parts))
     for layer in map_layers:
         utils.debug("layer : " + str(layer))
         layer_path = pathOfLayer(layer)
-        if layer_path == fname:
+        path_parts = Path(layer_path).parts
+        utils.debug("path_parts = " + str(path_parts))
+        if fname_parts == path_parts:
             return layer
     else:
         return None
