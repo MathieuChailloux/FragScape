@@ -24,6 +24,7 @@
 
 from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty, QgsFeature, QgsFeatureRequest, QgsField
 from PyQt5.QtCore import QVariant
+from PyQt5.QtGui import QGuiApplication
 import gdal
 
 import os.path
@@ -110,11 +111,13 @@ def applyProcessingAlg(provider,alg_name,parameters):
     #feedback = QgsProcessingFeedback()
     #feedback.setProgress(progressBar)
     utils.debug("parameters : " + str(parameters))
+    QGuiApplication.processEvents()
     try:
         complete_name = provider + ":" + alg_name
         utils.info("Calling processing algorithm '" + complete_name + "'")
         start_time = time.time()
         res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
+        utils.debug("res1 = " + str(res))
         end_time = time.time()
         diff_time = end_time - start_time
         utils.info("Call to " + alg_name + " successful"
@@ -123,6 +126,7 @@ def applyProcessingAlg(provider,alg_name,parameters):
         utils.debug("res = " + str(res))
         if "OUTPUT" in res:
             utils.debug("output = " + str(res["OUTPUT"]))
+            utils.debug("output type = " + str(type(res["OUTPUT"])))
             return res["OUTPUT"]
         else:
             return None
@@ -133,7 +137,7 @@ def applyProcessingAlg(provider,alg_name,parameters):
         utils.debug("End run " + alg_name)
 
 def applyGrassAlg(parameters,alg_name):
-    applyProcessingAlg("grass7",alg_name,parameters)        
+    applyProcessingAlg("grass7",alg_name,parameters)
 
 def selectGeomByExpression(in_layer,expr,out_path,out_name):
     utils.info("Calling 'selectGeomByExpression' algorithm")
@@ -162,7 +166,7 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
     qgsUtils.writeVectorLayer(out_layer,out_path)
     end_time = time.time()
     diff_time = end_time - start_time
-    utils.info("Call to " + alg_name + " successful"
+    utils.info("Call to 'selectGeomByExpression' successful"
                + ", performed in " + str(diff_time) + " seconds")
     
 def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
@@ -222,7 +226,8 @@ def applyBufferFromExpr(in_layer,expr,out_layer):
     if out_layer:
         qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'DISSOLVE' : False,
-                   'DISTANCE' : QgsProperty.fromExpression(expr),
+                   #'DISTANCE' : QgsProperty.fromExpression(expr),
+                   'DISTANCE' : expr,
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'END_CAP_STYLE' : 0,

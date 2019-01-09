@@ -188,9 +188,10 @@ class LanduseModel(abstract_model.DictModel):
             utils.user_error("No expression selected : TODO select everything")
         selectionResLayer = self.getSelectionLayer()
         dissolveLayer = self.getDissolveLayer()
-        clipLayer = self.getClipLayer()
-        qgsTreatments.applyVectorClip(in_layer,territory_layer,clipLayer)
-        qgsTreatments.extractByExpression(clipLayer,expr,selectionResLayer)
+        #clipLayer = self.getClipLayer()
+        #qgsTreatments.applyVectorClip(in_layer,territory_layer,clipLayer)
+        extractSourceLayer = in_layer
+        qgsTreatments.extractByExpression(extractSourceLayer,expr,selectionResLayer)
         dissolved = qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
         qgsUtils.loadLayer(dissolved,loadProject=True)
         progress.progressFeedback.endSection()

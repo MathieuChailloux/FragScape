@@ -23,8 +23,10 @@
 """
 
 import os.path
+import time
 
-from qgis.core import QgsProject, QgsMapLayerProxyModel
+from qgis.core import QgsProject, QgsMapLayerProxyModel, QgsVectorLayer, QgsProcessingFeedback
+import processing
 from processing import QgsProcessingUtils
 
 from .shared import utils, abstract_model, qgsUtils, qgsTreatments, progress
@@ -84,6 +86,9 @@ class FragmModel(abstract_model.DictModel):
     def getFragmLayer(self):
         return QgsProcessingUtils.generateTempFilename("fragm.gpkg")
         
+    def getBuffersMergedLayer(self):
+        return QgsProcessingUtils.generateTempFilename("fragmBuffersMerged.shp")
+        
     def getLanduseFragmLayer(self):
         return QgsProcessingUtils.generateTempFilename("landuseFragm.gpkg")
         
@@ -101,19 +106,25 @@ class FragmModel(abstract_model.DictModel):
             qgsTreatments.selectGeomByExpression(in_layer,item.dict["expr"],selectionPath,name)
             #selectionLayer = qgsTreatments.extractByExpression(in_layer_path,item.dict["expr"],selectionPath)
             #utils.debug("selectionNLayer = " + str(selectionLayer))
-            qgsUtils.loadVectorLayer(selectionPath,loadProject=True)
+            #qgsUtils.loadVectorLayer(selectionPath,loadProject=True)
             bufferPath = item.getBufferLayer()
             utils.debug("bufferPath = " + str(bufferPath))
             bufferLayer = qgsTreatments.applyBufferFromExpr(selectionPath,item.dict["buffer"],bufferPath)
             qgsUtils.loadVectorLayer(bufferLayer,loadProject=True)
         # Fragmentation layers merge
         buf_layers = [item.getBufferLayer() for item in self.items]
-        fragmPath = self.getFragmLayer()
-        qgsUtils.removeVectorLayer(fragmPath)
-        fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,'memory:')
+        #fragmPath = self.getFragmLayer()
+        #qgsUtils.removeVectorLayer(fragmPath)
+        fragm_path = self.getBuffersMergedLayer()
+        #fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,'memory:')
+        # if stored to geopackage, ids shall be normalized
+        fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,fragm_path)
+        if not fragm_layer:
+            assert(False)
+        #fragm_path = qgsUtils.pathOfLayer(fragm_layer)
         utils.debug("fragm_layer : " + str(fragm_layer))
         #qgsUtils.writeVectorLayer(fragm_layer,fragmPath)
-        #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)
+        qgsUtils.loadVectorLayer(fragm_layer,loadProject=True)
         #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)
         # Landuse /fragm difference
         landuseLayer = landuse.landuseModel.getDissolveLayer()
@@ -126,7 +137,6 @@ class FragmModel(abstract_model.DictModel):
         singleGeomLayer = qgsTreatments.multiToSingleGeom(landuseFragmPath,'memory:')
         qgsUtils.normFids(singleGeomLayer)
         qgsUtils.writeVectorLayer(singleGeomLayer,singleGeomPath)
-        #QgsProject.instance().addMapLayer(singleGeomLayer)
         qgsUtils.loadVectorLayer(singleGeomPath,loadProject=True)
         progress.progressFeedback.endSection()
             

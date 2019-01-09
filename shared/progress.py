@@ -30,6 +30,7 @@ from . import utils
 from . import qgsUtils
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
+from PyQt5.QtGui import QGuiApplication
 
 progressConnector = None
 progressFeedback = None
@@ -144,6 +145,7 @@ class ProgressFeedback(QgsProcessingFeedback):
         if subText:
             msg += subText
         self.dlg.lblProgress.setText(msg)
+        QGuiApplication.processEvents()
         
     def setProgress(self,value):
         #utils.debug("setProgress " + str(value))

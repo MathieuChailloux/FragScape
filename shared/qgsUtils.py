@@ -290,7 +290,7 @@ def normFids(layer):
     feats = layer.getFeatures()
     layer.startEditing()
     for f in feats:
-        utils.debug("new fid(" + str(f.id()) + ") = " + str(max_fid))
+        #utils.debug("new fid(" + str(f.id()) + ") = " + str(max_fid))
         layer.changeAttributeValue(f.id(),0,max_fid)
         #f.setId(max_fid)
         max_fid += 1
