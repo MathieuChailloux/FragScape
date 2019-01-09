@@ -1,2 +1,8 @@
-# Meff
-A QGIS plugin to compute mesh effective size
+# Overview
+
+Meff is a QGIS 3 plugin to compute landscape fragmentation measures such as effective mesh size.
+
+According to Jaeger(2000), 
+
+# 
+
