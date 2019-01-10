@@ -140,6 +140,7 @@ class LanduseModel(abstract_model.DictModel):
         self.landuseLayer = None
         self.landuseField = None
         fields = ["value","isNatural"]
+        self.dataClipFlag = True
         super().__init__(self,fields)
                         
     def mkItemFromDict(self,dict):
@@ -165,6 +166,10 @@ class LanduseModel(abstract_model.DictModel):
     def getDissolveLayer(self):
         return params.mkOutputFile("landuseSelectionDissolve.gpkg")
         
+    def switchDataClipFlag(self,state):
+        utils.debug("switchDataClipFlag")
+        self.dataClipFlag = not self.dataClipFlag
+
     def mkSelectionExpr(self):
         expr = ""
         for item in self.items:
@@ -188,9 +193,13 @@ class LanduseModel(abstract_model.DictModel):
             utils.user_error("No expression selected : TODO select everything")
         selectionResLayer = self.getSelectionLayer()
         dissolveLayer = self.getDissolveLayer()
-        #clipLayer = self.getClipLayer()
-        #qgsTreatments.applyVectorClip(in_layer,territory_layer,clipLayer)
-        extractSourceLayer = in_layer
+        if self.dataClipFlag:
+            utils.debug("dataClipFlag activated")
+            clip_layer = self.getClipLayer()
+            qgsTreatments.applyVectorClip(in_layer,territory_layer,clip_layer)
+            extractSourceLayer = clip_layer
+        else:
+            extractSourceLayer = in_layer
         qgsTreatments.extractByExpression(extractSourceLayer,expr,selectionResLayer)
         dissolved = qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
         qgsUtils.loadLayer(dissolved,loadProject=True)
@@ -228,12 +237,13 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseLayer.fileChanged.connect(self.loadLayer)
         self.dlg.landuseFieldCombo.fieldChanged.connect(self.loadField)
         self.dlg.landuseRun.clicked.connect(self.model.applyItems)
+        self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         
     def setLayer(self,layer):
         utils.debug("setLayer " + str(layer.type))
         self.dlg.landuseFieldCombo.setLayer(layer)
         self.model.landuseLayer = layer
-    
+  
     def loadLayer(self,path):
         utils.debug("loadLayer")
         loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
