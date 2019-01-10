@@ -32,11 +32,13 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QTranslator, qVersion, QCoreApplication
 
 from qgis.gui import QgsFileWidget
+from qgis.core import QgsApplication
 
 from .shared import utils, progress, config_parsing, log, qgsTreatments
 #from .shared import progress
 #from .shared import config_parsing
 from . import params, landuse, tabs, fragm, reporting
+from .algsProvider import MeffAlgorithmsProvider
 #from . import landuse
 #from .shared import log
 #from . import tabs
@@ -57,6 +59,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         # self.<objectname>, and you can use autoconnect slots - see
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
+        self.provider = MeffAlgorithmsProvider()
         self.setupUi(self)
 
     def initTabs(self):
@@ -82,6 +85,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         self.recomputeParsers()
         
     def initGui(self):
+        QgsApplication.processingRegistry().addProvider(self.provider)
         for k, tab in self.connectors.items():
             tab.initGui()
         
@@ -130,6 +134,9 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     # Initialize or re-initialize global variables.
     def initializeGlobals(self):
         pass  
+        
+    def unload(self):
+        QgsApplication.processingRegistry().removeProvider(self.provider)
         
     def initLog(self):
         utils.print_func = self.txtLog.append
