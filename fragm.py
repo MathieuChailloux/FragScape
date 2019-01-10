@@ -98,12 +98,17 @@ class FragmModel(abstract_model.DictModel):
     def applyItems(self,indexes):
         fragmMsg = "Application of fragmentation data to landuse"
         progress.progressFeedback.beginSection(fragmMsg)
+        territory_layer = params.getTerritoryLayer()
         for item in self.items:
             in_layer_path = params.getOrigPath(item.dict["in_layer"])
             in_layer = qgsUtils.loadVectorLayer(in_layer_path)
+            if params.getDataClipFlag():
+                source_layer = qgsTreatments.applyVectorClip(in_layer,territory_layer,'memory:')
+            else:
+                source_layer = in_layer
             name = item.dict["name"]
             selectionPath = item.getSelectionLayer()
-            qgsTreatments.selectGeomByExpression(in_layer,item.dict["expr"],selectionPath,name)
+            qgsTreatments.selectGeomByExpression(source_layer,item.dict["expr"],selectionPath,name)
             #selectionLayer = qgsTreatments.extractByExpression(in_layer_path,item.dict["expr"],selectionPath)
             #utils.debug("selectionNLayer = " + str(selectionLayer))
             #qgsUtils.loadVectorLayer(selectionPath,loadProject=True)

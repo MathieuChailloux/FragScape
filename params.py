@@ -93,6 +93,9 @@ def getPathFromLayerCombo(combo):
         
 def getTerritoryLayer():
     return getOrigPath(params.territoryLayer)
+    
+def getDataClipFlag():
+    return params.dataClipFlag
 
 def mkOutputFile(name):
     checkWorkspaceInit()
@@ -107,6 +110,7 @@ class ParamsModel(QAbstractTableModel):
         self.workspace = None
         self.outputDir = None
         self.territoryLayer = None
+        self.dataClipFlag = True
         self.projectFile = ""
         self.crs = defaultCrs
         self.fields = ["workspace","territoryLayer","projectFile","crs"]
@@ -117,6 +121,12 @@ class ParamsModel(QAbstractTableModel):
         utils.info("Setting territory layer to " + str(path))
         self.territoryLayer = path
         #self.layoutChanged.emit()
+        
+    def setDataClipFalg(self,val):
+        self.dataClipFlag = val
+        
+    def switchDataClipFlag(self):
+        self.dataClipFlag = not self.dataClipFlag
         
     def setCrs(self,crs):
         utils.info("Setting extent CRS to " + crs.description())
@@ -142,28 +152,6 @@ class ParamsModel(QAbstractTableModel):
         if not os.path.isdir(norm_path):
             utils.user_error("Directory '" + norm_path + "' does not exist")
         self.outputDir = utils.createSubdir(norm_path,"outputs")
-    
-    def fromXMLRoot(self,root):
-        dict = root.attrib
-        utils.debug("params dict = " + str(dict))
-        return self.fromXMLDict(dict)
-    
-    def fromXMLDict(self,dict):
-        if "workspace" in dict:
-            if os.path.isdir(dict["workspace"]):
-                self.setWorkspace(dict["workspace"])
-        if "territoryLayer" in dict:
-            self.setTerritoryLayer(dict["territoryLayer"])
-        self.layoutChanged.emit()
-    
-    def toXML(self,indent=""):
-        xmlStr = indent + "<" + self.parser_name
-        if self.workspace:
-            xmlStr += " workspace=\"" + str(self.workspace) + "\""
-        if self.territoryLayer:
-            xmlStr += " territoryLayer=\"" + str(self.territoryLayer) + "\""
-        xmlStr += "/>"
-        return xmlStr
         
     def rowCount(self,parent=QModelIndex()):
         return len(self.fields)
@@ -204,6 +192,7 @@ class ParamsModel(QAbstractTableModel):
 class ParamsConnector:
 
     def __init__(self,dlg):
+        self.parser_name = "Params"
         self.dlg = dlg
         self.model = ParamsModel()
         
@@ -216,10 +205,44 @@ class ParamsConnector:
         self.dlg.paramsView.setModel(self.model)
         self.dlg.territoryLayer.setStorageMode(QgsFileWidget.GetFile)
         self.dlg.territoryLayer.fileChanged.connect(self.model.setTerritoryLayer)
+        self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         self.dlg.workspace.setStorageMode(QgsFileWidget.GetDirectory)
         self.dlg.workspace.fileChanged.connect(self.model.setWorkspace)
         self.dlg.paramsCrs.crsChanged.connect(self.model.setCrs)
         header = self.dlg.paramsView.horizontalHeader()     
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.model.layoutChanged.emit()
+
+    def fromXMLRoot(self,root):
+        dict = root.attrib
+        utils.debug("params dict = " + str(dict))
+        return self.fromXMLDict(dict)
+
+    def fromXMLDict(self,dict):
+        if "workspace" in dict:
+            if os.path.isdir(dict["workspace"]):
+                self.model.setWorkspace(dict["workspace"])
+        if "territoryLayer" in dict:
+            self.model.setTerritoryLayer(dict["territoryLayer"])
+        if "dataClipFlag" in dict:
+            # Cast with bool() not working
+            flag = dict["dataClipFlag"] == "True"
+            # Maybe QCheckbox could be wrapped in a model and atomatically updated
+            if flag == True:
+                utils.debug("cas1")
+                self.dlg.dataClipFlag.setCheckState(2)
+            else:
+                utils.debug("cas2")
+                self.dlg.dataClipFlag.setCheckState(0)
+        self.model.layoutChanged.emit()
+
+    def toXML(self,indent=""):
+        xmlStr = indent + "<" + self.parser_name
+        if self.model.workspace:
+            xmlStr += " workspace=\"" + str(self.model.workspace) + "\""
+        if self.model.territoryLayer:
+            xmlStr += " territoryLayer=\"" + str(self.model.territoryLayer) + "\""
+        xmlStr += " dataClipFlag=\"" + str(self.model.dataClipFlag) + "\""
+        xmlStr += "/>"
+        return xmlStr
         

@@ -61,8 +61,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def initTabs(self):
         global landuseModel
-        paramsConnector = params.ParamsConnector(self)
-        params.params = paramsConnector.model
+        self.paramsConnector = params.ParamsConnector(self)
+        params.params = self.paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self)
         landuse.landuseModel = self.landuseConnector.model
         self.fragmConnector = fragm.FragmConnector(self)
@@ -72,7 +72,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         progressConnector = progress.ProgressConnector(self)
         progress.progressConnector = progressConnector
         tabConnector = tabs.TabConnector(self)
-        self.connectors = {"Params" : paramsConnector,
+        self.connectors = {"Params" : self.paramsConnector,
                            "Log" : logConnector,
                            "Landuse" : self.landuseConnector,
                            "Fragm" : self.fragmConnector,
@@ -169,7 +169,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     
     # Recompute self.parsers in case they have been reloaded
     def recomputeParsers(self):
-        self.parsers = [params.params,self.landuseConnector,
+        self.parsers = [self.paramsConnector,
+                        self.landuseConnector,
                         self.fragmConnector.model,
                         self.reportingConnector]
         

@@ -193,7 +193,7 @@ class LanduseModel(abstract_model.DictModel):
             utils.user_error("No expression selected : TODO select everything")
         selectionResLayer = self.getSelectionLayer()
         dissolveLayer = self.getDissolveLayer()
-        if self.dataClipFlag:
+        if params.getDataClipFlag():
             utils.debug("dataClipFlag activated")
             clip_layer = self.getClipLayer()
             qgsTreatments.applyVectorClip(in_layer,territory_layer,clip_layer)
