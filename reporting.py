@@ -107,7 +107,7 @@ class ReportingModel(abstract_model.DictModel):
                     new_f["patch_id"] = f.id()
                     new_f["report_id"] = report_feat.id()
                     new_f["area"] = f_area
-                    new_f["report_area"] = report_area
+                    new_f["report_area"] = intersection_area
                     new_f.setGeometry(f_geom)
                     res = intersection_layer.dataProvider().addFeature(new_f)
                     if not res:
