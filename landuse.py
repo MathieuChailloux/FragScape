@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingOutputVectorLayer
+from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QCoreApplication
 from .shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
@@ -166,19 +166,18 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Selection expression"),
                 "",
                 self.INPUT))
-        self.addOutput(
-            QgsProcessingOutputVectorLayer(
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
-                self.tr("Output layer"),
-                QgsProcessing.TypeVectorAnyGeometry))
+                self.tr("Output layer")))
                 
-    def run(self,parameters,context,feedback):
+    def processAlgorithm(self,parameters,context,feedback):
         feedback.pushInfo("begin")
         source = self.parameterAsSource(parameters,self.INPUT,context)
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        output = self.parameterAsOutputLayer(parameters,OUTPUT,context)
+        output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
         if output is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
         selected = qgsTreatments.extractByExpression(source,expr,'memory:')
