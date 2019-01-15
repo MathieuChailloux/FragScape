@@ -27,7 +27,7 @@ from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant
 from processing import QgsProcessingUtils
 
-from .shared import utils, abstract_model, qgsUtils, progress
+from ..shared import utils, abstract_model, qgsUtils, progress
 from . import params, fragm
 
 class ReportingModel(abstract_model.DictModel):

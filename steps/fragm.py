@@ -29,7 +29,7 @@ from qgis.core import QgsProject, QgsMapLayerProxyModel, QgsVectorLayer, QgsProc
 import processing
 from processing import QgsProcessingUtils
 
-from .shared import utils, abstract_model, qgsUtils, qgsTreatments, progress
+from ..shared import utils, abstract_model, qgsUtils, qgsTreatments, progress
 from . import params, landuse
 
 fragm_fields = ["in_layer","expr","buffer","name"]

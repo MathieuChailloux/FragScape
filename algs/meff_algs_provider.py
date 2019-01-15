@@ -25,12 +25,12 @@
 
 from qgis.core import QgsApplication, QgsProcessingProvider
 
-from .landuse import LanduseAlgorithm
+from ..steps.landuse import LanduseAlgorithm
 
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [LanduseAlgorithm()]
+        self.alglist = [LanduseAlgorithm(),ApplyFragmentationAlgorithm()]
         for a in self.alglist:
             a.initAlgorithm()
         super().__init__()

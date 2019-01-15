@@ -30,10 +30,7 @@ from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QHeaderView
 
-from .shared import utils
-from .shared import qgsUtils
-from .shared import qgsTreatments
-from .shared import abstract_model
+from ..shared import utils, qgsUtils, qgsTreatments, abstract_model
 
 # Meff global parameters
 

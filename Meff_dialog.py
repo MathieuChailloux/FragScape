@@ -35,13 +35,9 @@ from qgis.gui import QgsFileWidget
 from qgis.core import QgsApplication
 
 from .shared import utils, progress, config_parsing, log, qgsTreatments
-#from .shared import progress
-#from .shared import config_parsing
-from . import params, landuse, tabs, fragm, reporting
-from .algsProvider import MeffAlgorithmsProvider
-#from . import landuse
-#from .shared import log
-#from . import tabs
+from .algs.meff_algs import MeffAlgorithmsProvider
+from .steps import params, landuse, fragm, reporting
+from . import tabs
 
 #from MeffAbout_dialog import MeffAboutDialog
 

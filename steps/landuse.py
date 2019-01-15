@@ -25,7 +25,7 @@
 from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QCoreApplication
-from .shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
+from ..shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
 from . import params
 
 landuseModel = None

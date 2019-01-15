@@ -104,7 +104,7 @@ def setProgressBar(progress_bar):
     global progressBar
     progressBar = progress_bar
         
-def applyProcessingAlg(provider,alg_name,parameters):
+def applyProcessingAlg(provider,alg_name,parameters,feedback=None):
     # global progressFeedback
     # if progressFeedback:
         # utils.debug("feedback : " + progressFeedback.__class__.__name__)
@@ -116,7 +116,10 @@ def applyProcessingAlg(provider,alg_name,parameters):
         complete_name = provider + ":" + alg_name
         utils.info("Calling processing algorithm '" + complete_name + "'")
         start_time = time.time()
-        res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
+        if feedback:
+            res = processing.run(complete_name,parameters,feedback=feedback)
+        else:
+            res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
         utils.debug("res1 = " + str(res))
         end_time = time.time()
         diff_time = end_time - start_time
@@ -209,7 +212,7 @@ def multiToSingleGeom(in_layer,out_layer):
     res = applyProcessingAlg("qgis","multiparttosingleparts",parameters)
     return res
     
-def dissolveLayer(in_layer,out_layer):
+def dissolveLayer(in_layer,out_layer,context=None,feedback=None):
     #utils.checkFileExists(in_layer)
     progress.progressFeedback.setSubText("Dissolve " + str(in_layer))
     if out_layer:
@@ -217,7 +220,9 @@ def dissolveLayer(in_layer,out_layer):
     parameters = { 'FIELD' : [],
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","dissolve",parameters)
+    if feedback:
+        feedback.pushInfo("parameters = " + str(parameters))
+    res = applyProcessingAlg("qgis","dissolve",parameters,feedback)
     return res
     
 def applyBufferFromExpr(in_layer,expr,out_layer):
