@@ -189,17 +189,17 @@ def extractByExpression(in_layer,expr,out_layer,context=None,feedback=None):
     res = applyProcessingAlg("qgis","extractbyexpression",parameters,context=context,feedback=feedback)
     return res
     
-def selectByExpression(in_layer,expr):
+def selectByExpression(in_layer,expr,context=None,feedback=None):
     parameters = { 'EXPRESSION' : expr,
                    'INPUT' : in_layer,
                    'METHOD' : 0 }
-    res = applyProcessingAlg("qgis","selectbyexpression",parameters)
+    res = applyProcessingAlg("qgis","selectbyexpression",parameters,context=context,feedback=feedback)
     return res
     
-def saveSelectedAttributes(in_layer,out_layer):
+def saveSelectedAttributes(in_layer,out_layer,context=None,feedback=None):
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","saveselectedfeatures",parameters)
+    res = applyProcessingAlg("qgis","saveselectedfeatures",parameters,context=context,feedback=feedback)
     return res
     
 def cloneLayer(layer):
@@ -207,11 +207,11 @@ def cloneLayer(layer):
     clone_layer = saveSelectedAttributes(layer,'memory:')
     return clone_layer
                    
-def multiToSingleGeom(in_layer,out_layer):
+def multiToSingleGeom(in_layer,out_layer,context=None,feedback=None):
     progress.progressFeedback.setSubText("Multi to single geometry")
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","multiparttosingleparts",parameters)
+    res = applyProcessingAlg("qgis","multiparttosingleparts",parameters,context=context,feedback=feedback)
     return res
     
 def dissolveLayer(in_layer,out_layer,context=None,feedback=None):
@@ -227,7 +227,7 @@ def dissolveLayer(in_layer,out_layer,context=None,feedback=None):
     res = applyProcessingAlg("native","dissolve",parameters,context,feedback)
     return res
     
-def applyBufferFromExpr(in_layer,expr,out_layer):
+def applyBufferFromExpr(in_layer,expr,out_layer,context=None,feedback=None):
     #utils.checkFileExists(in_layer)
     progress.progressFeedback.setSubText("Buffer (" + str(expr) + ") on " + str(out_layer))
     if out_layer:
@@ -241,32 +241,32 @@ def applyBufferFromExpr(in_layer,expr,out_layer):
                    'JOIN_STYLE' : 0,
                    'MITER_LIMIT' : 2,
                    'SEGMENTS' : 5 }
-    res = applyProcessingAlg("qgis","buffer",parameters)
+    res = applyProcessingAlg("qgis","buffer",parameters,context,feedback)
     return res
     
-def mergeVectorLayers(in_layers,crs,out_layer):
+def mergeVectorLayers(in_layers,crs,out_layer,context=None,feedback=None):
     progress.progressFeedback.setSubText("Merge vector layers")
     parameters = { 'CRS' : crs,
                    'LAYERS' : in_layers,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","mergevectorlayers",parameters)
+    res = applyProcessingAlg("qgis","mergevectorlayers",parameters,context,feedback)
     return res
                    
     
-def applyDifference(in_layer,diff_layer,out_layer):
+def applyDifference(in_layer,diff_layer,out_layer,context=None,feedback=None):
     progress.progressFeedback.setSubText("Difference")
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'OVERLAY' : diff_layer }
-    res = applyProcessingAlg("qgis","difference",parameters)
+    res = applyProcessingAlg("qgis","difference",parameters,context=context,feedback=feedback)
     return res  
     
-def applyVectorClip(in_layer,clip_layer,out_layer):
+def applyVectorClip(in_layer,clip_layer,out_layer,context=None,feedback=None):
     progress.progressFeedback.setSubText("Clip")
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'OVERLAY' : clip_layer }
-    res = applyProcessingAlg("qgis","clip",parameters)
+    res = applyProcessingAlg("qgis","clip",parameters,context,feedback)
     return res
     
 # Apply rasterization on field 'field' of vector layer 'in_path'.

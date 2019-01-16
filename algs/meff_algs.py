@@ -22,8 +22,9 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtCore import QCoreApplication
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsProcessingProvider, QgsProcessingParameterMultipleLayers, QgsProcessingUtils, QgsProcessingParameterNumber
+from PyQt5.QtCore import QCoreApplication, QVariant
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsProcessingProvider, QgsProcessingParameterMultipleLayers, QgsProcessingUtils, QgsProcessingParameterNumber, QgsProcessingParameterMatrix
+from qgis.core importQgsField, QgsFeature, QgsFeatureSink
 
 import processing
 
@@ -131,11 +132,11 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
     def displayName(self):
         return self.tr("Landuse Dissolve")
         
-    def group(self):
-        return self.tr("Meff")
+    # def group(self):
+        # return self.tr("Meff")
         
-    def groupId(self):
-        return "meff"
+    # def groupId(self):
+        # return "meff"
         
     def shortHelpString(self):
         return self.tr("TODO")
@@ -162,42 +163,28 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
         def no_post_process(alg, context, feedback):
             pass
         feedback.pushInfo("begin")
-        feedback.pushInfo("source 1 = " + str(parameters[self.INPUT]))
-        #source = self.parameterAsSource(parameters,self.INPUT,context)
         source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
         feedback.pushInfo("source = " + str(source))
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
         feedback.pushInfo("source ok")
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
-        #output = self.parameterAsVectorLayer(parameters,self.OUTPUT,context)
-        #(sink, sink_id) = self.parameterAsSink(
-        #    parameters,
-        #    self.OUTPUT,
-        #    context,
-        #    source.fields(),
-        #    source.wkbType(),
-        #    source.sourceCrs())
-        #if sink is None:
-        #    raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
         select_layer = QgsProcessingUtils.generateTempFilename("select.gpkg")
         feedback.pushInfo("select_layer = " + str(select_layer))
         selected = qgsTreatments.extractByExpression(source,expr,'memory:',context=context,feedback=feedback)
         feedback.pushInfo("selected = " + str(selected))
-        #selected = qgsTreatments.extractByExpression(source,expr,'memory:')
-        #selected = qgsTreatments.extractByExpression(source,expr,select_layer)
         output = parameters[self.OUTPUT]
         dissolved = qgsTreatments.dissolveLayer(selected,output,context=context,feedback=feedback)
-        #qgsUtils.loadLayer(dissolved,loadProject=True)
         feedback.pushInfo("end")
         return {self.OUTPUT : dissolved}
+        
         
         
 class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
 
     LANDUSE = "LANDUSE"
     FRAGMENTATION = "FRAGMENTATION"
+    MATRIX = "MATRIX"
     OUTPUT = "OUTPUT"
 
     def tr(self, string):
@@ -212,11 +199,11 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
     def displayName(self):
         return self.tr("Apply Fragmentation")
         
-    def group(self):
-        return self.tr("Meff")
+    # def group(self):
+        # return self.tr("Meff")
         
-    def groupId(self):
-        return "meff"
+    # def groupId(self):
+        # return "meff"
         
     def shortHelpString(self):
         return self.tr("This algorithm cuts a land use layer with fragmentation data")
@@ -240,39 +227,196 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
     def processAlgorithm(self,parameters,context,feedback):
         feedback.pushInfo("begin")
         # Parameters
-        feedback.pushInfo("paramters = " + str(parameters))
-        landuse = self.parameterAsSource(parameters,self.LANDUSE,context)
-        feedback.pushInfo("landuse = " + str(landuse))
-        feedback.pushInfo("landuse type = " + str(type(landuse)))
+        feedback.pushInfo("parameters = " + str(parameters))
+        landuse = self.parameterAsVectorLayer(parameters,self.LANDUSE,context)
         if landuse is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
         fragm_layers = self.parameterAsLayerList(parameters,self.FRAGMENTATION,context)
         #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
-        (sink, sink_id) = self.parameterAsSink(
-            parameters,
-            self.OUTPUT,
-            context,
-            landuse.fields(),
-            landuse.wkbType(),
-            landuse.sourceCrs())
-        feedback.pushInfo("sink = " + str(sink))
-        feedback.pushInfo("sink_id = " + str(sink_id))
-        if sink is None:
-            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        output = parameters[self.OUTPUT]
         # Merge fragmentation layers
-        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,params.params.crs,'memory:')
+        fragm_path = QgsProcessingUtils.generateTempFilename("fragm.gpkg")
+        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,params.params.crs,fragm_path)
         feedback.pushDebugInfo("fragm_layer = " + str(fragm_layer))
-        #utils.debug("fragm_layer = " + str(fragm_layer))
         if fragm_layer is None:
             raise QgsProcessingException("Fragmentation layers merge failed")
         # Apply difference
-        diff_layer = qgsTreatments.applyDifference(landuse,fragm_layer,'memory:')
+        diff_layer = qgsTreatments.applyDifference(landuse,fragm_layer,'memory:',context=context,feedback=feedback)
         if fragm_layer is None:
             raise QgsProcessingException("Difference landuse/fragmentation failed")
         # Multi to single part
-        singleGeomLayer = qgsTreatments.multiToSingleGeom(landuseFragmPath,sink_id)
+        singleGeomLayer = qgsTreatments.multiToSingleGeom(diff_layer,output,context=context,feedback=feedback)
         if fragm_layer is None:
             raise QgsProcessingException("Multi to single part failed")
         feedback.pushInfo("end")
-        return {self.OUTPUT : fragm_layer}
+        return {self.OUTPUT : singleGeomLayer}
         
+                
+class ReportingIntersection(QgsProcessingAlgorithm):
+
+    INPUT = "INPUT"
+    REPORTING = "REPORTING"
+    OUTPUT = "OUTPUT"
+    
+    PATCH_ID_FIELD = QgsField("patch_id", QVariant.Int)
+    REPORT_ID_FIELD = QgsField("report_id", QVariant.Int)
+    AREA_FIELD = QgsField("area", QVariant.Double)
+    REPORT_AREA_FIELD = QgsField("report_area", QVariant.Double)
+    FIELDS = [PATCH_ID_FIELD,REPORT_ID_FIELD,AREA_FIELD,REPORT_AREA_FIELD]
+
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
+        
+    def createInstance(self):
+        return ReportingIntersection()
+        
+    def name(self):
+        return "reportingIntersection"
+        
+    def displayName(self):
+        return self.tr("4.1 - Reporting Intersection")
+        
+    # def group(self):
+        # return self.tr("Meff")
+        
+    # def groupId(self):
+        # return "meff"
+        
+    def shortHelpString(self):
+        return self.tr("Computes intersections with each reporting unit")
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                self.tr("Input layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.REPORTING,
+                self.tr("Reporting layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer")))
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        feedback.pushInfo("begin")
+        # Parameters
+        source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
+        feedback.pushInfo("source = " + str(source))
+        if source is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
+        feedback.pushInfo("reporting = " + str(reporting))
+        if reporting is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            source.fields(),
+            source.wkbType(),
+            source.sourceCrs()
+        )
+        if sink is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # progress step
+        nb_feats = source.featureCount() * reporting.featureCount()
+        if nb_feats == 0:
+            raise QgsProcessingException("Empty layers")
+        progress_step = 100.0 / nb_feats
+        curr_step = 0
+        # gna gna
+        for f in source.getFeatures():
+            f_geom = f.geometry()
+            f_area = f_geom.area()
+            patches_area_sum = 0
+            for report_feat in  reporting.getFeatures():
+                report_geom = report_feat.geometry()
+                report_area = report_geom.area()
+                if f_geom.intersects(report_geom):
+                    intersection = f_geom.intersection(report_geom)
+                    intersection_area = intersection.area()
+                    #f_area2 = pow(f_area,2)
+                    #intersection_area2 = pow(intersection_area,2)
+                    f_area_cbc = intersection_area * (f_area - intersection_area)
+                    patches_area_sum += f_area_cbc
+                    new_f = QgsFeature(intersection_fields)
+                    new_f["patch_id"] = f.id()
+                    new_f["report_id"] = report_feat.id()
+                    new_f["area"] = f_area
+                    new_f["report_area"] = intersection_area
+                    new_f.setGeometry(f_geom)
+                    sink.addFeature(new_f,QgsFeatureSink.FastInsert)
+                    curr_step += 1
+                    feedback.setProgress(int(curr_step * progress_step))
+            #coh = patches_area_sum / f_area
+            #utils.debug("coh = " + str(coh))
+        return {self.OUTPUT: sink_id}
+
+        
+class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
+
+    INPUT = "INPUT"
+    OUTPUT = "OUTPUT"
+
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
+        
+    def createInstance(self):
+        return EffectiveMeshSizeAlgorithm()
+        
+    def name(self):
+        return "effectiveMeshSize"
+        
+    def displayName(self):
+        return self.tr("Effective Mesh Size")
+        
+    # def group(self):
+        # return self.tr("Meff")
+        
+    # def groupId(self):
+        # return "meff"
+        
+    def shortHelpString(self):
+        return self.tr("Computes effective mesh size and other fragmentation metrics")
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                self.tr("Land use layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer")))
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        feedback.pushInfo("begin")
+        # Parameters
+        feedback.pushInfo("parameters = " + str(parameters))
+        landuse = self.parameterAsVectorLayer(parameters,self.LANDUSE,context)
+        if landuse is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
+        fragm_layers = self.parameterAsLayerList(parameters,self.FRAGMENTATION,context)
+        #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        output = parameters[self.OUTPUT]
+        # Merge fragmentation layers
+        fragm_path = QgsProcessingUtils.generateTempFilename("fragm.gpkg")
+        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,params.params.crs,fragm_path)
+        feedback.pushDebugInfo("fragm_layer = " + str(fragm_layer))
+        if fragm_layer is None:
+            raise QgsProcessingException("Fragmentation layers merge failed")
+        # Apply difference
+        diff_layer = qgsTreatments.applyDifference(landuse,fragm_layer,'memory:',context=context,feedback=feedback)
+        if fragm_layer is None:
+            raise QgsProcessingException("Difference landuse/fragmentation failed")
+        # Multi to single part
+        singleGeomLayer = qgsTreatments.multiToSingleGeom(diff_layer,output,context=context,feedback=feedback)
+        if fragm_layer is None:
+            raise QgsProcessingException("Multi to single part failed")
+        feedback.pushInfo("end")
+        return {self.OUTPUT : singleGeomLayer}
