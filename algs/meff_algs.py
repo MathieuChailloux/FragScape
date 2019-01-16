@@ -23,7 +23,9 @@
 """
 
 from PyQt5.QtCore import QCoreApplication
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsProcessingProvider, QgsProcessingParameterMultipleLayers, QgsProcessingUtils
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsProcessingProvider, QgsProcessingParameterMultipleLayers, QgsProcessingUtils, QgsProcessingParameterNumber
+
+import processing
 
 from ..shared import utils, qgsTreatments
 from ..steps import params
@@ -31,7 +33,7 @@ from ..steps import params
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [LanduseAlgorithm(), ApplyFragmentationAlgorithm()]
+        self.alglist = [algTest(), LanduseAlgorithm(), ApplyFragmentationAlgorithm()]
         for a in self.alglist:
             a.initAlgorithm()
         super().__init__()
@@ -53,6 +55,64 @@ class MeffAlgorithmsProvider(QgsProcessingProvider):
             self.addAlgorithm(a)
 
 
+class algTest(QgsProcessingAlgorithm):
+    INPUT_BUFFERDIST = 'BUFFERDIST'
+    OUTPUT_BUFFER = 'OUTPUT_BUFFER'
+    INPUT_VECTOR = 'INPUT_VECTOR'
+
+    def __init__(self):
+        super().__init__()
+
+    def name(self):
+        return "algTest"
+
+    def displayName(self):
+        return "algTest script"
+
+    def createInstance(self):
+        return type(self)()
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(QgsProcessingParameterFeatureSource(
+            self.INPUT_VECTOR, "Input vector",[QgsProcessing.TypeVectorAnyGeometry]))
+        self.addParameter(QgsProcessingParameterNumber(
+            self.INPUT_BUFFERDIST, "Buffer distance",
+            QgsProcessingParameterNumber.Double,
+            100.0))
+        self.addParameter(QgsProcessingParameterFeatureSink(
+            self.OUTPUT_BUFFER, "Output buffer"))
+
+    def processAlgorithm(self, parameters, context, feedback):
+        # Dummy function to enable running an alg inside an alg
+        def no_post_process(alg, context, feedback):
+            pass
+        #DO SOMETHING
+        #source = self.parameterAsSource( parameters,self.INPUT_VECTOR,context)
+        source = self.parameterAsVectorLayer( parameters,self.INPUT_VECTOR,context)
+        algresult = processing.run("native:smoothgeometry",
+            #{'INPUT': parameters[self.INPUT_VECTOR],
+            {'INPUT': source,
+             'ITERATIONS':2,
+             'OFFSET':0.25,
+             'MAX_ANGLE':180,
+             'OUTPUT': 'memory:'},
+            context=context, feedback=feedback, onFinish=no_post_process)
+        smoothed = algresult['OUTPUT']
+        buf = self.parameterAsDouble(parameters, self.INPUT_BUFFERDIST,context)
+        algresult = processing.run('native:buffer',
+            {'INPUT': smoothed,
+            #'DISTANCE': parameters[self.INPUT_BUFFERDIST],
+            'DISTANCE': buf,
+            'SEGMENTS': 5,
+            'END_CAP_STYLE': 0,
+            'JOIN_STYLE': 0,
+            'MITER_LIMIT': 10,
+            'DISSOLVE': True,
+            'OUTPUT': parameters[self.OUTPUT_BUFFER]},
+            context=context, feedback=feedback, onFinish=no_post_process)
+        buffered = algresult['OUTPUT']
+        return {self.OUTPUT_BUFFER: buffered}
+            
 class LanduseAlgorithm(QgsProcessingAlgorithm):
 
     INPUT = "INPUT"
@@ -98,6 +158,9 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
+        # Dummy function to enable running an alg inside an alg
+        def no_post_process(alg, context, feedback):
+            pass
         feedback.pushInfo("begin")
         feedback.pushInfo("source 1 = " + str(parameters[self.INPUT]))
         #source = self.parameterAsSource(parameters,self.INPUT,context)
@@ -109,22 +172,23 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
         #output = self.parameterAsVectorLayer(parameters,self.OUTPUT,context)
-        (sink, sink_id) = self.parameterAsSink(
-            parameters,
-            self.OUTPUT,
-            context,
-            source.fields(),
-            source.wkbType(),
-            source.sourceCrs())
-        if sink is None:
-            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        #(sink, sink_id) = self.parameterAsSink(
+        #    parameters,
+        #    self.OUTPUT,
+        #    context,
+        #    source.fields(),
+        #    source.wkbType(),
+        #    source.sourceCrs())
+        #if sink is None:
+        #    raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
         select_layer = QgsProcessingUtils.generateTempFilename("select.gpkg")
         feedback.pushInfo("select_layer = " + str(select_layer))
-        selected = qgsTreatments.extractByExpression(source,expr,'memory:')
+        selected = qgsTreatments.extractByExpression(source,expr,'memory:',context=context,feedback=feedback)
         feedback.pushInfo("selected = " + str(selected))
         #selected = qgsTreatments.extractByExpression(source,expr,'memory:')
-        selected = qgsTreatments.extractByExpression(source,expr,'memory:')
-        dissolved = qgsTreatments.dissolveLayer(source,'memory:',context=context,feedback=feedback)
+        #selected = qgsTreatments.extractByExpression(source,expr,select_layer)
+        output = parameters[self.OUTPUT]
+        dissolved = qgsTreatments.dissolveLayer(selected,output,context=context,feedback=feedback)
         #qgsUtils.loadLayer(dissolved,loadProject=True)
         feedback.pushInfo("end")
         return {self.OUTPUT : dissolved}

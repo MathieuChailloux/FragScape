@@ -104,32 +104,34 @@ def setProgressBar(progress_bar):
     global progressBar
     progressBar = progress_bar
         
-def applyProcessingAlg(provider,alg_name,parameters,feedback=None):
+def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None):
+    # Dummy function to enable running an alg inside an alg
+    def no_post_process(alg, context, feedback):
+        pass
     # global progressFeedback
     # if progressFeedback:
-        # utils.debug("feedback : " + progressFeedback.__class__.__name__)
+        # feedback.pushDebugInfo("feedback : " + progressFeedback.__class__.__name__)
     #feedback = QgsProcessingFeedback()
     #feedback.setProgress(progressBar)
-    utils.debug("parameters : " + str(parameters))
+    if not feedback:
+        feedback = progress.progressFeedback
+    feedback.pushDebugInfo("parameters : " + str(parameters))
     QGuiApplication.processEvents()
     try:
         complete_name = provider + ":" + alg_name
-        utils.info("Calling processing algorithm '" + complete_name + "'")
+        feedback.pushInfo("Calling processing algorithm '" + complete_name + "'")
         start_time = time.time()
-        if feedback:
-            res = processing.run(complete_name,parameters,feedback=feedback)
-        else:
-            res = processing.run(complete_name,parameters,feedback=progress.progressFeedback)
-        utils.debug("res1 = " + str(res))
+        res = processing.run(complete_name,parameters,context=context,feedback=feedback,onFinish=no_post_process)
+        feedback.pushDebugInfo("res1 = " + str(res))
         end_time = time.time()
         diff_time = end_time - start_time
-        utils.info("Call to " + alg_name + " successful"
+        feedback.pushInfo("Call to " + alg_name + " successful"
                     + ", performed in " + str(diff_time) + " seconds")
         progress.progressFeedback.endJob()
-        utils.debug("res = " + str(res))
+        feedback.pushDebugInfo("res = " + str(res))
         if "OUTPUT" in res:
-            utils.debug("output = " + str(res["OUTPUT"]))
-            utils.debug("output type = " + str(type(res["OUTPUT"])))
+            feedback.pushDebugInfo("output = " + str(res["OUTPUT"]))
+            feedback.pushDebugInfo("output type = " + str(type(res["OUTPUT"])))
             return res["OUTPUT"]
         else:
             return None
@@ -137,7 +139,7 @@ def applyProcessingAlg(provider,alg_name,parameters,feedback=None):
         utils.warn ("Failed to call " + alg_name + " : " + str(e))
         raise e
     finally:  
-        utils.debug("End run " + alg_name)
+        feedback.pushDebugInfo("End run " + alg_name)
 
 def applyGrassAlg(parameters,alg_name):
     applyProcessingAlg("grass7",alg_name,parameters)
@@ -177,14 +179,14 @@ def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
     out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
     
         
-def extractByExpression(in_layer,expr,out_layer):
+def extractByExpression(in_layer,expr,out_layer,context=None,feedback=None):
     #utils.checkFileExists(in_layer)
     if out_layer:
         qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'EXPRESSION' : expr,
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","extractbyexpression",parameters)
+    res = applyProcessingAlg("qgis","extractbyexpression",parameters,context=context,feedback=feedback)
     return res
     
 def selectByExpression(in_layer,expr):
@@ -215,14 +217,14 @@ def multiToSingleGeom(in_layer,out_layer):
 def dissolveLayer(in_layer,out_layer,context=None,feedback=None):
     #utils.checkFileExists(in_layer)
     progress.progressFeedback.setSubText("Dissolve " + str(in_layer))
-    if out_layer:
-        qgsUtils.removeVectorLayer(out_layer)
+    #if out_layer:
+    #    qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'FIELD' : [],
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
     if feedback:
         feedback.pushInfo("parameters = " + str(parameters))
-    res = applyProcessingAlg("qgis","dissolve",parameters,feedback)
+    res = applyProcessingAlg("native","dissolve",parameters,context,feedback)
     return res
     
 def applyBufferFromExpr(in_layer,expr,out_layer):
