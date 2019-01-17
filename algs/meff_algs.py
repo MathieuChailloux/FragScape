@@ -23,8 +23,17 @@
 """
 
 from PyQt5.QtCore import QCoreApplication, QVariant
-from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsProcessingProvider, QgsProcessingParameterMultipleLayers, QgsProcessingUtils, QgsProcessingParameterNumber, QgsProcessingParameterMatrix
-from qgis.core importQgsField, QgsFeature, QgsFeatureSink
+from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException
+from qgis.core import (QgsProcessingParameterFeatureSource,
+                       QgsProcessingParameterExpression,
+                       QgsProcessingParameterFeatureSink,
+                       QgsProcessingProvider,
+                       QgsProcessingParameterMultipleLayers,
+                       QgsProcessingUtils,
+                       QgsProcessingParameterNumber,
+                       QgsProcessingParameterMatrix,
+                       QgsProcessingParameterBoolean)
+from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
 
@@ -34,7 +43,10 @@ from ..steps import params
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [algTest(), LanduseAlgorithm(), ApplyFragmentationAlgorithm()]
+        self.alglist = [LanduseAlgorithm(),
+                        ApplyFragmentationAlgorithm(),
+                        ReportingIntersection(),
+                        EffectiveMeshSizeAlgorithm()]
         for a in self.alglist:
             a.initAlgorithm()
         super().__init__()
@@ -199,12 +211,6 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
     def displayName(self):
         return self.tr("Apply Fragmentation")
         
-    # def group(self):
-        # return self.tr("Meff")
-        
-    # def groupId(self):
-        # return "meff"
-        
     def shortHelpString(self):
         return self.tr("This algorithm cuts a land use layer with fragmentation data")
 
@@ -258,12 +264,6 @@ class ReportingIntersection(QgsProcessingAlgorithm):
     REPORTING = "REPORTING"
     OUTPUT = "OUTPUT"
     
-    PATCH_ID_FIELD = QgsField("patch_id", QVariant.Int)
-    REPORT_ID_FIELD = QgsField("report_id", QVariant.Int)
-    AREA_FIELD = QgsField("area", QVariant.Double)
-    REPORT_AREA_FIELD = QgsField("report_area", QVariant.Double)
-    FIELDS = [PATCH_ID_FIELD,REPORT_ID_FIELD,AREA_FIELD,REPORT_AREA_FIELD]
-
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
         
@@ -275,12 +275,6 @@ class ReportingIntersection(QgsProcessingAlgorithm):
         
     def displayName(self):
         return self.tr("4.1 - Reporting Intersection")
-        
-    # def group(self):
-        # return self.tr("Meff")
-        
-    # def groupId(self):
-        # return "meff"
         
     def shortHelpString(self):
         return self.tr("Computes intersections with each reporting unit")
@@ -312,13 +306,22 @@ class ReportingIntersection(QgsProcessingAlgorithm):
         feedback.pushInfo("reporting = " + str(reporting))
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        patch_id_field = QgsField("patch_id", QVariant.Int)
+        report_id_field = QgsField("report_id", QVariant.Int)
+        area_field = QgsField("area", QVariant.Double)
+        report_area_field = QgsField("report_area", QVariant.Double)
+        output_fields = QgsFields()
+        output_fields.append(patch_id_field)
+        output_fields.append(report_id_field)
+        output_fields.append(area_field)
+        output_fields.append(report_area_field)
         (sink, dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT,
             context,
-            source.fields(),
-            source.wkbType(),
-            source.sourceCrs()
+            output_fields,
+            reporting.wkbType(),
+            reporting.sourceCrs()
         )
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
@@ -343,7 +346,7 @@ class ReportingIntersection(QgsProcessingAlgorithm):
                     #intersection_area2 = pow(intersection_area,2)
                     f_area_cbc = intersection_area * (f_area - intersection_area)
                     patches_area_sum += f_area_cbc
-                    new_f = QgsFeature(intersection_fields)
+                    new_f = QgsFeature(output_fields)
                     new_f["patch_id"] = f.id()
                     new_f["report_id"] = report_feat.id()
                     new_f["area"] = f_area
@@ -354,14 +357,30 @@ class ReportingIntersection(QgsProcessingAlgorithm):
                     feedback.setProgress(int(curr_step * progress_step))
             #coh = patches_area_sum / f_area
             #utils.debug("coh = " + str(coh))
-        return {self.OUTPUT: sink_id}
+        return {self.OUTPUT: dest_id}
 
         
 class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
 
+    # Algorithm parameters
     INPUT = "INPUT"
+    REPORTING = "REPORTING"
+    CBC_MODE = "CBC_MODE"
     OUTPUT = "OUTPUT"
-
+    
+    # Output layer fields
+    ID = "fid"
+    NB_PATCHES = "nb_patches"
+    # Main measures
+    MESH_SIZE = "effective_mesh_size"
+    DIVI = "landscape_division"
+    SPLITTING_INDEX = "splitting_index"
+    # Auxiliary measures
+    COHERENCE = "coherence"
+    SPLITTING_DENSITY = "splitting_density"
+    NET_PRODUCT = "net_product"
+    
+    
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
         
@@ -372,23 +391,26 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         return "effectiveMeshSize"
         
     def displayName(self):
-        return self.tr("Effective Mesh Size")
-        
-    # def group(self):
-        # return self.tr("Meff")
-        
-    # def groupId(self):
-        # return "meff"
+        return self.tr("4 - Effective Mesh Size")
         
     def shortHelpString(self):
-        return self.tr("Computes effective mesh size and other fragmentation metrics")
+        return self.tr("Computes effective mesh size and other fragmentation indicators")
 
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
-                self.tr("Land use layer"),
+                self.tr("Input layer"),
                 [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.REPORTING,
+                self.tr("Reporting layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.CBC_MODE,
+                self.tr("Cross-boundary connection method")))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
@@ -397,26 +419,81 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
     def processAlgorithm(self,parameters,context,feedback):
         feedback.pushInfo("begin")
         # Parameters
-        feedback.pushInfo("parameters = " + str(parameters))
-        landuse = self.parameterAsVectorLayer(parameters,self.LANDUSE,context)
-        if landuse is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
-        fragm_layers = self.parameterAsLayerList(parameters,self.FRAGMENTATION,context)
-        #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
-        output = parameters[self.OUTPUT]
-        # Merge fragmentation layers
-        fragm_path = QgsProcessingUtils.generateTempFilename("fragm.gpkg")
-        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,params.params.crs,fragm_path)
-        feedback.pushDebugInfo("fragm_layer = " + str(fragm_layer))
-        if fragm_layer is None:
-            raise QgsProcessingException("Fragmentation layers merge failed")
-        # Apply difference
-        diff_layer = qgsTreatments.applyDifference(landuse,fragm_layer,'memory:',context=context,feedback=feedback)
-        if fragm_layer is None:
-            raise QgsProcessingException("Difference landuse/fragmentation failed")
-        # Multi to single part
-        singleGeomLayer = qgsTreatments.multiToSingleGeom(diff_layer,output,context=context,feedback=feedback)
-        if fragm_layer is None:
-            raise QgsProcessingException("Multi to single part failed")
-        feedback.pushInfo("end")
-        return {self.OUTPUT : singleGeomLayer}
+        source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
+        feedback.pushInfo("source = " + str(source))
+        if source is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
+        feedback.pushInfo("reporting = " + str(reporting))
+        if reporting is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        cbc_mode = self.parameterAsBool(parameters,self.CBC_MODE,context)
+        report_id_field = QgsField(self.ID, QVariant.Int)
+        nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
+        mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
+        div_field = QgsField(self.DIVI, QVariant.Double)
+        split_index_field = QgsField(self.SPLITTING_INDEX, QVariant.Double)
+        coherence_field = QgsField(self.COHERENCE, QVariant.Double)
+        split_density_field = QgsField(self.SPLITTING_DENSITY, QVariant.Double)
+        net_product_field = QgsField(self.NET_PRODUCT, QVariant.Double)
+        output_fields = QgsFields()
+        output_fields.append(report_id_field)
+        output_fields.append(nb_patches_field)
+        output_fields.append(mesh_size_field)
+        output_fields.append(div_field)
+        output_fields.append(split_index_field)
+        output_fields.append(coherence_field)
+        output_fields.append(split_density_field)
+        output_fields.append(net_product_field)
+        feedback.pushDebugInfo("fields =  " + str(output_fields.names()))
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            output_fields,
+            reporting.wkbType(),
+            reporting.sourceCrs()
+        )
+        if sink is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # progress step
+        nb_feats = reporting.featureCount()
+        feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
+        if nb_feats == 0:
+            raise QgsProcessingException("Empty layer")
+        progress_step = 100.0 / nb_feats
+        curr_step = 0
+        # gna gna
+        for report_feat in reporting.getFeatures():
+            report_geom = report_feat.geometry()
+            report_area = report_geom.area() / 1000
+            report_area_sq = report_area * report_area
+            new_f = QgsFeature(output_fields)
+            new_f.setGeometry(report_geom)
+            new_f[self.ID] = report_feat.id()
+            new_f[self.NB_PATCHES] = 0
+            new_f[self.NET_PRODUCT] = 0
+            new_f[self.COHERENCE] = 0
+            net_product = 0
+            for f in source.getFeatures():
+                f_geom = f.geometry()
+                if f_geom.intersects(report_geom):
+                    f_area = f_geom.area() / 1000
+                    intersection = f_geom.intersection(report_geom)
+                    intersection_area = intersection.area() / 1000
+                    new_f[self.NB_PATCHES] += 1
+                    if cbc_mode:
+                        net_product += f_area * intersection_area
+                    else:
+                        net_product += intersection_area * intersection_area
+                    new_f[self.COHERENCE] += pow(f_area / report_area,2)
+            new_f[self.NET_PRODUCT] = net_product
+            new_f[self.COHERENCE] = net_product / report_area_sq
+            new_f[self.SPLITTING_DENSITY] = report_area / net_product
+            new_f[self.MESH_SIZE] = net_product / report_area
+            new_f[self.SPLITTING_INDEX] = report_area_sq / net_product
+            new_f[self.DIVI] = 1 - new_f[self.COHERENCE]
+            sink.addFeature(new_f)
+            curr_step += 1
+            feedback.setProgress(int(curr_step * progress_step))
+        return {self.OUTPUT: dest_id}
