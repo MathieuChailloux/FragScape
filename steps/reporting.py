@@ -22,12 +22,13 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsMapLayerProxyModel, QgsField, QgsFeature
+from qgis.core import QgsMapLayerProxyModel, QgsField, QgsFeature, QgsProcessingFeedback
 from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant
 from processing import QgsProcessingUtils
 
-from ..shared import utils, abstract_model, qgsUtils, progress
+from ..shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
+from ..algs import meff_algs
 from . import params, fragm
 
 class ReportingModel(abstract_model.DictModel):
@@ -174,6 +175,15 @@ class ReportingModel(abstract_model.DictModel):
         self.computeResults()
         progress.progressFeedback.endSection()
         
+    def runReportingNew(self):
+        landuseFragmPath = fragm.fragmModel.getFinalLayer()
+        results_path = self.getOutLayer()
+        parameters = { meff_algs.EffectiveMeshSizeAlgorithm.INPUT : landuseFragmPath,
+                       meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
+                       meff_algs.EffectiveMeshSizeAlgorithm.CBC_MODE : False,
+                       meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT : results_path }
+        qgsTreatments.applyProcessingAlg("Meff","effectiveMeshSize",parameters,context=None,feedback=progress.progressFeedback)
+        
     def toXML(self,indent=" "):
         if not self.layer:
             utils.warn("No reporting layer selected")
@@ -206,7 +216,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.reportingLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.reportingLayer.fileChanged.connect(self.loadLayer)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
-        self.dlg.resultsRun.clicked.connect(self.model.runReporting)
+        self.dlg.resultsRun.clicked.connect(self.model.runReportingNew)
         
     def setLayer(self,layer):
         utils.debug("setLayer " + str(layer.type))

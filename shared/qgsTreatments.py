@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty, QgsFeature, QgsFeatureRequest, QgsField
+from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty, QgsFeature, QgsFeatureRequest, QgsField, QgsProcessingContext
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QGuiApplication
 import gdal
@@ -121,6 +121,8 @@ def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None):
         complete_name = provider + ":" + alg_name
         feedback.pushInfo("Calling processing algorithm '" + complete_name + "'")
         start_time = time.time()
+        if context is None:
+            context = QgsProcessingContext()
         res = processing.run(complete_name,parameters,context=context,feedback=feedback,onFinish=no_post_process)
         feedback.pushDebugInfo("res1 = " + str(res))
         end_time = time.time()
