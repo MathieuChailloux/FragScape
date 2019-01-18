@@ -30,22 +30,28 @@ import processing
 from processing import QgsProcessingUtils
 
 from ..shared import utils, abstract_model, qgsUtils, qgsTreatments, progress
+from ..algs import meff_algs
 from . import params, landuse
 
-fragm_fields = ["in_layer","expr","buffer","name"]
+
 
 fragmModel = None
 
 class FragmItem(abstract_model.DictItem):
 
-    def __init__(self,in_layer,expr,buffer,name):
-        dict = {"in_layer" : in_layer,
-                "expr" : expr,
-                "buffer" : buffer,
-                "name" : name}
+    def __init__(self,dict):
         super().__init__(dict)
         self.selectionLayer = None
         self.bufferLayer = None
+
+    # def __init__(self,in_layer,expr,buffer,name):
+        # dict = {"in_layer" : in_layer,
+                # "expr" : expr,
+                # "buffer" : buffer,
+                # "name" : name}
+        # super().__init__(dict)
+        # self.selectionLayer = None
+        # self.bufferLayer = None
         
     def applyItem(self):
         pass
@@ -74,14 +80,34 @@ class FragmItem(abstract_model.DictItem):
         return selection_layer
         
 class FragmModel(abstract_model.DictModel):
+
+    PREPARE_INPUT = meff_algs.PrepareFragmentationAlgorithm.INPUT
+    PREPARE_CLIP_LAYER = meff_algs.PrepareFragmentationAlgorithm.CLIP_LAYER
+    PREPARE_SELECT_EXPR = meff_algs.PrepareFragmentationAlgorithm.SELECT_EXPR
+    PREPARE_BUFFER = meff_algs.PrepareFragmentationAlgorithm.BUFFER
+    PREPARE_NAME = "name"
+    PREPARE_OUTPUT = meff_algs.PrepareFragmentationAlgorithm.OUTPUT
+    
+    FIELDS = [PREPARE_INPUT,PREPARE_SELECT_EXPR,PREPARE_BUFFER,PREPARE_NAME]
+    
+    APPLY_LANDUSE = meff_algs.ApplyFragmentationAlgorithm.LANDUSE
+    APPLY_FRAGMENTATION = meff_algs.ApplyFragmentationAlgorithm.FRAGMENTATION
+    APPLY_OUTPUT = meff_algs.ApplyFragmentationAlgorithm.OUTPUT
     
     def __init__(self):
         self.parser_name = "FragmModel"
-        super().__init__(self,fragm_fields)
+        super().__init__(self,self.FIELDS)
         
     def mkItemFromDict(self,dict):
-        item = FragmItem(dict["in_layer"],dict["expr"],dict["buffer"],dict["name"])
-        return item
+        #item = FragmItem(dict["in_layer"],dict["expr"],dict["buffer"],dict["name"])
+        if "in_layer" in dict:
+            new_dict = { self.PREPARE_INPUT : dict["in_layer"],
+                         self.PREPARE_SELECT_EXPR : dict["expr"],
+                         self.PREPARE_BUFFER : dict["buffer"],
+                         self.PREPARE_NAME : dict["name"] }
+            return FragmItem(new_dict)
+        else:
+            return FragmItem(dict)
         
     def getFragmLayer(self):
         return QgsProcessingUtils.generateTempFilename("fragm.gpkg")
@@ -148,14 +174,32 @@ class FragmModel(abstract_model.DictModel):
     def applyItems(self,indexes):
         fragmMsg = "Application of fragmentation data to landuse"
         progress.progressFeedback.beginSection(fragmMsg)
-        territory_layer = params.getTerritoryLayer()
+        if params.getDataClipFlag():
+            clip_layer = params.getTerritoryLayer()
+        else:
+            clip_layer = None
+        prepared_layers = []
         for item in self.items:
-            in_layer_path = params.getOrigPath(item.dict["in_layer"])
-            if params.getDataClipFlag():
-                source_layer = qgsTreatments.applyVectorClip(in_layer_path,territory_layer,'memory:')
-            else:
-                source_layer = in_layer_path
-            name = item.dict["name"]
+            in_layer_path = params.getOrigPath(item.dict[self.PREPARE_INPUT])
+            select_expr = item.dict[self.PREPARE_SELECT_EXPR]
+            buffer_expr = item.dict[self.PREPARE_BUFFER]
+            selectionPath = item.getSelectionLayer()
+            name = item.dict[self.PREPARE_NAME]
+            parameters = { self.PREPARE_INPUT : in_layer_path,
+                           self.PREPARE_CLIP_LAYER : clip_layer,
+                           self.PREPARE_SELECT_EXPR : select_expr,
+                           self.PREPARE_BUFFER : buffer_expr,
+                           self.PREPARE_OUTPUT : selectionPath }
+            prepared = qgsTreatments.applyProcessingAlg("Meff","prepareFragm",parameters)
+            prepared_layers.append(prepared)
+        landuseLayer = landuse.landuseModel.getDissolveLayer()
+        res_path = self.getFinalLayer()
+        qgsUtils.removeVectorLayer(res_path)
+        parameters = { self.APPLY_LANDUSE : landuseLayer,
+                       self.APPLY_FRAGMENTATION : prepared_layers,
+                       self.APPLY_OUTPUT : res_path }
+        res = qgsTreatments.applyProcessingAlg("Meff","applyFragm",parameters)
+        qgsUtils.loadVectorLayer(res_path,loadProject=True)
         
             
     def fromXMLRoot(self,root):
@@ -211,7 +255,12 @@ class FragmConnector(abstract_model.AbstractConnector):
         name = self.dlg.fragmName.text()
         if not name:
             utils.user_error("Empty name")
-        item = FragmItem(in_layer_path,expr,buffer,name)
+        dict = { FragmModel.PREPARE_INPUT : in_layer,
+                 FragmModel.PREPARE_SELECT_EXPR : expr,
+                 FragmModel.PREPARE_BUFFER : buffer,
+                 FragmModel.PREPARE_NAME : name }
+        #item = FragmItem(in_layer_path,expr,buffer,name)
+        item = FragmItem(dict)
         return item
         
         

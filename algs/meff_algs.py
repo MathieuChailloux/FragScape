@@ -43,7 +43,7 @@ from ..steps import params
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [LanduseAlgorithm(),
+        self.alglist = [PrepareLanduseAlgorithm(),
                         PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
                         ReportingIntersection(),
@@ -67,67 +67,9 @@ class MeffAlgorithmsProvider(QgsProcessingProvider):
     def loadAlgorithms(self):
         for a in self.alglist:
             self.addAlgorithm(a)
-
-
-class algTest(QgsProcessingAlgorithm):
-    INPUT_BUFFERDIST = 'BUFFERDIST'
-    OUTPUT_BUFFER = 'OUTPUT_BUFFER'
-    INPUT_VECTOR = 'INPUT_VECTOR'
-
-    def __init__(self):
-        super().__init__()
-
-    def name(self):
-        return "algTest"
-
-    def displayName(self):
-        return "algTest script"
-
-    def createInstance(self):
-        return type(self)()
-
-    def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_VECTOR, "Input vector",[QgsProcessing.TypeVectorAnyGeometry]))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.INPUT_BUFFERDIST, "Buffer distance",
-            QgsProcessingParameterNumber.Double,
-            100.0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT_BUFFER, "Output buffer"))
-
-    def processAlgorithm(self, parameters, context, feedback):
-        # Dummy function to enable running an alg inside an alg
-        def no_post_process(alg, context, feedback):
-            pass
-        #DO SOMETHING
-        #source = self.parameterAsSource( parameters,self.INPUT_VECTOR,context)
-        source = self.parameterAsVectorLayer( parameters,self.INPUT_VECTOR,context)
-        algresult = processing.run("native:smoothgeometry",
-            #{'INPUT': parameters[self.INPUT_VECTOR],
-            {'INPUT': source,
-             'ITERATIONS':2,
-             'OFFSET':0.25,
-             'MAX_ANGLE':180,
-             'OUTPUT': 'memory:'},
-            context=context, feedback=feedback, onFinish=no_post_process)
-        smoothed = algresult['OUTPUT']
-        buf = self.parameterAsDouble(parameters, self.INPUT_BUFFERDIST,context)
-        algresult = processing.run('native:buffer',
-            {'INPUT': smoothed,
-            #'DISTANCE': parameters[self.INPUT_BUFFERDIST],
-            'DISTANCE': buf,
-            'SEGMENTS': 5,
-            'END_CAP_STYLE': 0,
-            'JOIN_STYLE': 0,
-            'MITER_LIMIT': 10,
-            'DISSOLVE': True,
-            'OUTPUT': parameters[self.OUTPUT_BUFFER]},
-            context=context, feedback=feedback, onFinish=no_post_process)
-        buffered = algresult['OUTPUT']
-        return {self.OUTPUT_BUFFER: buffered}
             
-class LanduseAlgorithm(QgsProcessingAlgorithm):
+            
+class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
 
     INPUT = "INPUT"
     SELECT_EXPR = "SELECT_EXPR"
@@ -140,16 +82,10 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
         return LanduseAlgorithm()
         
     def name(self):
-        return "landuseDissolve"
+        return "prepareLanduse"
         
     def displayName(self):
-        return self.tr("Landuse Dissolve")
-        
-    # def group(self):
-        # return self.tr("Meff")
-        
-    # def groupId(self):
-        # return "meff"
+        return self.tr("1 - Prepare land use data")
         
     def shortHelpString(self):
         return self.tr("TODO")
@@ -197,7 +133,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
     INPUT = "INPUT"
     CLIP_LAYER = "CLIP_LAYER"
     SELECT_EXPR = "SELECT_EXPR"
-    BUFFER = "BUFFER"
+    BUFFER = "BUFFER_EXPR"
     OUTPUT = "OUTPUT"
     
     def tr(self, string):
@@ -210,7 +146,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         return "prepareFragm"
         
     def displayName(self):
-        return self.tr("Prepare Fragmentation")
+        return self.tr("2.1 - Prepare Fragmentation")
         
     def shortHelpString(self):
         return self.tr("This algorithm prepares a fragmentation layer by applying clip, selection and buffer")
@@ -271,11 +207,12 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         #buffered = qgsTreatments.applyBufferFromExpr(selected,parameters[self.BUFFER],output,context,feedback)
         return {self.OUTPUT : buffered}
         
+
+        
 class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
 
     LANDUSE = "LANDUSE"
     FRAGMENTATION = "FRAGMENTATION"
-    MATRIX = "MATRIX"
     OUTPUT = "OUTPUT"
 
     def tr(self, string):
@@ -288,7 +225,7 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         return "applyFragm"
         
     def displayName(self):
-        return self.tr("Apply Fragmentation")
+        return self.tr("2.2 - Apply fragmentation")
         
     def shortHelpString(self):
         return self.tr("This algorithm cuts a land use layer with fragmentation data")
@@ -353,7 +290,7 @@ class ReportingIntersection(QgsProcessingAlgorithm):
         return "reportingIntersection"
         
     def displayName(self):
-        return self.tr("4.1 - Reporting Intersection")
+        return self.tr("3.1 - Reporting Intersection")
         
     def shortHelpString(self):
         return self.tr("Computes intersections with each reporting unit")
@@ -470,7 +407,146 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         return "effectiveMeshSize"
         
     def displayName(self):
-        return self.tr("4 - Effective Mesh Size")
+        return self.tr("3 - Effective Mesh Size")
+        
+    def shortHelpString(self):
+        return self.tr("Computes effective mesh size and other fragmentation indicators")
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                self.tr("Input layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.REPORTING,
+                self.tr("Reporting layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.CBC_MODE,
+                self.tr("Cross-boundary connection method")))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer")))
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        feedback.pushInfo("begin")
+        # Parameters
+        source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
+        feedback.pushInfo("source = " + str(source))
+        if source is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
+        feedback.pushInfo("reporting = " + str(reporting))
+        if reporting is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        cbc_mode = self.parameterAsBool(parameters,self.CBC_MODE,context)
+        report_id_field = QgsField(self.ID, QVariant.Int)
+        nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
+        mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
+        div_field = QgsField(self.DIVI, QVariant.Double)
+        split_index_field = QgsField(self.SPLITTING_INDEX, QVariant.Double)
+        coherence_field = QgsField(self.COHERENCE, QVariant.Double)
+        split_density_field = QgsField(self.SPLITTING_DENSITY, QVariant.Double)
+        net_product_field = QgsField(self.NET_PRODUCT, QVariant.Double)
+        output_fields = QgsFields()
+        output_fields.append(report_id_field)
+        output_fields.append(nb_patches_field)
+        output_fields.append(mesh_size_field)
+        output_fields.append(div_field)
+        output_fields.append(split_index_field)
+        output_fields.append(coherence_field)
+        output_fields.append(split_density_field)
+        output_fields.append(net_product_field)
+        feedback.pushDebugInfo("fields =  " + str(output_fields.names()))
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            output_fields,
+            reporting.wkbType(),
+            reporting.sourceCrs()
+        )
+        if sink is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # progress step
+        nb_feats = reporting.featureCount()
+        feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
+        if nb_feats == 0:
+            raise QgsProcessingException("Empty layer")
+        progress_step = 100.0 / nb_feats
+        curr_step = 0
+        # gna gna
+        for report_feat in reporting.getFeatures():
+            report_geom = report_feat.geometry()
+            report_area = report_geom.area() / 1000
+            report_area_sq = report_area * report_area
+            new_f = QgsFeature(output_fields)
+            new_f.setGeometry(report_geom)
+            new_f[self.ID] = report_feat.id()
+            new_f[self.NB_PATCHES] = 0
+            new_f[self.NET_PRODUCT] = 0
+            new_f[self.COHERENCE] = 0
+            net_product = 0
+            for f in source.getFeatures():
+                f_geom = f.geometry()
+                if f_geom.intersects(report_geom):
+                    f_area = f_geom.area() / 1000
+                    intersection = f_geom.intersection(report_geom)
+                    intersection_area = intersection.area() / 1000
+                    new_f[self.NB_PATCHES] += 1
+                    if cbc_mode:
+                        net_product += f_area * intersection_area
+                    else:
+                        net_product += intersection_area * intersection_area
+                    new_f[self.COHERENCE] += pow(f_area / report_area,2)
+            new_f[self.NET_PRODUCT] = net_product
+            new_f[self.COHERENCE] = net_product / report_area_sq
+            new_f[self.SPLITTING_DENSITY] = report_area / net_product
+            new_f[self.MESH_SIZE] = net_product / report_area
+            new_f[self.SPLITTING_INDEX] = report_area_sq / net_product
+            new_f[self.DIVI] = 1 - new_f[self.COHERENCE]
+            sink.addFeature(new_f)
+            curr_step += 1
+            feedback.setProgress(int(curr_step * progress_step))
+        return {self.OUTPUT: dest_id}
+
+        
+class FragScapeAlgorithm(QgsProcessingAlgorithm):
+
+        # Algorithm parameters
+    INPUT = "INPUT"
+    REPORTING = "REPORTING"
+    CBC_MODE = "CBC_MODE"
+    OUTPUT = "OUTPUT"
+    
+    # Output layer fields
+    ID = "fid"
+    NB_PATCHES = "nb_patches"
+    # Main measures
+    MESH_SIZE = "effective_mesh_size"
+    DIVI = "landscape_division"
+    SPLITTING_INDEX = "splitting_index"
+    # Auxiliary measures
+    COHERENCE = "coherence"
+    SPLITTING_DENSITY = "splitting_density"
+    NET_PRODUCT = "net_product"
+    
+    
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
+        
+    def createInstance(self):
+        return EffectiveMeshSizeAlgorithm()
+        
+    def name(self):
+        return "effectiveMeshSize"
+        
+    def displayName(self):
+        return self.tr("3 - Effective Mesh Size")
         
     def shortHelpString(self):
         return self.tr("Computes effective mesh size and other fragmentation indicators")

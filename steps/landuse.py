@@ -127,64 +127,64 @@ class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
         return QtCore.QRect(check_box_point, check_box_rect.size())
 
 
-class LanduseAlgorithm(QgsProcessingAlgorithm):
+# class LanduseAlgorithm(QgsProcessingAlgorithm):
 
-    INPUT = "INPUT"
-    SELECT_EXPR = "SELECT_EXPR"
-    OUTPUT = "OUTPUT"
+    # INPUT = "INPUT"
+    # SELECT_EXPR = "SELECT_EXPR"
+    # OUTPUT = "OUTPUT"
 
-    def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
+    # def tr(self, string):
+        # return QCoreApplication.translate('Processing', string)
         
-    def createInstance(self):
-        return LanduseAlgorithm()
+    # def createInstance(self):
+        # return LanduseAlgorithm()
         
-    def name(self):
-        return "landuseDissolve"
+    # def name(self):
+        # return "landuseDissolve"
         
-    def displayName(self):
-        return self.tr("Landuse Dissolve")
+    # def displayName(self):
+        # return self.tr("Landuse Dissolve")
         
-    def group(self):
-        return self.tr("Meff")
+    # def group(self):
+        # return self.tr("Meff")
         
-    def groupId(self):
-        return "meff"
+    # def groupId(self):
+        # return "meff"
         
-    def shortHelpString(self):
-        return self.tr("TODO")
+    # def shortHelpString(self):
+        # return self.tr("TODO")
 
-    def initAlgorithm(self, config=None):
-        self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                self.INPUT,
-                self.tr("Input layer"),
-                [QgsProcessing.TypeVectorAnyGeometry]))
-        self.addParameter(
-            QgsProcessingParameterExpression(
-                self.SELECT_EXPR,
-                self.tr("Selection expression"),
-                "",
-                self.INPUT))
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Output layer")))
+    # def initAlgorithm(self, config=None):
+        # self.addParameter(
+            # QgsProcessingParameterFeatureSource(
+                # self.INPUT,
+                # self.tr("Input layer"),
+                # [QgsProcessing.TypeVectorAnyGeometry]))
+        # self.addParameter(
+            # QgsProcessingParameterExpression(
+                # self.SELECT_EXPR,
+                # self.tr("Selection expression"),
+                # "",
+                # self.INPUT))
+        # self.addParameter(
+            # QgsProcessingParameterFeatureSink(
+                # self.OUTPUT,
+                # self.tr("Output layer")))
                 
-    def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("begin")
-        source = self.parameterAsSource(parameters,self.INPUT,context)
-        if source is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
-        if output is None:
-            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
-        selected = qgsTreatments.extractByExpression(source,expr,'memory:')
-        dissolved = qgsTreatments.dissolveLayer(selectionResLayer,dissolveLayer)
-        qgsUtils.loadLayer(dissolved,loadProject=True)
-        feedback.pushInfo("end")
-        return {self.OUTPUT : dissolved}
+    # def processAlgorithm(self,parameters,context,feedback):
+        # feedback.pushInfo("begin")
+        # source = self.parameterAsSource(parameters,self.INPUT,context)
+        # if source is None:
+            # raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        # expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
+        # output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        # if output is None:
+            # raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # selected = qgsTreatments.extractByExpression(source,expr,'memory:')
+        # dissolved = qgsTreatments.dissolveLayer(selectionResLayer,output)
+        # qgsUtils.loadLayer(dissolved,loadProject=True)
+        # feedback.pushInfo("end")
+        # return {self.OUTPUT : dissolved}
         
         
         
@@ -255,9 +255,12 @@ class LanduseModel(abstract_model.DictModel):
             utils.user_error("No expression selected : TODO select everything")
         selectionResLayer = self.getSelectionLayer()
         dissolveLayer = self.getDissolveLayer()
+        qgsUtils.removeVectorLayer(selectionResLayer)
+        qgsUtils.removeVectorLayer(dissolveLayer)
         if params.getDataClipFlag():
             utils.debug("dataClipFlag activated")
             clip_layer = self.getClipLayer()
+            qgsUtils.removeVectorLayer(clip_layer)
             qgsTreatments.applyVectorClip(in_layer,territory_layer,clip_layer)
             extractSourceLayer = clip_layer
         else:
