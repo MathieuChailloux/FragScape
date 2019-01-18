@@ -182,7 +182,11 @@ class ReportingModel(abstract_model.DictModel):
                        meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
                        meff_algs.EffectiveMeshSizeAlgorithm.CBC_MODE : False,
                        meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT : results_path }
-        qgsTreatments.applyProcessingAlg("Meff","effectiveMeshSize",parameters,context=None,feedback=progress.progressFeedback)
+        res = qgsTreatments.applyProcessingAlg(
+            "Meff","effectiveMeshSize",parameters,
+            context=None,feedback=progress.progressFeedback)
+        qgsUtils.loadVectorLayer(res,loadProject=True)
+        
         
     def toXML(self,indent=" "):
         if not self.layer:

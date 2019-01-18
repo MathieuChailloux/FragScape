@@ -61,14 +61,14 @@ def removeVectorLayer(path):
     
 # Returns path from QgsMapLayer
 def pathOfLayer(l):
-    utils.debug("pathOfLayer")
+    #utils.debug("pathOfLayer")
     uri = l.dataProvider().dataSourceUri()
-    utils.debug(str(uri))
+    #utils.debug(str(uri))
     if l.type() == QgsMapLayer.VectorLayer:
         path = uri[:uri.rfind('|')]
     else:
         path = uri
-    utils.debug(str(path))
+    #utils.debug(str(path))
     return path
       
 def layerNameOfPath(p):
@@ -107,6 +107,7 @@ def isLayerLoaded(fname):
 # Opens vector layer from path.
 # If loadProject is True, layer is added to QGIS project
 def loadVectorLayer(fname,loadProject=False):
+    utils.debug("loadVectorLayer " + str(fname))
     utils.checkFileExists(fname)
     if isLayerLoaded(fname):
        return getLayerByFilename(fname)
