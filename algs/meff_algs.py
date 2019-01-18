@@ -44,6 +44,7 @@ class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
         self.alglist = [LanduseAlgorithm(),
+                        PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
                         ReportingIntersection(),
                         EffectiveMeshSizeAlgorithm()]
@@ -191,6 +192,84 @@ class LanduseAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT : dissolved}
         
         
+class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
+
+    INPUT = "INPUT"
+    CLIP_LAYER = "CLIP_LAYER"
+    SELECT_EXPR = "SELECT_EXPR"
+    BUFFER = "BUFFER"
+    OUTPUT = "OUTPUT"
+    
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
+        
+    def createInstance(self):
+        return PrepareFragmentationAlgorithm()
+        
+    def name(self):
+        return "prepareFragm"
+        
+    def displayName(self):
+        return self.tr("Prepare Fragmentation")
+        
+    def shortHelpString(self):
+        return self.tr("This algorithm prepares a fragmentation layer by applying clip, selection and buffer")
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                description=self.tr("Input layer"),
+                types=[QgsProcessing.TypeVectorLine]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.CLIP_LAYER,
+                description=self.tr("Clip layer"),
+                types=[QgsProcessing.TypeVectorPolygon],
+                optional=True))
+        self.addParameter(
+            QgsProcessingParameterExpression(
+                self.SELECT_EXPR,
+                description=self.tr("Selection expression"),
+                parentLayerParameterName=self.INPUT,
+                optional=True))
+        self.addParameter(
+            QgsProcessingParameterExpression(
+                self.BUFFER,
+                description=self.tr("Buffer expression"),
+                parentLayerParameterName=self.INPUT))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                description=self.tr("Output layer")))
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        # Parameters
+        feedback.pushDebugInfo("parameters = " + str(parameters))
+        input = self.parameterAsVectorLayer(parameters,self.INPUT,context)
+        if input is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        clip = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
+        clip_flag = (clip is None)
+        select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
+        feedback.pushDebugInfo("select_expr : " + str(select_expr))
+        feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
+        buffer_expr = self.parameterAsExpression(parameters,self.BUFFER,context)
+        feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
+        if buffer_expr is None:
+            raise QgsProcessingException("Empty buffer")
+        output = parameters[self.OUTPUT]
+        if clip is None:
+            clipped = input
+        else:
+            clipped = qgsTreatments.applyVectorClip(input,clip,'memory:',context,feedback)
+        if select_expr == "":
+            selected = clipped
+        else:
+            selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
+        buffered = qgsTreatments.applyBufferFromExpr(selected,buffer_expr,output,context,feedback)
+        #buffered = qgsTreatments.applyBufferFromExpr(selected,parameters[self.BUFFER],output,context,feedback)
+        return {self.OUTPUT : buffered}
         
 class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
 

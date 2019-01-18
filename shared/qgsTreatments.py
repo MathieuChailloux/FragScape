@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty, QgsFeature, QgsFeatureRequest, QgsField, QgsProcessingContext
+from qgis.core import QgsProcessingFeedback, QgsProject, QgsProperty, QgsFeature, QgsFeatureRequest, QgsField, QgsProcessingContext, QgsExpression
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QGuiApplication
 import gdal
@@ -183,8 +183,8 @@ def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
         
 def extractByExpression(in_layer,expr,out_layer,context=None,feedback=None):
     #utils.checkFileExists(in_layer)
-    if out_layer:
-        qgsUtils.removeVectorLayer(out_layer)
+    #if out_layer:
+    #    qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'EXPRESSION' : expr,
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
@@ -232,8 +232,8 @@ def dissolveLayer(in_layer,out_layer,context=None,feedback=None):
 def applyBufferFromExpr(in_layer,expr,out_layer,context=None,feedback=None):
     #utils.checkFileExists(in_layer)
     progress.progressFeedback.setSubText("Buffer (" + str(expr) + ") on " + str(out_layer))
-    if out_layer:
-        qgsUtils.removeVectorLayer(out_layer)
+    #if out_layer:
+    #    qgsUtils.removeVectorLayer(out_layer)
     parameters = { 'DISSOLVE' : False,
                    #'DISTANCE' : QgsProperty.fromExpression(expr),
                    'DISTANCE' : expr,

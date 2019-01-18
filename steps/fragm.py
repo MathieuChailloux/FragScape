@@ -95,7 +95,7 @@ class FragmModel(abstract_model.DictModel):
     def getFinalLayer(self):
         return params.mkOutputFile("landuseFragmSingleGeom.gpkg")
         
-    def applyItems(self,indexes):
+    def applyItemsOld(self,indexes):
         fragmMsg = "Application of fragmentation data to landuse"
         progress.progressFeedback.beginSection(fragmMsg)
         territory_layer = params.getTerritoryLayer()
@@ -144,6 +144,19 @@ class FragmModel(abstract_model.DictModel):
         qgsUtils.writeVectorLayer(singleGeomLayer,singleGeomPath)
         qgsUtils.loadVectorLayer(singleGeomPath,loadProject=True)
         progress.progressFeedback.endSection()
+        
+    def applyItems(self,indexes):
+        fragmMsg = "Application of fragmentation data to landuse"
+        progress.progressFeedback.beginSection(fragmMsg)
+        territory_layer = params.getTerritoryLayer()
+        for item in self.items:
+            in_layer_path = params.getOrigPath(item.dict["in_layer"])
+            if params.getDataClipFlag():
+                source_layer = qgsTreatments.applyVectorClip(in_layer_path,territory_layer,'memory:')
+            else:
+                source_layer = in_layer_path
+            name = item.dict["name"]
+        
             
     def fromXMLRoot(self,root):
         utils.debug("fromXML")
