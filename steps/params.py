@@ -89,7 +89,10 @@ def getPathFromLayerCombo(combo):
     return layer_path
         
 def getTerritoryLayer():
-    return getOrigPath(params.territoryLayer)
+    if getDataClipFlag():
+        return getOrigPath(params.territoryLayer)
+    else:
+        return None
     
 def getDataClipFlag():
     return params.dataClipFlag

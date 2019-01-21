@@ -174,10 +174,7 @@ class FragmModel(abstract_model.DictModel):
     def applyItems(self,indexes):
         fragmMsg = "Application of fragmentation data to landuse"
         progress.progressFeedback.beginSection(fragmMsg)
-        if params.getDataClipFlag():
-            clip_layer = params.getTerritoryLayer()
-        else:
-            clip_layer = None
+        clip_layer = params.getTerritoryLayer()
         prepared_layers = []
         for item in self.items:
             in_layer_path = params.getOrigPath(item.dict[self.PREPARE_INPUT])

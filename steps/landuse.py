@@ -26,167 +26,11 @@ from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorit
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QCoreApplication
 from ..shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
+from ..algs import meff_algs 
 from . import params
 
 landuseModel = None
 
-# Code snippet from https://stackoverflow.com/questions/17748546/pyqt-column-of-checkboxes-in-a-qtableview
-class CheckBoxDelegate(QtWidgets.QStyledItemDelegate):
-    """
-    A delegate that places a fully functioning QCheckBox in every
-    cell of the column to which it's applied
-    """
-    def __init__(self, parent):
-        QtWidgets.QItemDelegate.__init__(self, parent)
-
-    def createEditor(self, parent, option, index):
-        '''
-        Important, otherwise an editor is created if the user clicks in this cell.
-        ** Need to hook up a signal to the model
-        '''
-        return None
-
-    def paint(self, painter, option, index):
-        '''
-        Paint a checkbox without the label.
-        '''
-
-        checked = bool(index.data())
-        check_box_style_option = QtWidgets.QStyleOptionButton()
-
-        #if (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
-        if (index.flags() & QtCore.Qt.ItemIsEditable):
-            check_box_style_option.state |= QtWidgets.QStyle.State_Enabled
-        else:
-            check_box_style_option.state |= QtWidgets.QStyle.State_ReadOnly
-
-        if checked:
-            check_box_style_option.state |= QtWidgets.QStyle.State_On
-        else:
-            check_box_style_option.state |= QtWidgets.QStyle.State_Off
-
-        check_box_style_option.rect = self.getCheckBoxRect(option)
-
-        # this will not run - hasFlag does not exist
-        #if not index.model().hasFlag(index, QtCore.Qt.ItemIsEditable):
-            #check_box_style_option.state |= QtWidgets.QStyle.State_ReadOnly
-
-        check_box_style_option.state |= QtWidgets.QStyle.State_Enabled
-
-        QtWidgets.QApplication.style().drawControl(QtWidgets.QStyle.CE_CheckBox, check_box_style_option, painter)
-
-    def editorEvent(self, event, model, option, index):
-        '''
-        Change the data in the model and the state of the checkbox
-        if the user presses the left mousebutton or presses
-        Key_Space or Key_Select and this cell is editable. Otherwise do nothing.
-        '''
-        utils.debug('Check Box editor Event detected : ')
-        utils.debug(str(event.type()))
-        #if not (index.flags() & QtCore.Qt.ItemIsEditable) > 0:
-        if not (index.flags() & QtCore.Qt.ItemIsEditable):
-            return False
-
-        utils.debug('Check Box editor Event detected : passed first check')
-        # Do not change the checkbox-state
-        if event.type() == QtCore.QEvent.MouseButtonPress:
-          return False
-        if event.type() == QtCore.QEvent.MouseButtonRelease or event.type() == QtCore.QEvent.MouseButtonDblClick:
-            if event.button() != QtCore.Qt.LeftButton or not self.getCheckBoxRect(option).contains(event.pos()):
-                return False
-            if event.type() == QtCore.QEvent.MouseButtonDblClick:
-                return True
-        elif event.type() == QtCore.QEvent.KeyPress:
-            if event.key() != QtCore.Qt.Key_Space and event.key() != QtCore.Qt.Key_Select:
-                return False
-        else:
-            return False
-
-        # Change the checkbox-state
-        self.setModelData(None, model, index)
-        return True
-
-    def setModelData (self, editor, model, index):
-        '''
-        The user wanted to change the old state in the opposite.
-        '''
-        utils.debug('SetModelData')
-        newValue = not bool(index.data())
-        utils.debug('New Value : {0}'.format(newValue))
-        model.setData(index, newValue, QtCore.Qt.EditRole)
-
-    def getCheckBoxRect(self, option):
-        check_box_style_option = QtWidgets.QStyleOptionButton()
-        check_box_rect = QtWidgets.QApplication.style().subElementRect(QtWidgets.QStyle.SE_CheckBoxIndicator, check_box_style_option, None)
-        check_box_point = QtCore.QPoint (option.rect.x() +
-                            option.rect.width() / 2 -
-                            check_box_rect.width() / 2,
-                            option.rect.y() +
-                            option.rect.height() / 2 -
-                            check_box_rect.height() / 2)
-        return QtCore.QRect(check_box_point, check_box_rect.size())
-
-
-# class LanduseAlgorithm(QgsProcessingAlgorithm):
-
-    # INPUT = "INPUT"
-    # SELECT_EXPR = "SELECT_EXPR"
-    # OUTPUT = "OUTPUT"
-
-    # def tr(self, string):
-        # return QCoreApplication.translate('Processing', string)
-        
-    # def createInstance(self):
-        # return LanduseAlgorithm()
-        
-    # def name(self):
-        # return "landuseDissolve"
-        
-    # def displayName(self):
-        # return self.tr("Landuse Dissolve")
-        
-    # def group(self):
-        # return self.tr("Meff")
-        
-    # def groupId(self):
-        # return "meff"
-        
-    # def shortHelpString(self):
-        # return self.tr("TODO")
-
-    # def initAlgorithm(self, config=None):
-        # self.addParameter(
-            # QgsProcessingParameterFeatureSource(
-                # self.INPUT,
-                # self.tr("Input layer"),
-                # [QgsProcessing.TypeVectorAnyGeometry]))
-        # self.addParameter(
-            # QgsProcessingParameterExpression(
-                # self.SELECT_EXPR,
-                # self.tr("Selection expression"),
-                # "",
-                # self.INPUT))
-        # self.addParameter(
-            # QgsProcessingParameterFeatureSink(
-                # self.OUTPUT,
-                # self.tr("Output layer")))
-                
-    # def processAlgorithm(self,parameters,context,feedback):
-        # feedback.pushInfo("begin")
-        # source = self.parameterAsSource(parameters,self.INPUT,context)
-        # if source is None:
-            # raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        # expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        # output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
-        # if output is None:
-            # raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
-        # selected = qgsTreatments.extractByExpression(source,expr,'memory:')
-        # dissolved = qgsTreatments.dissolveLayer(selectionResLayer,output)
-        # qgsUtils.loadLayer(dissolved,loadProject=True)
-        # feedback.pushInfo("end")
-        # return {self.OUTPUT : dissolved}
-        
-        
         
 class LanduseFieldItem(abstract_model.DictItem):
 
@@ -196,6 +40,15 @@ class LanduseFieldItem(abstract_model.DictItem):
         
         
 class LanduseModel(abstract_model.DictModel):
+
+    INPUT = meff_algs.PrepareLanduseAlgorithm.INPUT
+    CLIP_LAYER = meff_algs.PrepareLanduseAlgorithm.CLIP_LAYER
+    SELECT_EXPR = meff_algs.PrepareLanduseAlgorithm.SELECT_EXPR
+    OUTPUT = meff_algs.PrepareLanduseAlgorithm.OUTPUT
+    
+    VALUE_FIELD = "value"
+    SELECT_FIELD = "toSelect"
+    FIELDS = [VALUE_FIELD,SELECT_FIELD]
 
     def __init__(self):
         self.parser_name = "Landuse"
@@ -243,7 +96,7 @@ class LanduseModel(abstract_model.DictModel):
         utils.debug("selectionExpr = " + expr)
         return expr
         
-    def applyItems(self):
+    def applyItemsOld(self):
         progress.progressFeedback.beginSection("Landuse classification")
         params.checkWorkspaceInit()
         self.checkLayerSelected()
@@ -270,6 +123,25 @@ class LanduseModel(abstract_model.DictModel):
         qgsUtils.loadLayer(dissolved,loadProject=True)
         progress.progressFeedback.endSection()
         
+    def applyItems(self):
+        progress.progressFeedback.beginSection("Landuse classification")
+        params.checkWorkspaceInit()
+        self.checkLayerSelected()
+        self.checkFieldSelected()
+        in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
+        clip_layer = params.getTerritoryLayer()
+        expr = self.mkSelectionExpr()
+        if not expr:
+            utils.user_error("No expression selected : TODO select everything")
+        dissolveLayer = self.getDissolveLayer()
+        qgsUtils.removeVectorLayer(dissolveLayer)
+        parameters = { self.INPUT : in_layer,
+                       self.CLIP_LAYER : clip_layer,
+                       self.SELECT_EXPR : expr,
+                       self.OUTPUT : dissolveLayer }
+        res = qgsTreatments.applyProcessingAlg("Meff","prepareLanduse",parameters)
+        qgsUtils.loadVectorLayer(res_path,dissolveLayer)
+        
     def toXML(self,indent=" "):
         if not self.landuseLayer:
             utils.warn("No layer selected")
@@ -288,7 +160,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
     def __init__(self,dlg):
         self.dlg = dlg
         self.parser_name = "Landuse"
-        self.dlg.landuseView.setItemDelegateForColumn(1,CheckBoxDelegate(self.dlg.landuseView))
+        self.dlg.landuseView.setItemDelegateForColumn(1,abstract_model.CheckBoxDelegate(self.dlg.landuseView))
         landuse_model = LanduseModel()
         super().__init__(landuse_model,self.dlg.landuseView)
         

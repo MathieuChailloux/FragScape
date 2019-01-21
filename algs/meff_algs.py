@@ -43,7 +43,7 @@ from ..steps import params
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [PrepareLanduseAlgorithm(),
+        self.alglist = [
                         PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
                         ReportingIntersection(),
@@ -72,6 +72,7 @@ class MeffAlgorithmsProvider(QgsProcessingProvider):
 class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
 
     INPUT = "INPUT"
+    CLIP_LAYER = "CLIP_LAYER"
     SELECT_EXPR = "SELECT_EXPR"
     OUTPUT = "OUTPUT"
 
@@ -96,6 +97,12 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
                 self.INPUT,
                 self.tr("Input layer"),
                 [QgsProcessing.TypeVectorAnyGeometry]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.CLIP_LAYER,
+                description=self.tr("Clip layer"),
+                types=[QgsProcessing.TypeVectorPolygon],
+                optional=True))
         self.addParameter(
             QgsProcessingParameterExpression(
                 self.SELECT_EXPR,
