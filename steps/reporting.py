@@ -169,13 +169,15 @@ class ReportingModel(abstract_model.DictModel):
                 
             
             
-    def runReporting(self):
+    def runReportingOld(self):
         progress.progressFeedback.beginSection("Meff results computation")
         self.computeIntersections()
         self.computeResults()
         progress.progressFeedback.endSection()
         
-    def runReportingNew(self):
+    def runReporting(self):
+        reportingMsg = "Computing reporting layer"
+        progress.progressFeedback.beginSection(reportingMsg)
         landuseFragmPath = fragm.fragmModel.getFinalLayer()
         results_path = self.getOutLayer()
         parameters = { meff_algs.EffectiveMeshSizeAlgorithm.INPUT : landuseFragmPath,
@@ -186,6 +188,7 @@ class ReportingModel(abstract_model.DictModel):
             "Meff","effectiveMeshSize",parameters,
             context=None,feedback=progress.progressFeedback)
         qgsUtils.loadVectorLayer(res,loadProject=True)
+        progress.progressFeedback.endSection()
         
         
     def toXML(self,indent=" "):
@@ -220,7 +223,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.reportingLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.reportingLayer.fileChanged.connect(self.loadLayer)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
-        self.dlg.resultsRun.clicked.connect(self.model.runReportingNew)
+        self.dlg.resultsRun.clicked.connect(self.model.runReporting)
         
     def setLayer(self,layer):
         utils.debug("setLayer " + str(layer.type))

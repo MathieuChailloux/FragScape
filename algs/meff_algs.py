@@ -43,7 +43,7 @@ from ..steps import params
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [
+        self.alglist = [PrepareLanduseAlgorithm(),
                         PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
                         ReportingIntersection(),
@@ -80,7 +80,7 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         return QCoreApplication.translate('Processing', string)
         
     def createInstance(self):
-        return LanduseAlgorithm()
+        return PrepareLanduseAlgorithm()
         
     def name(self):
         return "prepareLanduse"
@@ -116,22 +116,26 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
                 
     def processAlgorithm(self,parameters,context,feedback):
         # Dummy function to enable running an alg inside an alg
-        def no_post_process(alg, context, feedback):
-            pass
-        feedback.pushInfo("begin")
-        source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        feedback.pushInfo("source = " + str(source))
-        if source is None:
+        # def no_post_process(alg, context, feedback):
+            # pass
+        input = self.parameterAsVectorLayer(parameters,self.INPUT,context)
+        feedback.pushInfo("input = " + str(input))
+        if input is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        feedback.pushInfo("source ok")
+        feedback.pushDebugInfo("input ok")
+        clip_layer = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         select_layer = QgsProcessingUtils.generateTempFilename("select.gpkg")
-        feedback.pushInfo("select_layer = " + str(select_layer))
-        selected = qgsTreatments.extractByExpression(source,expr,'memory:',context=context,feedback=feedback)
-        feedback.pushInfo("selected = " + str(selected))
+        feedback.pushDebugInfo("select_layer = " + str(select_layer))
+        if clip_layer is None:
+            clipped = input
+        else:
+            clipped = qgsTreatments.applyVectorClip(input,clip_layer,'memory:',context,feedback)
+        selected = qgsTreatments.extractByExpression(clipped,expr,'memory:',context=context,feedback=feedback)
+        feedback.pushDebugInfo("selected = " + str(selected))
         output = parameters[self.OUTPUT]
         dissolved = qgsTreatments.dissolveLayer(selected,output,context=context,feedback=feedback)
-        feedback.pushInfo("end")
+        dissolved = None
         return {self.OUTPUT : dissolved}
         
         

@@ -23,8 +23,8 @@
 """
 
 from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import QCoreApplication
+# from PyQt5 import QtGui, QtCore, QtWidgets
+# from PyQt5.QtCore import QCoreApplication
 from ..shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
 from ..algs import meff_algs 
 from . import params
@@ -139,8 +139,11 @@ class LanduseModel(abstract_model.DictModel):
                        self.CLIP_LAYER : clip_layer,
                        self.SELECT_EXPR : expr,
                        self.OUTPUT : dissolveLayer }
-        res = qgsTreatments.applyProcessingAlg("Meff","prepareLanduse",parameters)
-        qgsUtils.loadVectorLayer(res_path,dissolveLayer)
+        res = qgsTreatments.applyProcessingAlg(
+            "Meff","prepareLanduse",parameters,
+            context=None,feedback=progress.progressFeedback)
+        qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
+        progress.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
