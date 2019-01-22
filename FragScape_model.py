@@ -22,6 +22,7 @@
  ***************************************************************************/
 """
 
+from .shared import utils
 from .steps import params, landuse, fragm,  reporting
 
 class FragScapeModel:
@@ -52,19 +53,29 @@ class FragScapeModel:
         xmlStr = indent + "<" + self.parser_name
         new_indent = " "
         if self.paramsModel:
-            xmlstr += self.paramsModel.toXML(indent=new_indent)
+            xmlStr += self.paramsModel.toXML(indent=new_indent)
         if self.landuseModel:
-            xmlstr += self.landuseModel.toXML(indent=new_indent)
+            xmlStr += self.landuseModel.toXML(indent=new_indent)
         if self.fragmModel:
-            xmlstr += self.fragmModel.toXML(indent=new_indent)
+            xmlStr += self.fragmModel.toXML(indent=new_indent)
         if self.reportingModel:
-            xmlstr += self.reportingModel.toXML(indent=new_indent)
+            xmlStr += self.reportingModel.toXML(indent=new_indent)
         xmlStr += indent + "</" + self.parser_name + ">"
         
-    def fromXMLRoot(self,infile):
-        self.paramsModel.fromXML()
-        self.landuseModel.fromXML()
-        self.fragmModel.fromXML()
-        self.reportingModel.fromXML()
+    def fromXMLRoot(self,root):
+        for child in root:
+            utils.debug("tag = " + str(child.tag))
+            if child.tag == self.paramsModel.parser_name:
+                self.paramsModel.fromXMLRoot(child)
+                self.paramsModel.layoutChanged.emit()
+            elif child.tag == self.landuseModel.parser_name:
+                self.landuseModel.fromXMLRoot(child)
+                self.landuseModel.layoutChanged.emit()
+            elif child.tag == self.fragmModel.parser_name:
+                self.fragmModel.fromXMLRoot(child)
+                self.fragmModel.layoutChanged.emit()
+            elif child.tag == self.reportingModel.parser_name:
+                self.reportingModel.fromXMLRoot(child)
+                self.reportingModel.layoutChanged.emit()
         
     

@@ -26,6 +26,7 @@ import os
 import sys
 import traceback
 from io import StringIO
+import xml.etree.ElementTree as ET
 
 from PyQt5 import uic
 from PyQt5 import QtWidgets
@@ -181,17 +182,18 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         
         # Return XML string describing project
     def toXML(self):
-        xmlStr = "<MeffConfig>\n"
-        for parser in self.parsers:
-            xmlStr += parser.toXML() + "\n"
-        xmlStr += "</MeffConfig>\n"
-        utils.debug("Final xml : \n" + xmlStr)
+        # xmlStr = "<MeffConfig>\n"
+        # for parser in self.parsers:
+            # xmlStr += parser.toXML() + "\n"
+        # xmlStr += "</MeffConfig>\n"
+        # utils.debug("Final xml : \n" + xmlStr)
+        xmlStr = self.fsModel.toXML()
         return xmlStr
 
     # Save project to 'fname'
     def saveModelAs(self,fname):
         self.recomputeParsers()
-        xmlStr = self.toXML()
+        xmlStr = self.fsModel.toXML()
         #params.params.projectFile = fname
         self.fsModel.paramsModel.projectFile = fname
         utils.writeFile(fname,xmlStr)
@@ -215,7 +217,10 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         utils.checkFileExists(fname)
         config_parsing.setConfigParsers(self.parsers)
         #params.params.projectFile = fname
+        #xml_tree = ET.parse(fname)
+        #xml_root = xml_tree.getroot()
         self.fsModel.paramsModel.projectFile = fname
+        #self.fsModel.fromXMLRoot(xml_root)
         config_parsing.parseConfig(fname)
         utils.info("Meff model loaded from file '" + fname + "'")
         

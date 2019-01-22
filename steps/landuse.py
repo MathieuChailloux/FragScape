@@ -44,10 +44,15 @@ class LanduseFieldItem(abstract_model.DictItem):
         
 class LanduseModel(abstract_model.DictModel):
 
-    INPUT = meff_algs.PrepareLanduseAlgorithm.INPUT
-    CLIP_LAYER = meff_algs.PrepareLanduseAlgorithm.CLIP_LAYER
-    SELECT_EXPR = meff_algs.PrepareLanduseAlgorithm.SELECT_EXPR
-    OUTPUT = meff_algs.PrepareLanduseAlgorithm.OUTPUT
+    # INPUT = meff_algs.PrepareLanduseAlgorithm.INPUT
+    # CLIP_LAYER = meff_algs.PrepareLanduseAlgorithm.CLIP_LAYER
+    # SELECT_EXPR = meff_algs.PrepareLanduseAlgorithm.SELECT_EXPR
+    # OUTPUT = meff_algs.PrepareLanduseAlgorithm.OUTPUT
+    INPUT = "in_layer"
+    ALG_INPUT = meff_algs.PrepareLanduseAlgorithm.INPUT
+    ALG_CLIP_LAYER = meff_algs.PrepareLanduseAlgorithm.CLIP_LAYER
+    ALG_SELECT_EXPR = meff_algs.PrepareLanduseAlgorithm.SELECT_EXPR
+    ALG_OUTPUT = meff_algs.PrepareLanduseAlgorithm.OUTPUT
     
     SELECT_FIELD = "field"
     FIELDS = [LanduseFieldItem.VALUE_FIELD,LanduseFieldItem.TO_SELECT_FIELD]
@@ -137,10 +142,10 @@ class LanduseModel(abstract_model.DictModel):
             utils.user_error("No expression selected : TODO select everything")
         dissolveLayer = self.getDissolveLayer()
         qgsUtils.removeVectorLayer(dissolveLayer)
-        parameters = { self.INPUT : in_layer,
-                       self.CLIP_LAYER : clip_layer,
-                       self.SELECT_EXPR : expr,
-                       self.OUTPUT : dissolveLayer }
+        parameters = { self.ALG_INPUT : in_layer,
+                       self.ALG_CLIP_LAYER : clip_layer,
+                       self.ALG_SELECT_EXPR : expr,
+                       self.ALG_OUTPUT : dissolveLayer }
         res = qgsTreatments.applyProcessingAlg(
             "Meff","prepareLanduse",parameters,
             context=None,feedback=progress.progressFeedback)
@@ -154,7 +159,8 @@ class LanduseModel(abstract_model.DictModel):
         if not self.landuseField:
             utils.warn("No field selected")
             return ""
-        layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.landuseLayer))
+        #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.landuseLayer))
+        layerRelPath = self.fsModel.normalizePath(self.landuseLayer)
         attribs_dict = { self.INPUT : layerRelPath, self.SELECT_FIELD : self.landuseField }
         xmlStr = super().toXML(indent,attribs_dict)
         return xmlStr
@@ -171,7 +177,7 @@ class LanduseModel(abstract_model.DictModel):
         self.items = []
         for parsed_item in root:
             dict = parsed_item.attrib
-            item = self.model.mkItemFromDict(dict)
+            item = self.mkItemFromDict(dict)
             self.addItem(item)
         self.layoutChanged.emit()
 
@@ -213,6 +219,8 @@ class LanduseConnector(abstract_model.AbstractConnector):
         curr_layer = self.dlg.landuseLayerCombo.currentLayer()
         if not curr_layer:
             utils.internal_error("No layer selected in landuse tab")
+        if fieldname == self.model.landuseField:
+            return
         fieldVals = qgsUtils.getLayerFieldUniqueValues(curr_layer,fieldname)
         self.model.items = []
         for fieldVal in fieldVals:
@@ -222,22 +230,34 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.model.landuseField = fieldname
         self.model.layoutChanged.emit()
         
-
-    def fromXMLAttribs(self,attribs):
-        attrib_fields = ["layer", "field"]
-        utils.checkFields(attrib_fields,attribs.keys())
-        abs_layer = self.model.fsModel.getOrigPath(attribs["layer"])
-        self.loadLayer(abs_layer)
-        self.dlg.landuseFieldCombo.setField(attribs["field"])
+    def updateUI(self):
+        utils.debug("1")
+        if self.model.landuseLayer:
+            utils.debug("2")
+            self.loadLayer(self.model.landuseLayer)
+        if self.model.landuseField:
+            utils.debug("3")
+            self.dlg.landuseFieldCombo.setField(self.model.landuseField)
         
     def fromXMLRoot(self,root):
-        self.fromXMLAttribs(root.attrib)
-        self.model.items = []
-        for parsed_item in root:
-            dict = parsed_item.attrib
-            item = self.model.mkItemFromDict(dict)
-            self.model.addItem(item)
-        self.model.layoutChanged.emit()
+        self.model.fromXMLRoot(root)
+        self.updateUI()
+
+    # def fromXMLAttribs(self,attribs):
+        # attrib_fields = ["layer", "field"]
+        # utils.checkFields(attrib_fields,attribs.keys())
+        # abs_layer = self.model.fsModel.getOrigPath(attribs["layer"])
+        # self.loadLayer(abs_layer)
+        # self.dlg.landuseFieldCombo.setField(attribs["field"])
+        
+    # def fromXMLRoot(self,root):
+        # self.fromXMLAttribs(root.attrib)
+        # self.model.items = []
+        # for parsed_item in root:
+            # dict = parsed_item.attrib
+            # item = self.model.mkItemFromDict(dict)
+            # self.model.addItem(item)
+        # self.model.layoutChanged.emit()
         
     def toXML(self):
         return self.model.toXML()

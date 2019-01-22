@@ -40,6 +40,7 @@ import processing
 
 from ..shared import utils, qgsTreatments
 from ..steps import params
+#from .. import FragScape_model
 
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
@@ -502,6 +503,8 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         for report_feat in reporting.getFeatures():
             report_geom = report_feat.geometry()
             report_area = report_geom.area() / 1000
+            if report_area == 0:
+                break
             report_area_sq = report_area * report_area
             new_f = QgsFeature(output_fields)
             new_f.setGeometry(report_geom)
@@ -524,9 +527,9 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                     new_f[self.COHERENCE] += pow(f_area / report_area,2)
             new_f[self.NET_PRODUCT] = net_product
             new_f[self.COHERENCE] = net_product / report_area_sq
-            new_f[self.SPLITTING_DENSITY] = report_area / net_product
+            new_f[self.SPLITTING_DENSITY] = report_area / net_product if net_product > 0 else 0
             new_f[self.MESH_SIZE] = net_product / report_area
-            new_f[self.SPLITTING_INDEX] = report_area_sq / net_product
+            new_f[self.SPLITTING_INDEX] = report_area_sq / net_product if net_product > 0 else 0
             new_f[self.DIVI] = 1 - new_f[self.COHERENCE]
             sink.addFeature(new_f)
             curr_step += 1
@@ -536,138 +539,38 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         
 class FragScapeAlgorithm(QgsProcessingAlgorithm):
 
-        # Algorithm parameters
-    INPUT = "INPUT"
-    REPORTING = "REPORTING"
-    CBC_MODE = "CBC_MODE"
+    # Algorithm parameters
+    INPUT_CONFIG = "INPUT"
     OUTPUT = "OUTPUT"
-    
-    # Output layer fields
-    ID = "fid"
-    NB_PATCHES = "nb_patches"
-    # Main measures
-    MESH_SIZE = "effective_mesh_size"
-    DIVI = "landscape_division"
-    SPLITTING_INDEX = "splitting_index"
-    # Auxiliary measures
-    COHERENCE = "coherence"
-    SPLITTING_DENSITY = "splitting_density"
-    NET_PRODUCT = "net_product"
-    
     
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
         
     def createInstance(self):
-        return EffectiveMeshSizeAlgorithm()
+        return FragScapeAlgorithm()
         
     def name(self):
-        return "effectiveMeshSize"
+        return "FragScapeAlgorithm"
         
     def displayName(self):
-        return self.tr("3 - Effective Mesh Size")
+        return self.tr("Run FragScape from configuration file")
         
     def shortHelpString(self):
-        return self.tr("Computes effective mesh size and other fragmentation indicators")
+        return self.tr("Executes complete process from XML configuration file")
 
     def initAlgorithm(self, config=None):
         self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                self.INPUT,
-                self.tr("Input layer"),
-                [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                self.REPORTING,
-                self.tr("Reporting layer"),
-                [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(
-            QgsProcessingParameterBoolean(
-                self.CBC_MODE,
-                self.tr("Cross-boundary connection method")))
+            QgsProcessingParameterFile(
+                self.INPUT_CONFIG,
+                description=self.tr("Input configuration file")))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
-                self.tr("Output layer")))
+                description=self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
         feedback.pushInfo("begin")
         # Parameters
-        source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        feedback.pushInfo("source = " + str(source))
-        if source is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
-        feedback.pushInfo("reporting = " + str(reporting))
-        if reporting is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
-        cbc_mode = self.parameterAsBool(parameters,self.CBC_MODE,context)
-        report_id_field = QgsField(self.ID, QVariant.Int)
-        nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
-        mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
-        div_field = QgsField(self.DIVI, QVariant.Double)
-        split_index_field = QgsField(self.SPLITTING_INDEX, QVariant.Double)
-        coherence_field = QgsField(self.COHERENCE, QVariant.Double)
-        split_density_field = QgsField(self.SPLITTING_DENSITY, QVariant.Double)
-        net_product_field = QgsField(self.NET_PRODUCT, QVariant.Double)
-        output_fields = QgsFields()
-        output_fields.append(report_id_field)
-        output_fields.append(nb_patches_field)
-        output_fields.append(mesh_size_field)
-        output_fields.append(div_field)
-        output_fields.append(split_index_field)
-        output_fields.append(coherence_field)
-        output_fields.append(split_density_field)
-        output_fields.append(net_product_field)
-        feedback.pushDebugInfo("fields =  " + str(output_fields.names()))
-        (sink, dest_id) = self.parameterAsSink(
-            parameters,
-            self.OUTPUT,
-            context,
-            output_fields,
-            reporting.wkbType(),
-            reporting.sourceCrs()
-        )
-        if sink is None:
-            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
-        # progress step
-        nb_feats = reporting.featureCount()
-        feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
-        if nb_feats == 0:
-            raise QgsProcessingException("Empty layer")
-        progress_step = 100.0 / nb_feats
-        curr_step = 0
-        # gna gna
-        for report_feat in reporting.getFeatures():
-            report_geom = report_feat.geometry()
-            report_area = report_geom.area() / 1000
-            report_area_sq = report_area * report_area
-            new_f = QgsFeature(output_fields)
-            new_f.setGeometry(report_geom)
-            new_f[self.ID] = report_feat.id()
-            new_f[self.NB_PATCHES] = 0
-            new_f[self.NET_PRODUCT] = 0
-            new_f[self.COHERENCE] = 0
-            net_product = 0
-            for f in source.getFeatures():
-                f_geom = f.geometry()
-                if f_geom.intersects(report_geom):
-                    f_area = f_geom.area() / 1000
-                    intersection = f_geom.intersection(report_geom)
-                    intersection_area = intersection.area() / 1000
-                    new_f[self.NB_PATCHES] += 1
-                    if cbc_mode:
-                        net_product += f_area * intersection_area
-                    else:
-                        net_product += intersection_area * intersection_area
-                    new_f[self.COHERENCE] += pow(f_area / report_area,2)
-            new_f[self.NET_PRODUCT] = net_product
-            new_f[self.COHERENCE] = net_product / report_area_sq
-            new_f[self.SPLITTING_DENSITY] = report_area / net_product
-            new_f[self.MESH_SIZE] = net_product / report_area
-            new_f[self.SPLITTING_INDEX] = report_area_sq / net_product
-            new_f[self.DIVI] = 1 - new_f[self.COHERENCE]
-            sink.addFeature(new_f)
-            curr_step += 1
-            feedback.setProgress(int(curr_step * progress_step))
+        fragScapeModel = FragScape_model.FragScapeModel()
+        fragScapeModel.fromXMLRoot()
         return {self.OUTPUT: dest_id}

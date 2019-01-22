@@ -259,6 +259,16 @@ class ParamsModel(QAbstractTableModel):
             flag = dict[self.CLIP] == "True"
             self.dataClipFlag = flag
         #self.model.layoutChanged.emit()
+        
+    def toXML(self,indent=""):
+        xmlStr = indent + "<" + self.parser_name
+        if self.workspace:
+            xmlStr += " " + self.WORKSPACE + "=\"" + str(self.workspace) + "\""
+        xmlStr += " " + self.CLIP + "=\"" + str(self.dataClipFlag) + "\""
+        if self.territoryLayer:
+            xmlStr += " " + self.TERRITORY + "=\"" + str(self.territoryLayer) + "\""
+        xmlStr += "/>"
+        return xmlStr
 
 class ParamsConnector:
 
@@ -284,17 +294,23 @@ class ParamsConnector:
         header = self.dlg.paramsView.horizontalHeader()     
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.model.layoutChanged.emit()
-
-    def fromXMLRoot(self,root):
-        dict = root.attrib
-        utils.debug("params dict = " + str(dict))
-        return self.fromXMLDict(dict)
-
-    def fromXMLDict(self,dict):
-        self.model.fromXMLDict(dict)
+        
+    def updateUI(self):
+        self.dlg.workspace.setFilePath(self.model.workspace)
+        self.dlg.territoryLayer.setFilePath(self.model.territoryLayer)
         checkState = 2 if self.model.dataClipFlag else 0
         self.dlg.dataClipFlag.setCheckState(checkState)
-        self.model.layoutChanged.emit()
+        self.dlg.paramsCrs.setCrs(self.model.crs)
+
+    def fromXMLRoot(self,root):
+        self.model.fromXMLRoot(root)
+        self.updateUI()
+
+    # def fromXMLDict(self,dict):
+        # self.model.fromXMLDict(dict)
+        # checkState = 2 if self.model.dataClipFlag else 0
+        # self.dlg.dataClipFlag.setCheckState(checkState)
+        # self.model.layoutChanged.emit()
         # if "workspace" in dict:
             # if os.path.isdir(dict["workspace"]):
                 # self.model.setWorkspace(dict["workspace"])
@@ -309,12 +325,13 @@ class ParamsConnector:
         # self.model.layoutChanged.emit()
 
     def toXML(self,indent=""):
-        xmlStr = indent + "<" + self.parser_name
-        if self.model.workspace:
-            xmlStr += " " + ParamsModel.WORKSPACE + "=\"" + str(self.model.workspace) + "\""
-        xmlStr += " " + ParamsModel.CLIP + "=\"" + str(self.model.dataClipFlag) + "\""
-        if self.model.territoryLayer:
-            xmlStr += " " + ParamsModel.TERRITORY + "=\"" + str(self.model.territoryLayer) + "\""
-        xmlStr += "/>"
-        return xmlStr
+        return self.model.toXML(indent)
+        # xmlStr = indent + "<" + self.parser_name
+        # if self.model.workspace:
+            # xmlStr += " " + ParamsModel.WORKSPACE + "=\"" + str(self.model.workspace) + "\""
+        # xmlStr += " " + ParamsModel.CLIP + "=\"" + str(self.model.dataClipFlag) + "\""
+        # if self.model.territoryLayer:
+            # xmlStr += " " + ParamsModel.TERRITORY + "=\"" + str(self.model.territoryLayer) + "\""
+        # xmlStr += "/>"
+        # return xmlStr
         
