@@ -38,6 +38,7 @@ from .shared import utils, progress, config_parsing, log, qgsTreatments
 from .algs.meff_algs import MeffAlgorithmsProvider
 from .steps import params, landuse, fragm, reporting
 from . import tabs
+from .FragScape_model import FragScapeModel
 
 #from MeffAbout_dialog import MeffAboutDialog
 
@@ -60,13 +61,14 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def initTabs(self):
         global landuseModel
-        self.paramsConnector = params.ParamsConnector(self)
-        params.params = self.paramsConnector.model
-        self.landuseConnector = landuse.LanduseConnector(self)
-        landuse.landuseModel = self.landuseConnector.model
-        self.fragmConnector = fragm.FragmConnector(self)
-        fragm.fragmModel = self.fragmConnector.model
-        self.reportingConnector = reporting.ReportingConnector(self)
+        self.fsModel = FragScapeModel()
+        self.paramsConnector = params.ParamsConnector(self,self.fsModel.paramsModel)
+        #params.params = self.paramsConnector.model
+        self.landuseConnector = landuse.LanduseConnector(self,self.fsModel.landuseModel)
+        #landuse.landuseModel = self.landuseConnector.model
+        self.fragmConnector = fragm.FragmConnector(self,self.fsModel.fragmModel)
+        #fragm.fragmModel = self.fragmConnector.model
+        self.reportingConnector = reporting.ReportingConnector(self,self.fsModel.reportingModel)
         logConnector = log.LogConnector(self)
         progressConnector = progress.ProgressConnector(self)
         progress.progressConnector = progressConnector
@@ -190,7 +192,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
     def saveModelAs(self,fname):
         self.recomputeParsers()
         xmlStr = self.toXML()
-        params.params.projectFile = fname
+        #params.params.projectFile = fname
+        self.fsModel.paramsModel.projectFile = fname
         utils.writeFile(fname,xmlStr)
         utils.info("Meff model saved into file '" + fname + "'")
         
@@ -201,7 +204,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         
     # Save project to projectFile if existing
     def saveModel(self):
-        fname = params.params.projectFile
+        #fname = params.params.projectFile
+        fname = self.fsModel.paramsModel.projectFile
         utils.checkFileExists(fname,"Project ")
         self.saveModelAs(fname)
    
@@ -210,7 +214,8 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         utils.debug("loadModel " + str(fname))
         utils.checkFileExists(fname)
         config_parsing.setConfigParsers(self.parsers)
-        params.params.projectFile = fname
+        #params.params.projectFile = fname
+        self.fsModel.paramsModel.projectFile = fname
         config_parsing.parseConfig(fname)
         utils.info("Meff model loaded from file '" + fname + "'")
         

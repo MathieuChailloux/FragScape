@@ -33,8 +33,9 @@ from . import params, fragm
 
 class ReportingModel(abstract_model.DictModel):
 
-    def __init__(self):
+    def __init__(self,fsModel):
         self.parser_name = "Reporting"
+        self.fsModel = fsModel
         self.layer = None
         self.outLayer = None
         self.init_fields = ["meff"]
@@ -47,7 +48,7 @@ class ReportingModel(abstract_model.DictModel):
         
     def getOutLayer(self):
         if self.outLayer:
-            return params.getOrigPath(self.outLayer)
+            return self.fsModel.getOrigPath(self.outLayer)
         else:
             return QgsProcessingUtils.generateTempFilename("reportingResults.gpkg")
         
@@ -55,15 +56,15 @@ class ReportingModel(abstract_model.DictModel):
         pass
         
     def getIntersectionLayerPath(self):
-        return params.mkOutputFile("reportingIntersection.gpkg")
+        return self.fsModel.mkOutputFile("reportingIntersection.gpkg")
         
     def getReportingResultsLayerPath(self):
-        return params.mkOutputFile("reportingResults.gpkg")
+        return self.fsModel.mkOutputFile("reportingResults.gpkg")
         
     def createIntersectionLayer(self):
         path = self.getIntersectionLayerPath()
         qgsUtils.removeVectorLayer(path)
-        landuseFragmPath = fragm.fragmModel.getFinalLayer()
+        landuseFragmPath = self.fsModel.fragmModel.getFinalLayer()
         landuseFragmlayer = qgsUtils.loadVectorLayer(landuseFragmPath)
         layer = qgsUtils.createLayerFromExisting(landuseFragmlayer,"reportingIntersection")
         #fid_field = QgsField("Origin", QVariant.Int)
@@ -79,7 +80,7 @@ class ReportingModel(abstract_model.DictModel):
         
     def computeIntersections(self):
         progress.progressFeedback.setSubText("Intersection with reporting units")
-        landuseFragmPath = fragm.fragmModel.getFinalLayer()
+        landuseFragmPath = self.fsModel.fragmModel.getFinalLayer()
         landuseFragmlayer = qgsUtils.loadVectorLayer(landuseFragmPath)
         #reporting_layer = qgsUtils.loadVectorLayer(self.layer)
         reporting_layer = self.layer
@@ -178,7 +179,7 @@ class ReportingModel(abstract_model.DictModel):
     def runReporting(self):
         reportingMsg = "Computing reporting layer"
         progress.progressFeedback.beginSection(reportingMsg)
-        landuseFragmPath = fragm.fragmModel.getFinalLayer()
+        landuseFragmPath = self.fsModel.fragmModel.getFinalLayer()
         results_path = self.getOutLayer()
         parameters = { meff_algs.EffectiveMeshSizeAlgorithm.INPUT : landuseFragmPath,
                        meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
@@ -195,10 +196,10 @@ class ReportingModel(abstract_model.DictModel):
         if not self.layer:
             utils.warn("No reporting layer selected")
             return ""
-        layerRelPath = params.normalizePath(qgsUtils.pathOfLayer(self.layer))
+        layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.layer))
         modelParams = { "layer" : layerRelPath }
         if self.outLayer:
-            modelParams["outLayer"] = params.normalizePath(self.outLayer)
+            modelParams["outLayer"] = self.fsModel.normalizePath(self.outLayer)
         xmlStr = super().toXML(indent,modelParams)
         return xmlStr
         
@@ -206,10 +207,10 @@ class ReportingModel(abstract_model.DictModel):
 class ReportingConnector(abstract_model.AbstractConnector):
 
     
-    def __init__(self,dlg):
+    def __init__(self,dlg,reportingModel):
         self.dlg = dlg
         self.parser_name = "Reporting"
-        reportingModel = ReportingModel()
+        #reportingModel = ReportingModel()
         super().__init__(reportingModel,self.dlg.resultsView)
         
     def initGui(self):
@@ -241,7 +242,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         attrib_fields = ["layer"]
         fields = attribs.keys()
         #utils.checkFields(attrib_fields,attribs.keys())
-        abs_layer = params.getOrigPath(attribs["layer"])
+        abs_layer = self.model.fsModel.getOrigPath(attribs["layer"])
         self.loadLayer(abs_layer)
         if "outLayer" in fields:
             self.model.setOutLayer(attribs["outLayer"])

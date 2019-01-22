@@ -41,87 +41,101 @@ params = None
 defaultCrs = QgsCoordinateReferenceSystem("EPSG:2154")
 
 # Checks that workspace is intialized and is an existing directory.
-def checkWorkspaceInit():
-    if not params.workspace:
-        utils.user_error("Workspace parameter not initialized")
-    if not os.path.isdir(params.workspace):
-        utils.user_error("Workspace directory '" + params.workspace + "' does not exist")
+# def checkWorkspaceInit():
+    # if not params.workspace:
+        # utils.user_error("Workspace parameter not initialized")
+    # if not os.path.isdir(params.workspace):
+        # utils.user_error("Workspace directory '" + params.workspace + "' does not exist")
         
 # Returns relative path w.r.t. workspace directory.
 # File separator is set to common slash '/'.
-def normalizePath(path):
-    checkWorkspaceInit()
-    if not path:
-        utils.user_error("Empty path")
-    norm_path = utils.normPath(path)
-    if os.path.isabs(norm_path):
-        rel_path = os.path.relpath(norm_path,params.workspace)
-    else:
-        rel_path = norm_path
-    final_path = utils.normPath(rel_path)
-    return final_path
+# def normalizePath(path):
+    # checkWorkspaceInit()
+    # if not path:
+        # utils.user_error("Empty path")
+    # norm_path = utils.normPath(path)
+    # if os.path.isabs(norm_path):
+        # rel_path = os.path.relpath(norm_path,params.workspace)
+    # else:
+        # rel_path = norm_path
+    # final_path = utils.normPath(rel_path)
+    # return final_path
         
 # Returns absolute path from normalized path (cf 'normalizePath' function)
-def getOrigPath(path):
-    checkWorkspaceInit()
-    if path == "":
-        utils.user_error("Empty path")
-    elif os.path.isabs(path):
-        return path
-    else:
-        return os.path.normpath(utils.joinPath(params.workspace,path))
+# def getOrigPath(path):
+    # checkWorkspaceInit()
+    # if path == "":
+        # utils.user_error("Empty path")
+    # elif os.path.isabs(path):
+        # return path
+    # else:
+        # return os.path.normpath(utils.joinPath(params.workspace,path))
     
 # Checks that all parameters are initialized
-def checkInit():
-    checkWorkspaceInit()
-    if not params.territoryLayer:
-        utils.user_error("Territory layer parameter not initialized")
-    utils.checkFileExists(getOrigPath(params.territoryLayer),"Territory layer ")
-    if not params.crs:
-        utils.user_error("CRS parameter not initialized")
-    if not params.crs.isValid():
-        utils.user_error("Invalid CRS")
+# def checkInit():
+    # checkWorkspaceInit()
+    # if not params.territoryLayer:
+        # utils.user_error("Territory layer parameter not initialized")
+    # utils.checkFileExists(getOrigPath(params.territoryLayer),"Territory layer ")
+    # if not params.crs:
+        # utils.user_error("CRS parameter not initialized")
+    # if not params.crs.isValid():
+        # utils.user_error("Invalid CRS")
 
 # Returns normalized path from QgsMapLayerComboBox
-def getPathFromLayerCombo(combo):
-    layer = combo.currentLayer()
-    layer_path = normalizePath(qgsUtils.pathOfLayer(layer))
-    return layer_path
+# def getPathFromLayerCombo(combo):
+    # layer = combo.currentLayer()
+    # layer_path = normalizePath(qgsUtils.pathOfLayer(layer))
+    # return layer_path
         
-def getTerritoryLayer():
-    utils.debug("PARAMS clip flag = " + str(getDataClipFlag()))
-    if getDataClipFlag():
-        return getOrigPath(params.territoryLayer)
-    else:
-        return None
+# def getTerritoryLayer():
+    # utils.debug("PARAMS clip flag = " + str(getDataClipFlag()))
+    # if getDataClipFlag():
+        # return getOrigPath(params.territoryLayer)
+    # else:
+        # return None
     
-def getDataClipFlag():
-    return params.dataClipFlag
+# def getDataClipFlag():
+    # return params.dataClipFlag
 
-def mkOutputFile(name):
-    checkWorkspaceInit()
-    new_path = utils.joinPath(params.outputDir,name)
-    return new_path
+# def mkOutputFile(name):
+    # checkWorkspaceInit()
+    # new_path = utils.joinPath(params.outputDir,name)
+    # return new_path
         
 #class ParamsModel(abstract_model.AbstractGroupModel):
 class ParamsModel(QAbstractTableModel):
 
-    def __init__(self):
+    WORKSPACE = "workspace"
+    CLIP = "clip"
+    TERRITORY = "territoryLayer"
+    PROJECT = "projectFile"
+    CRS = "crs"
+
+    def __init__(self,fsModel):
         self.parser_name = "Params"
+        self.fsModel = fsModel
         self.workspace = None
         self.outputDir = None
         self.territoryLayer = None
         self.dataClipFlag = True
         self.projectFile = ""
         self.crs = defaultCrs
-        self.fields = ["workspace","territoryLayer","projectFile","crs"]
+        self.fields = [self.WORKSPACE,self.TERRITORY,self.PROJECT,self.CRS]
         QAbstractTableModel.__init__(self)
         
+    """ Getters and setters """
     def setTerritoryLayer(self,path):
-        path = normalizePath(path)
+        path = self.normalizePath(path)
         utils.info("Setting territory layer to " + str(path))
         self.territoryLayer = path
         #self.layoutChanged.emit()
+        
+    def getTerritoryLayer(self):
+        if self.dataClipFlag:
+            return self.getOrigPath(self.territoryLayer)
+        else:
+            return None
         
     def setDataClipFalg(self,val):
         self.dataClipFlag = val
@@ -154,6 +168,44 @@ class ParamsModel(QAbstractTableModel):
             utils.user_error("Directory '" + norm_path + "' does not exist")
         self.outputDir = utils.createSubdir(norm_path,"outputs")
         
+    """ Path/workspace utils """
+    # Checks that workspace is intialized and is an existing directory.
+    def checkWorkspaceInit(self):
+        if not self.workspace:
+            utils.user_error("Workspace parameter not initialized")
+        if not os.path.isdir(self.workspace):
+            utils.user_error("Workspace directory '" + self.workspace + "' does not exist")
+            
+    # Returns relative path w.r.t. workspace directory.
+    # File separator is set to common slash '/'.
+    def normalizePath(self,path):
+        self.checkWorkspaceInit()
+        if not path:
+            utils.user_error("Empty path")
+        norm_path = utils.normPath(path)
+        if os.path.isabs(norm_path):
+            rel_path = os.path.relpath(norm_path,self.workspace)
+        else:
+            rel_path = norm_path
+        final_path = utils.normPath(rel_path)
+        return final_path
+            
+    # Returns absolute path from normalized path (cf 'normalizePath' function)
+    def getOrigPath(self,path):
+        self.checkWorkspaceInit()
+        if path == "":
+            utils.user_error("Empty path")
+        elif os.path.isabs(path):
+            return path
+        else:
+            return os.path.normpath(utils.joinPath(self.workspace,path))
+    
+    def mkOutputFile(self,name):
+        self.checkWorkspaceInit()
+        new_path = utils.joinPath(self.outputDir,name)
+        return new_path
+        
+    """ MVC functions """
     def rowCount(self,parent=QModelIndex()):
         return len(self.fields)
         
@@ -189,13 +241,32 @@ class ParamsModel(QAbstractTableModel):
         elif orientation == Qt.Vertical and role == Qt.DisplayRole:
             return QVariant(self.fields[col])
         return QVariant()
+        
+    """ XML """
+    def fromXMLRoot(self,root):
+        dict = root.attrib
+        utils.debug("params dict = " + str(dict))
+        return self.fromXMLDict(dict)
+
+    def fromXMLDict(self,dict):
+        if self.WORKSPACE in dict:
+            if os.path.isdir(dict[self.WORKSPACE]):
+                self.setWorkspace(dict[self.WORKSPACE])
+        if self.TERRITORY in dict:
+            self.setTerritoryLayer(dict[self.TERRITORY])
+        if self.CLIP in dict:
+            # Cast with bool() not working
+            flag = dict[self.CLIP] == "True"
+            self.dataClipFlag = flag
+        #self.model.layoutChanged.emit()
 
 class ParamsConnector:
 
-    def __init__(self,dlg):
+    def __init__(self,dlg,paramsModel):
         self.parser_name = "Params"
         self.dlg = dlg
-        self.model = ParamsModel()
+        self.model = paramsModel
+        #self.model = ParamsModel()
         
     def initGui(self):
         self.dlg.paramsView.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
@@ -220,30 +291,30 @@ class ParamsConnector:
         return self.fromXMLDict(dict)
 
     def fromXMLDict(self,dict):
-        if "workspace" in dict:
-            if os.path.isdir(dict["workspace"]):
-                self.model.setWorkspace(dict["workspace"])
-        if "territoryLayer" in dict:
-            self.model.setTerritoryLayer(dict["territoryLayer"])
-        if "dataClipFlag" in dict:
-            # Cast with bool() not working
-            flag = dict["dataClipFlag"] == "True"
-            # Maybe QCheckbox could be wrapped in a model and atomatically updated
-            if flag == True:
-                utils.debug("cas1")
-                self.dlg.dataClipFlag.setCheckState(2)
-            else:
-                utils.debug("cas2")
-                self.dlg.dataClipFlag.setCheckState(0)
+        self.model.fromXMLDict(dict)
+        checkState = 2 if self.model.dataClipFlag else 0
+        self.dlg.dataClipFlag.setCheckState(checkState)
         self.model.layoutChanged.emit()
+        # if "workspace" in dict:
+            # if os.path.isdir(dict["workspace"]):
+                # self.model.setWorkspace(dict["workspace"])
+        # if "territoryLayer" in dict:
+            # self.model.setTerritoryLayer(dict["territoryLayer"])
+        # if "dataClipFlag" in dict:
+            # flag = dict["dataClipFlag"] == "True"
+            # if flag == True:
+                # self.dlg.dataClipFlag.setCheckState(2)
+            # else:
+                # self.dlg.dataClipFlag.setCheckState(0)
+        # self.model.layoutChanged.emit()
 
     def toXML(self,indent=""):
         xmlStr = indent + "<" + self.parser_name
         if self.model.workspace:
-            xmlStr += " workspace=\"" + str(self.model.workspace) + "\""
+            xmlStr += " " + ParamsModel.WORKSPACE + "=\"" + str(self.model.workspace) + "\""
+        xmlStr += " " + ParamsModel.CLIP + "=\"" + str(self.model.dataClipFlag) + "\""
         if self.model.territoryLayer:
-            xmlStr += " territoryLayer=\"" + str(self.model.territoryLayer) + "\""
-        xmlStr += " dataClipFlag=\"" + str(self.model.dataClipFlag) + "\""
+            xmlStr += " " + ParamsModel.TERRITORY + "=\"" + str(self.model.territoryLayer) + "\""
         xmlStr += "/>"
         return xmlStr
         

@@ -371,11 +371,11 @@ class DictModel(AbstractGroupModel):
             self.fields.remove(fieldname)
         self.layoutChanged.emit()
         
-    def toXML(self,indent=" ",modelParams=None):
+    def toXML(self,indent=" ",attribs_dict=None):
         utils.debug("toXML " + self.parser_name)
         xmlStr = indent + "<" + self.parser_name
-        if modelParams:
-            for k,v in modelParams.items():
+        if attribs_dict:
+            for k,v in attribs_dict.items():
                 xmlStr += " " + str(k).replace('"','&quot;')
                 xmlStr += "=\"" + str(v).replace('"','&quot;') + "\""
         xmlStr += ">\n"

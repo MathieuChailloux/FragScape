@@ -92,10 +92,12 @@ class FragmModel(abstract_model.DictModel):
     
     APPLY_LANDUSE = meff_algs.ApplyFragmentationAlgorithm.LANDUSE
     APPLY_FRAGMENTATION = meff_algs.ApplyFragmentationAlgorithm.FRAGMENTATION
+    APPLY_CRS = meff_algs.ApplyFragmentationAlgorithm.CRS
     APPLY_OUTPUT = meff_algs.ApplyFragmentationAlgorithm.OUTPUT
     
-    def __init__(self):
+    def __init__(self,fsModel):
         self.parser_name = "FragmModel"
+        self.fsModel = fsModel
         super().__init__(self,self.FIELDS)
         
     def mkItemFromDict(self,dict):
@@ -119,16 +121,16 @@ class FragmModel(abstract_model.DictModel):
         return QgsProcessingUtils.generateTempFilename("landuseFragm.gpkg")
         
     def getFinalLayer(self):
-        return params.mkOutputFile("landuseFragmSingleGeom.gpkg")
+        return self.fsModel.mkOutputFile("landuseFragmSingleGeom.gpkg")
         
     def applyItemsOld(self,indexes):
         fragmMsg = "Application of fragmentation data to landuse"
         progress.progressFeedback.beginSection(fragmMsg)
-        territory_layer = params.getTerritoryLayer()
         for item in self.items:
-            in_layer_path = params.getOrigPath(item.dict["in_layer"])
+            in_layer_path = self.fsModel.getOrigPath(item.dict["in_layer"])
             in_layer = qgsUtils.loadVectorLayer(in_layer_path)
-            if params.getDataClipFlag():
+            if self.fsModel.paramsModel.dataClipFlag:
+                territory_layer = self.fsModel.paramsModel.getTerritoryLayer()
                 source_layer = qgsTreatments.applyVectorClip(in_layer,territory_layer,'memory:')
             else:
                 source_layer = in_layer
@@ -144,10 +146,7 @@ class FragmModel(abstract_model.DictModel):
             qgsUtils.loadVectorLayer(bufferLayer,loadProject=True)
         # Fragmentation layers merge
         buf_layers = [item.getBufferLayer() for item in self.items]
-        #fragmPath = self.getFragmLayer()
-        #qgsUtils.removeVectorLayer(fragmPath)
         fragm_path = self.getBuffersMergedLayer()
-        #fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,'memory:')
         # if stored to geopackage, ids shall be normalized
         fragm_layer = qgsTreatments.mergeVectorLayers(buf_layers,params.params.crs,fragm_path)
         if not fragm_layer:
@@ -158,7 +157,7 @@ class FragmModel(abstract_model.DictModel):
         qgsUtils.loadVectorLayer(fragm_layer,loadProject=True)
         #qgsUtils.loadVectorLayer(fragmPath,loadProject=True)
         # Landuse /fragm difference
-        landuseLayer = landuse.landuseModel.getDissolveLayer()
+        landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
         landuseFragmPath = self.getLanduseFragmLayer()
         qgsUtils.removeVectorLayer(landuseFragmPath)
         qgsTreatments.applyDifference(landuseLayer,fragm_layer,landuseFragmPath)
@@ -174,10 +173,10 @@ class FragmModel(abstract_model.DictModel):
     def applyItems(self,indexes):
         fragmMsg = "Application of fragmentation data to landuse"
         progress.progressFeedback.beginSection(fragmMsg)
-        clip_layer = params.getTerritoryLayer()
+        clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         prepared_layers = []
         for item in self.items:
-            in_layer_path = params.getOrigPath(item.dict[self.PREPARE_INPUT])
+            in_layer_path = self.fsModel.getOrigPath(item.dict[self.PREPARE_INPUT])
             select_expr = item.dict[self.PREPARE_SELECT_EXPR]
             buffer_expr = item.dict[self.PREPARE_BUFFER]
             selectionPath = item.getSelectionLayer()
@@ -189,11 +188,12 @@ class FragmModel(abstract_model.DictModel):
                            self.PREPARE_OUTPUT : selectionPath }
             prepared = qgsTreatments.applyProcessingAlg("Meff","prepareFragm",parameters)
             prepared_layers.append(prepared)
-        landuseLayer = landuse.landuseModel.getDissolveLayer()
+        landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
         res_path = self.getFinalLayer()
         qgsUtils.removeVectorLayer(res_path)
         parameters = { self.APPLY_LANDUSE : landuseLayer,
                        self.APPLY_FRAGMENTATION : prepared_layers,
+                       self.APPLY_CRS : params.defaultCrs,
                        self.APPLY_OUTPUT : res_path }
         res = qgsTreatments.applyProcessingAlg("Meff","applyFragm",parameters)
         qgsUtils.loadVectorLayer(res_path,loadProject=True)
@@ -213,10 +213,10 @@ class FragmModel(abstract_model.DictModel):
         
 class FragmConnector(abstract_model.AbstractConnector):
 
-    def __init__(self,dlg):
+    def __init__(self,dlg,fragmModel):
         self.parser_name = "FragmConnector"
         self.dlg = dlg
-        fragmModel = FragmModel()
+        #fragmModel = FragmModel()
         self.onlySelection = False
         super().__init__(fragmModel,self.dlg.fragmView,
                         self.dlg.fragmAdd,self.dlg.fragmRemove,
@@ -245,7 +245,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         in_layer = self.dlg.fragmInLayerCombo.currentLayer()
         if not in_layer:
             utils.user_error("No layer selected")
-        in_layer_path = params.normalizePath(qgsUtils.pathOfLayer(in_layer))
+        in_layer_path = self.model.fsModel.normalizePath(qgsUtils.pathOfLayer(in_layer))
         expr = self.dlg.fragmExpr.expression()
         buffer = self.dlg.fragmBuffer.expression()
         if not buffer:

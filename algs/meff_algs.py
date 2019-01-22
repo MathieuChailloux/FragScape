@@ -32,7 +32,8 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingUtils,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterMatrix,
-                       QgsProcessingParameterBoolean)
+                       QgsProcessingParameterBoolean,
+                       QgsProcessingParameterCrs)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
@@ -224,6 +225,7 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
 
     LANDUSE = "LANDUSE"
     FRAGMENTATION = "FRAGMENTATION"
+    CRS = "CRS"
     OUTPUT = "OUTPUT"
 
     def tr(self, string):
@@ -253,6 +255,11 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Fragmentation layers"),
                 QgsProcessing.TypeVectorPolygon))
         self.addParameter(
+            QgsProcessingParameterCrs(
+                self.CRS,
+                description=self.tr("Output CRS"),
+                defaultValue=params.defaultCrs))
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
                 self.tr("Output layer")))
@@ -266,10 +273,11 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
         fragm_layers = self.parameterAsLayerList(parameters,self.FRAGMENTATION,context)
         #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        crs = self.parameterAsCrs(parameters,self.CRS,context)
         output = parameters[self.OUTPUT]
         # Merge fragmentation layers
         fragm_path = QgsProcessingUtils.generateTempFilename("fragm.gpkg")
-        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,params.params.crs,fragm_path)
+        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,crs,fragm_path)
         feedback.pushDebugInfo("fragm_layer = " + str(fragm_layer))
         if fragm_layer is None:
             raise QgsProcessingException("Fragmentation layers merge failed")
