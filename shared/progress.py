@@ -35,67 +35,66 @@ from PyQt5.QtGui import QGuiApplication
 progressConnector = None
 progressFeedback = None
 
-@pyqtSlot(int)
-def catchProgress(n):
-    utils.debug("Setting progress bar value to '" + str(n) + "'")
-    progressConnector.dlg.progressBar.setValue(n)
+# @pyqtSlot(int)
+# def catchProgress(n):
+    # utils.debug("Setting progress bar value to '" + str(n) + "'")
+    # progressConnector.dlg.progressBar.setValue(n)
     
-@pyqtSlot()
-def catchProgressEnd():
-    utils.debug("Progress End")
-    progressConnector.dlg.progressBar.setValue(100)
-    progressConnector.focusLogTab()
+# @pyqtSlot()
+# def catchProgressEnd():
+    # utils.debug("Progress End")
+    # progressConnector.dlg.progressBar.setValue(100)
+    # progressConnector.focusLogTab()
     
-class ProgressConnector(QObject):
+# class ProgressConnector(QObject):
 
-    progressSignal = pyqtSignal('int')
-    progressEnd = pyqtSignal()
+    # progressSignal = pyqtSignal('int')
+    # progressEnd = pyqtSignal()
 
-    def __init__(self,dlg):
-        self.dlg = dlg
-        super(ProgressConnector,self).__init__()
+    # def __init__(self,dlg):
+        # self.dlg = dlg
+        # super(ProgressConnector,self).__init__()
         
-    def initGui(self):
-        pass
+    # def initGui(self):
+        # pass
         
-    def clear(self):
-        self.progressSignal.emit(0)
+    # def clear(self):
+        # self.progressSignal.emit(0)
         
-    @pyqtSlot(int)
-    def catchProgressVal(self,val):
-        self.dlg.progressBar.setValue(val)
+    # @pyqtSlot(int)
+    # def catchProgressVal(self,val):
+        # self.dlg.progressBar.setValue(val)
         
-    def connectComponents(self):
-        self.progressSignal.connect(catchProgress)
-        self.progressEnd.connect(catchProgressEnd)
-        #qgsUtils.progressBarValueChanged.connect(catchClassRemoved)
+    # def connectComponents(self):
+        # self.progressSignal.connect(catchProgress)
+        # self.progressEnd.connect(catchProgressEnd)
         
-    def focusLogTab(self):
-        self.dlg.mTabWidget.setCurrentWidget(self.dlg.logTab)
-        self.dlg.txtLog.verticalScrollBar().setValue(self.dlg.txtLog.verticalScrollBar().maximum())
+    # def focusLogTab(self):
+        # self.dlg.mTabWidget.setCurrentWidget(self.dlg.logTab)
+        # self.dlg.txtLog.verticalScrollBar().setValue(self.dlg.txtLog.verticalScrollBar().maximum())
             
-class ProgressSection(utils.Section):
+# class ProgressSection(utils.Section):
 
-    def __init__(self,title,nb_steps):
-        super().__init__(title)
-        self.curr_step = 0
-        if nb_steps <= 0:
-            utils.warn("Nothing to do")
-        else:
-            self.step = 100.0 / nb_steps
+    # def __init__(self,title,nb_steps):
+        # super().__init__(title)
+        # self.curr_step = 0
+        # if nb_steps <= 0:
+            # utils.warn("Nothing to do")
+        # else:
+            # self.step = 100.0 / nb_steps
         
-    def start_section(self):
-        super().start_section()
-        self.curr_step = 0
-        progressConnector.clear()
+    # def start_section(self):
+        # super().start_section()
+        # self.curr_step = 0
+        # progressConnector.clear()
         
-    def next_step(self):
-        self.curr_step += self.step
-        progressConnector.progressSignal.emit(self.curr_step)
+    # def next_step(self):
+        # self.curr_step += self.step
+        # progressConnector.progressSignal.emit(self.curr_step)
         
-    def end_section(self):
-        super().end_section()
-        progressConnector.progressEnd.emit()
+    # def end_section(self):
+        # super().end_section()
+        # progressConnector.progressEnd.emit()
         
 class ProgressFeedback(QgsProcessingFeedback):
     
@@ -162,6 +161,9 @@ class ProgressFeedback(QgsProcessingFeedback):
     def endJob(self):
         self.setProgress(100)
         self.focusLogTab()
+        
+    def initGui(self):
+        pass
         
     def connectComponents(self):
         self.progressChanged.connect(self.setProgress)

@@ -113,16 +113,20 @@ def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None):
         # feedback.pushDebugInfo("feedback : " + progressFeedback.__class__.__name__)
     #feedback = QgsProcessingFeedback()
     #feedback.setProgress(progressBar)
-    if not feedback:
+    #utils.debug("feedback apa = " + str(feedback))
+    if feedback is None:
         feedback = progress.progressFeedback
+    utils.debug("parameters : " + str(parameters))
     feedback.pushDebugInfo("parameters : " + str(parameters))
     QGuiApplication.processEvents()
     try:
         complete_name = provider + ":" + alg_name
         feedback.pushInfo("Calling processing algorithm '" + complete_name + "'")
         start_time = time.time()
+        utils.debug("context = " + str(context))
         if context is None:
             context = QgsProcessingContext()
+            context = None
         res = processing.run(complete_name,parameters,context=context,feedback=feedback,onFinish=no_post_process)
         feedback.pushDebugInfo("res1 = " + str(res))
         end_time = time.time()

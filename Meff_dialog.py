@@ -33,10 +33,11 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QTranslator, qVersion, QCoreApplication
 
 from qgis.gui import QgsFileWidget
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, QgsProcessingContext
 
 from .shared import utils, progress, config_parsing, log, qgsTreatments
 from .algs.meff_algs import MeffAlgorithmsProvider
+from .algs.meff_global_alg import FragScapeAlgorithm
 from .steps import params, landuse, fragm, reporting
 from . import tabs
 from .FragScape_model import FragScapeModel
@@ -58,11 +59,21 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.provider = MeffAlgorithmsProvider()
+        fsGlobalAlg = FragScapeAlgorithm()
+        fsGlobalAlg.initAlgorithm()
+        self.provider.alglist.append(fsGlobalAlg)
         self.setupUi(self)
 
     def initTabs(self):
-        global landuseModel
-        self.fsModel = FragScapeModel()
+        global progressFeedback
+        logConnector = log.LogConnector(self)
+        logConnector.initGui()
+        self.feedback =  progress.ProgressFeedback(self)
+        progress.progressFeedback = self.feedback
+        utils.debug("progressFeedback = " + str(progress.progressFeedback))
+        self.context = QgsProcessingContext()
+        self.context.setFeedback(progress.progressFeedback)
+        self.fsModel = FragScapeModel(self.context,progress.progressFeedback)
         self.paramsConnector = params.ParamsConnector(self,self.fsModel.paramsModel)
         #params.params = self.paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self,self.fsModel.landuseModel)
@@ -70,16 +81,15 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         self.fragmConnector = fragm.FragmConnector(self,self.fsModel.fragmModel)
         #fragm.fragmModel = self.fragmConnector.model
         self.reportingConnector = reporting.ReportingConnector(self,self.fsModel.reportingModel)
-        logConnector = log.LogConnector(self)
-        progressConnector = progress.ProgressConnector(self)
-        progress.progressConnector = progressConnector
+        # progressConnector = progress.ProgressConnector(self)
+        # progress.progressConnector = progressConnector
         tabConnector = tabs.TabConnector(self)
         self.connectors = {"Params" : self.paramsConnector,
                            "Log" : logConnector,
                            "Landuse" : self.landuseConnector,
                            "Fragm" : self.fragmConnector,
                            "Reporting" : self.reportingConnector,
-                           "Progress" : progressConnector,
+                           "Progress" : progress.progressFeedback,
                            "Tabs" : tabConnector}
         self.recomputeParsers()
         
@@ -110,13 +120,17 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
             final_msg = tbinfo + "\n" + msg
             utils.error_msg(final_msg,prefix="Unexpected error")
         self.mTabWidget.setCurrentWidget(self.logTab)
-        progress.progressConnector.clear()
+        #progress.progressConnector.clear()
         
     # Connects view and model components for each tab.
     # Connects global elements such as project file and language management.
     def connectComponents(self):
         for k, tab in self.connectors.items():
             tab.connectComponents()
+        utils.debug("progressFeedback cc = " + str(progress.progressFeedback))
+        utils.debug("progressFeedback cc type = " + str(type(progress.progressFeedback)))
+        utils.debug("progressFeedback cc type = " + str(progress.progressFeedback.__class__))
+        utils.debug("progressFeedback cc type = " + str(progress.progressFeedback is None))
         # Main tab connectors
         self.saveProjectAs.clicked.connect(self.saveModelAsAction)
         self.saveProject.clicked.connect(self.saveModel)
@@ -124,9 +138,9 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         self.langEn.clicked.connect(self.switchLangEn)
         self.langFr.clicked.connect(self.switchLangFr)
         self.aboutButton.clicked.connect(self.openHelpDialog)
-        progressFeedback = progress.ProgressFeedback(self)
-        progressFeedback.connectComponents()
-        progress.progressFeedback = progressFeedback
+        #progressFeedback = progress.ProgressFeedback(self)
+        progress.progressFeedback.connectComponents()
+        #progress.progressFeedback = progressFeedback
         #qgsTreatments.setProgressFeedback(progressFeedback)
         sys.excepthook = self.bioDispHook
         
@@ -135,6 +149,7 @@ class MeffDialog(QtWidgets.QDialog, FORM_CLASS):
         pass  
         
     def unload(self):
+        self.fsModel = None
         QgsApplication.processingRegistry().removeProvider(self.provider)
         
     def initLog(self):

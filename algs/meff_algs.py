@@ -33,14 +33,16 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterNumber,
                        QgsProcessingParameterMatrix,
                        QgsProcessingParameterBoolean,
-                       QgsProcessingParameterCrs)
+                       QgsProcessingParameterCrs,
+                       QgsProcessingParameterVectorDestination,
+                       QgsProcessingParameterFile)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
+import xml.etree.ElementTree as ET
 
 from ..shared import utils, qgsTreatments
 from ..steps import params
-#from .. import FragScape_model
 
 class MeffAlgorithmsProvider(QgsProcessingProvider):
 
@@ -133,7 +135,9 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
             clipped = input
         else:
             clipped = qgsTreatments.applyVectorClip(input,clip_layer,'memory:',context,feedback)
-        selected = qgsTreatments.extractByExpression(clipped,expr,'memory:',context=context,feedback=feedback)
+        selected = qgsTreatments.extractByExpression(
+            clipped,expr,'memory:',
+            context=context,feedback=feedback)
         feedback.pushDebugInfo("selected = " + str(selected))
         output = parameters[self.OUTPUT]
         dissolved = qgsTreatments.dissolveLayer(selected,output,context=context,feedback=feedback)
@@ -283,11 +287,15 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         if fragm_layer is None:
             raise QgsProcessingException("Fragmentation layers merge failed")
         # Apply difference
-        diff_layer = qgsTreatments.applyDifference(landuse,fragm_layer,'memory:',context=context,feedback=feedback)
+        diff_layer = qgsTreatments.applyDifference(
+            landuse,fragm_layer,'memory:',
+            context=context,feedback=feedback)
         if fragm_layer is None:
             raise QgsProcessingException("Difference landuse/fragmentation failed")
         # Multi to single part
-        singleGeomLayer = qgsTreatments.multiToSingleGeom(diff_layer,output,context=context,feedback=feedback)
+        singleGeomLayer = qgsTreatments.multiToSingleGeom(
+            diff_layer,output,
+            context=context,feedback=feedback)
         if fragm_layer is None:
             raise QgsProcessingException("Multi to single part failed")
         feedback.pushInfo("end")
@@ -537,40 +545,3 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT: dest_id}
 
         
-class FragScapeAlgorithm(QgsProcessingAlgorithm):
-
-    # Algorithm parameters
-    INPUT_CONFIG = "INPUT"
-    OUTPUT = "OUTPUT"
-    
-    def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
-        
-    def createInstance(self):
-        return FragScapeAlgorithm()
-        
-    def name(self):
-        return "FragScapeAlgorithm"
-        
-    def displayName(self):
-        return self.tr("Run FragScape from configuration file")
-        
-    def shortHelpString(self):
-        return self.tr("Executes complete process from XML configuration file")
-
-    def initAlgorithm(self, config=None):
-        self.addParameter(
-            QgsProcessingParameterFile(
-                self.INPUT_CONFIG,
-                description=self.tr("Input configuration file")))
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                description=self.tr("Output layer")))
-                
-    def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("begin")
-        # Parameters
-        fragScapeModel = FragScape_model.FragScapeModel()
-        fragScapeModel.fromXMLRoot()
-        return {self.OUTPUT: dest_id}

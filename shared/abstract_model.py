@@ -24,7 +24,7 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt, QCoreApplication
-from . import utils
+from . import utils, progress
 
 from abc import ABC, abstractmethod
 #class Abstract(ABC):
@@ -439,8 +439,9 @@ class AbstractConnector:
         
     def applyItems(self):
         indexes = self.getSelectedIndexes()
-        utils.debug("applyItems to indexes " + str(indexes))
-        self.model.applyItems(indexes)
+        utils.debug("Selected indexes = " + str(indexes))
+        self.model.applyItemsWithContext(None,self.dlg.feedback)#,indexes)
+        #self.model.applyItemsWithContext(self.dlg.context,self.dlg.feedback)
         
     def addItem(self):
         utils.debug("AbstractConnector.addItem")

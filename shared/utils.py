@@ -42,9 +42,13 @@ if file_dir not in sys.path:
 
 def printLine(msg):
     print(msg + "\n")
+    
+def doNothing(msg):
+    pass
 
 debug_flag=False
-print_func = printLine
+#print_func = printLine
+print_func = doNothing
 curr_language = "fr"
 dialog_base_dir = None
 

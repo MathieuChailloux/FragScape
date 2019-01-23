@@ -27,7 +27,10 @@ from .steps import params, landuse, fragm,  reporting
 
 class FragScapeModel:
 
-    def __init__(self):
+    def __init__(self,context,feedback):
+        self.context = None
+        self.feedback = feedback
+        utils.debug("feedback fs = " + str(feedback))
         self.paramsModel = params.ParamsModel(self)
         self.landuseModel = landuse.LanduseModel(self)
         self.fragmModel = fragm.FragmModel(self)
@@ -48,6 +51,12 @@ class FragScapeModel:
     
     def mkOutputFile(self,name):
         return self.paramsModel.mkOutputFile(name)
+        
+    def runModel(self):
+        utils.debug("feedback fs rm = " + str(self.feedback))
+        self.landuseModel.applyItemsWithContext(self.context,self.feedback)
+        self.fragmModel.applyItemsWithContext(self.context,self.feedback)
+        self.reportingModel.runReportingWithContext(self.context,self.feedback)
         
     def toXML(self,indent=""):
         xmlStr = indent + "<" + self.parser_name

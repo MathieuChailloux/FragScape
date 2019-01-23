@@ -130,27 +130,32 @@ class LanduseModel(abstract_model.DictModel):
         # qgsUtils.loadLayer(dissolved,loadProject=True)
         # progress.progressFeedback.endSection()
         
-    def applyItems(self):
+    def applyItemsWithContext(self,context,feedback):
         progress.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
         self.checkFieldSelected()
-        in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
+        #in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
         clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         expr = self.mkSelectionExpr()
         if not expr:
             utils.user_error("No expression selected : TODO select everything")
         dissolveLayer = self.getDissolveLayer()
         qgsUtils.removeVectorLayer(dissolveLayer)
-        parameters = { self.ALG_INPUT : in_layer,
+        parameters = { self.ALG_INPUT : self.landuseLayer,
                        self.ALG_CLIP_LAYER : clip_layer,
                        self.ALG_SELECT_EXPR : expr,
                        self.ALG_OUTPUT : dissolveLayer }
         res = qgsTreatments.applyProcessingAlg(
             "Meff","prepareLanduse",parameters,
-            context=None,feedback=progress.progressFeedback)
+            context,feedback)
         qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
         progress.progressFeedback.endSection()
+        
+    # def applyItems(self):
+        # context = None
+        # feedback  =progress.progressFeedback
+        # self.applyItemsWithFB(context,feedback)
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
@@ -200,7 +205,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.landuseLayer.fileChanged.connect(self.loadLayer)
         self.dlg.landuseFieldCombo.fieldChanged.connect(self.loadField)
-        self.dlg.landuseRun.clicked.connect(self.model.applyItems)
+        self.dlg.landuseRun.clicked.connect(self.applyItems)
         self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         
     def setLayer(self,layer):

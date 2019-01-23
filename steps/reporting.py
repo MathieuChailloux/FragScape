@@ -174,27 +174,30 @@ class ReportingModel(abstract_model.DictModel):
         # self.computeResults()
         # progress.progressFeedback.endSection()
         
-    def runReporting(self):
+    def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
         progress.progressFeedback.beginSection(reportingMsg)
         landuseFragmPath = self.fsModel.fragmModel.getFinalLayer()
+        
         results_path = self.getOutLayer()
         parameters = { meff_algs.EffectiveMeshSizeAlgorithm.INPUT : landuseFragmPath,
-                       meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
+                       #meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
+                       meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : self.layer,
                        meff_algs.EffectiveMeshSizeAlgorithm.CBC_MODE : False,
                        meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT : results_path }
         res = qgsTreatments.applyProcessingAlg(
             "Meff","effectiveMeshSize",parameters,
-            context=None,feedback=progress.progressFeedback)
+            context=context,feedback=feedback)
         qgsUtils.loadVectorLayer(res,loadProject=True)
         progress.progressFeedback.endSection()
-        
-        
+        return results_path
+                
     def toXML(self,indent=" "):
         if not self.layer:
             utils.warn("No reporting layer selected")
             return ""
-        layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.layer))
+        #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.layer))
+        layerRelPath = self.fsModel.normalizePath(self.layer)
         modelParams = { "layer" : layerRelPath }
         if self.outLayer:
             modelParams["outLayer"] = self.fsModel.normalizePath(self.outLayer)
@@ -231,18 +234,21 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.reportingLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.reportingLayer.fileChanged.connect(self.loadLayer)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
-        self.dlg.resultsRun.clicked.connect(self.model.runReporting)
+        self.dlg.resultsRun.clicked.connect(self.runReporting)
+        
+    def runReporting(self):
+        self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
         
     def setLayer(self,layer):
         utils.debug("setLayer " + str(layer.type))
         #self.dlg.reportingLayerCombo.setLayer(layer)
-        self.model.layer = layer
+        self.model.layer = qgsUtils.pathOfLayer(layer)
     
     def loadLayer(self,path):
         utils.debug("loadLayer")
         loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
         self.dlg.reportingLayerCombo.setLayer(loaded_layer)
-        self.model.layer = loaded_layer
+        self.model.layer = path
         #self.setLayer(loaded_layer)
         
     def updateUI(self):
