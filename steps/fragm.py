@@ -191,7 +191,7 @@ class FragmModel(abstract_model.DictModel):
         res = qgsTreatments.applyProcessingAlg(
             "Meff","applyFragm",parameters,
             context=context,feedback=feedback)
-        qgsUtils.loadVectorLayer(res_path,loadProject=True)
+        qgsUtils.loadVectorLayer(res_path,loadProject=False)
         progress.progressFeedback.endSection()
             
     def fromXMLRoot(self,root):

@@ -188,7 +188,7 @@ class ReportingModel(abstract_model.DictModel):
         res = qgsTreatments.applyProcessingAlg(
             "Meff","effectiveMeshSize",parameters,
             context=context,feedback=feedback)
-        qgsUtils.loadVectorLayer(res,loadProject=True)
+        qgsUtils.loadVectorLayer(res,loadProject=False)
         progress.progressFeedback.endSection()
         return results_path
                 

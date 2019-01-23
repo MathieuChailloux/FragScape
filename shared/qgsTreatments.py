@@ -126,7 +126,7 @@ def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None):
         utils.debug("context = " + str(context))
         if context is None:
             context = QgsProcessingContext()
-            context = None
+            context.setFeedback(feedback)
         res = processing.run(complete_name,parameters,context=context,feedback=feedback,onFinish=no_post_process)
         feedback.pushDebugInfo("res1 = " + str(res))
         end_time = time.time()

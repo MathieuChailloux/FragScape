@@ -128,7 +128,18 @@ def createSubdir(par_dir,name):
         info("Creating directory '" + path + "'")
         os.makedirs(path)
     return path
-        
+     
+def fileExists(fname,prefix=""):
+    if not fname:
+        return False
+    print("fe 1")
+    path = pathlib.Path(fname)
+    print("fe 2")
+    if not path.exists():
+        return False
+    if not (os.path.isfile(fname)):
+        return False
+    return True
 
 def checkFileExists(fname,prefix=""):
     path = pathlib.Path(fname)

@@ -149,7 +149,7 @@ class LanduseModel(abstract_model.DictModel):
         res = qgsTreatments.applyProcessingAlg(
             "Meff","prepareLanduse",parameters,
             context,feedback)
-        qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
+        qgsUtils.loadVectorLayer(dissolveLayer,loadProject=False)
         progress.progressFeedback.endSection()
         
     # def applyItems(self):

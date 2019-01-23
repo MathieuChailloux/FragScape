@@ -23,6 +23,7 @@
 """
 
 import time
+import sys
 
 from qgis.core import QgsProcessingFeedback
 
@@ -167,4 +168,39 @@ class ProgressFeedback(QgsProcessingFeedback):
         
     def connectComponents(self):
         self.progressChanged.connect(self.setProgress)
+        
+ 
+ 
+class FileFeedback(QgsProcessingFeedback):
+    
+    def __init__(self,fname):
+        self.fname = fname
+        super().__init__()
+        
+    def printFunc(self,msg):
+        with open(self.fname,"a") as f:
+            f.write(str(msg + "\n"))
+        
+    def pushCommandInfo(self,msg):
+        self.printFunc(msg)
+        
+    def pushConsoleInfo(self,msg):
+        self.printFunc(msg)
+        
+    def pushDebugInfo(self,msg):
+        self.printFunc(msg)
+        
+    def pushInfo(self,msg):
+        self.printFunc(msg)
+        
+    def reportError(self,error,fatalError=False):
+        print("reportError : " + str(error))
+        self.printFunc("reportError : " + str(error))
+        
+    def setProgressText(self,text):
+        pass
+        
+    def setProgress(self,value):
+        pass
+
     

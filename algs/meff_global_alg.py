@@ -22,6 +22,9 @@
  ***************************************************************************/
 """
 
+import os
+import sys
+
 from PyQt5.QtCore import QCoreApplication, QVariant
 from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException
 from qgis.core import (QgsProcessingProvider,
@@ -32,13 +35,14 @@ from qgis.core import (QgsProcessingProvider,
 import processing
 import xml.etree.ElementTree as ET
 
-from ..shared import utils, qgsUtils
+from ..shared import utils, qgsUtils, progress
 from ..FragScape_model import FragScapeModel
 
 class FragScapeAlgorithm(QgsProcessingAlgorithm):
 
     # Algorithm parameters
     INPUT_CONFIG = "INPUT"
+    LOG_FILE = "LOG"
     OUTPUT = "OUTPUT"
     
     def tr(self, string):
@@ -62,6 +66,10 @@ class FragScapeAlgorithm(QgsProcessingAlgorithm):
                 self.INPUT_CONFIG,
                 description=self.tr("Input configuration file")))
         self.addParameter(
+            QgsProcessingParameterFile(
+                self.LOG_FILE,
+                description=self.tr("Log file")))
+        self.addParameter(
             QgsProcessingParameterVectorDestination(
                 self.OUTPUT,
                 description=self.tr("Output layer"),
@@ -69,15 +77,35 @@ class FragScapeAlgorithm(QgsProcessingAlgorithm):
                 
     def processAlgorithm(self,parameters,context,feedback):
         feedback.pushInfo("begin")
+        print("coucou")
         utils.print_func = feedback.pushInfo
         # Parameters
+        log_file = self.parameterAsFile(parameters,self.LOG_FILE,context)
+        print("lof_file = " + str(log_file))
+        if utils.fileExists(log_file):
+            os.remove(log_file)
+        with open(log_file,"w+") as f:
+            f.write("FragScape from configuration file " + str(log_file) + "\n")
+            #raise QgsProcessingException("Log file " + str(log_file) + " already exists")
+        print("args ok")
+        log_feedback = progress.FileFeedback(log_file)
+        print("args ok")
+        log_feedback.pushInfo("test")
         config_file = self.parameterAsFile(parameters,self.INPUT_CONFIG,context)
+        print("args ok")
         config_tree = ET.parse(config_file)
+        print("args ok")
         config_root = config_tree.getroot()
-        fragScapeModel = FragScapeModel(context,feedback)
+        print("args ok")
+        fragScapeModel = FragScapeModel(context,log_feedback)
+        print("fs ok")
         fragScapeModel.fromXMLRoot(config_root)
-        fragScapeModel.landuseModel.applyItemsWithContext(context,feedback)
-        fragScapeModel.fragmModel.applyItemsWithContext(context,feedback)
-        res = fragScapeModel.reportingModel.runReportingWithContext(context,feedback)
+        print("fs2 ok")
+        fragScapeModel.landuseModel.applyItemsWithContext(context,log_feedback)
+        print("s1 ok")
+        fragScapeModel.fragmModel.applyItemsWithContext(context,log_feedback)
+        print("s2 ok")
+        res = fragScapeModel.reportingModel.runReportingWithContext(context,log_feedback)
+        print("s3 ok")
         #qgsUtils.loadVectorLayer(res,loadProject=True)
         return {self.OUTPUT: res}
