@@ -205,8 +205,8 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         clip = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         clip_flag = (clip is None)
         select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        feedback.pushDebugInfo("select_expr : " + str(select_expr))
-        feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
+        #feedback.pushDebugInfo("select_expr : " + str(select_expr))
+        #feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
         buffer_expr = self.parameterAsExpression(parameters,self.BUFFER,context)
         feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
         if buffer_expr is None:

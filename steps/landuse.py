@@ -132,12 +132,17 @@ class LanduseModel(abstract_model.DictModel):
         return expr
         
     def getSelectionExpr(self):
+        utils.debug("select mode = " + str(self.select_mode))
+        utils.debug("items = " + str(self.items))
         if self.select_mode == self.SELECT_FIELD_MODE:
-            return self.mkSelectionExpr()
+            expr = self.mkSelectionExpr()
+            if not expr:
+                utils.user_error("No value selected")
         elif self.select_mode == self.SELECT_EXPR_MODE:
-            return self.select_expr
+            expr = self.select_expr
         else:
             utils.internal_error("Unexpected selection mode : " + str(self.select_mode))
+        return expr
                 
     def applyItemsWithContext(self,context,feedback):
         progress.progressFeedback.beginSection("Landuse classification")
@@ -147,8 +152,8 @@ class LanduseModel(abstract_model.DictModel):
         #in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
         clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         expr = self.getSelectionExpr()
-        if not expr:
-            utils.user_error("No expression selected : TODO select everything")
+        #if not expr:
+        #    utils.user_error("No expression selected : TODO select everything")
         dissolveLayer = self.getDissolveLayer()
         qgsUtils.removeVectorLayer(dissolveLayer)
         parameters = { self.ALG_INPUT : self.landuseLayer,
@@ -186,7 +191,7 @@ class LanduseModel(abstract_model.DictModel):
             abs_layer = self.fsModel.getOrigPath(attribs[self.INPUT_FIELD])
             self.landuseLayer = abs_layer
         if self.SELECT_MODE_FIELD in attribs:
-            self.select_mode = attribs[self.SELECT_MODE_FIELD]
+            self.select_mode = int(attribs[self.SELECT_MODE_FIELD])
         if self.SELECT_FIELD_FIELD in attribs:
             self.select_field = attribs[self.SELECT_FIELD_FIELD]
         if self.SELECT_DESCR_FIELD in attribs:
