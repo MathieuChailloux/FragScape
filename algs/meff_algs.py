@@ -529,9 +529,9 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                     intersection_area = intersection.area() / 1000
                     new_f[self.NB_PATCHES] += 1
                     if cut_mode:
-                        net_product += f_area * intersection_area
-                    else:
                         net_product += intersection_area * intersection_area
+                    else:
+                        net_product += f_area * intersection_area
                     new_f[self.COHERENCE] += pow(f_area / report_area,2)
             new_f[self.NET_PRODUCT] = net_product
             new_f[self.COHERENCE] = net_product / report_area_sq

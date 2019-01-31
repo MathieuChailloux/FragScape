@@ -90,6 +90,7 @@ class ReportingModel(abstract_model.DictModel):
         else:
             selected = input_layer
         results_path = self.getOutLayer()
+        qgsUtils.removeVectorLayer(results_path)
         if self.method == self.CUT_METHOD:
             cut_mode = True
         elif self.method == self.CBC_METHOD:
@@ -118,6 +119,8 @@ class ReportingModel(abstract_model.DictModel):
             # pass
         if self.select_expr:
             modelParams[self.SELECT_EXPR] = self.select_expr
+        if self.method:
+            modelParams[self.METHOD] = self.method
         if self.reporting_layer:
             layerRelPath = self.fsModel.normalizePath(self.reporting_layer)
             modelParams[self.REPORTING] = layerRelPath
@@ -160,6 +163,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         super().connectComponents()
         #self.dlg.reportingLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.resultsReportingLayer.fileChanged.connect(self.loadLayer)
+        self.dlg.resultsCutMode.currentIndexChanged.connect(self.setMethod)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
         self.dlg.resultsRun.clicked.connect(self.runReporting)
         
@@ -170,6 +174,14 @@ class ReportingConnector(abstract_model.AbstractConnector):
         # utils.debug("setLayer " + str(layer.type))
         # self.dlg.reportingLayerCombo.setLayer(layer)
         # self.model.reporting_layer = qgsUtils.pathOfLayer(layer)
+    
+    def setMethod(self,idx):
+        if idx == 0:
+            self.model.method = ReportingModel.CUT_METHOD
+        elif idx == 1:
+            self.model.method = ReportingModel.CBC_METHOD
+        else:
+            utils.internal_error("Unexpected index for reporting method : " + str(idx))
     
     def loadLayer(self,path):
         utils.debug("loadLayer")
