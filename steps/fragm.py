@@ -39,6 +39,8 @@ fragmModel = None
 
 class FragmItem(abstract_model.DictItem):
 
+    NAME_FIELD = "NAME"
+
     def __init__(self,dict):
         super().__init__(dict)
         self.selectionLayer = None
@@ -57,27 +59,27 @@ class FragmItem(abstract_model.DictItem):
         pass
         
     def equals(self,other):
-        return (self.dict["name"] == other.dict["name"])
+        return (self.dict[self.NAME_FIELD] == other.dict[self.NAME_FIELD])
         
     def getSelectionLayer(self):
         if not self.selectionLayer:
-            name = self.dict["name"]
+            name = self.dict[self.NAME_FIELD]
             self.selectionLayer = QgsProcessingUtils.generateTempFilename(name + ".gpkg")
         return self.selectionLayer
        
     def getBufferLayer(self):
         if not self.bufferLayer:
-            name = self.dict["name"]
+            name = self.dict[self.NAME_FIELD]
             self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
         return self.bufferLayer
         
-    def instantiateSelectionLayer(self):
-        out_path = self.getSelectionLayer()
-        qgsUtils.removeVectorLayer(out_path)
-        in_layer_path = self.dict["in_layer"]
-        in_layer = qgsUtils.loadVectorLayer(in_layer_path)
-        selection_layer = qgsUtils.createLayerFromExisting(in_layer,self.dict["name"])
-        return selection_layer
+    # def instantiateSelectionLayer(self):
+        # out_path = self.getSelectionLayer()
+        # qgsUtils.removeVectorLayer(out_path)
+        # in_layer_path = self.dict["in_layer"]
+        # in_layer = qgsUtils.loadVectorLayer(in_layer_path)
+        # selection_layer = qgsUtils.createLayerFromExisting(in_layer,self.dict["name"])
+        # return selection_layer
         
 class FragmModel(abstract_model.DictModel):
 
@@ -85,7 +87,7 @@ class FragmModel(abstract_model.DictModel):
     PREPARE_CLIP_LAYER = meff_algs.PrepareFragmentationAlgorithm.CLIP_LAYER
     PREPARE_SELECT_EXPR = meff_algs.PrepareFragmentationAlgorithm.SELECT_EXPR
     PREPARE_BUFFER = meff_algs.PrepareFragmentationAlgorithm.BUFFER
-    PREPARE_NAME = "name"
+    PREPARE_NAME = FragmItem.NAME_FIELD
     PREPARE_OUTPUT = meff_algs.PrepareFragmentationAlgorithm.OUTPUT
     
     FIELDS = [PREPARE_INPUT,PREPARE_SELECT_EXPR,PREPARE_BUFFER,PREPARE_NAME]
@@ -214,7 +216,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.onlySelection = False
         super().__init__(fragmModel,self.dlg.fragmView,
                         self.dlg.fragmAdd,self.dlg.fragmRemove,
-                        self.dlg.fragmRun,self.dlg.fragmRunSelectionMode)
+                        self.dlg.fragmRun)
 
     def initGui(self):
         self.dlg.fragmInLayerCombo.setFilters(QgsMapLayerProxyModel.VectorLayer)

@@ -275,6 +275,26 @@ def getLayerFieldUniqueValues(layer,fieldname):
     for f in layer.getFeatures():
         field_values.add(f[fieldname])
     return field_values
+    
+def getLayerAssocs(layer,key_field,val_field):
+    assoc = {}
+    path = pathOfLayer(layer)
+    fieldnames = layer.fields().names()
+    if key_field not in fieldnames:
+        utils.internal_error("No field named '" + key_field + "' in layer " + path)
+    if val_field not in fieldnames:
+        utils.internal_error("No field named '" + val_field + "' in layer " + path)
+    for f in layer.getFeatures():
+        k = f[key_field]
+        v = f[val_field]
+        if k in assoc:
+            old_v = assoc[k]
+            if v not in old_v:
+                old_v.append(v)
+        else:
+            assoc[k] = [v]
+    return assoc
+    
 
 # Geopackages 'fid'
 def getMaxFid(layer):

@@ -409,7 +409,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
     # Algorithm parameters
     INPUT = "INPUT"
     REPORTING = "REPORTING"
-    CBC_MODE = "CBC_MODE"
+    CUT_MODE = "CUT_MODE"
     OUTPUT = "OUTPUT"
     
     # Output layer fields
@@ -453,7 +453,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                 [QgsProcessing.TypeVectorPolygon]))
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.CBC_MODE,
+                self.CUT_MODE,
                 self.tr("Cross-boundary connection method")))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
@@ -471,7 +471,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo("reporting = " + str(reporting))
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
-        cbc_mode = self.parameterAsBool(parameters,self.CBC_MODE,context)
+        cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
         report_id_field = QgsField(self.ID, QVariant.Int)
         nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
         mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
@@ -528,7 +528,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                     intersection = f_geom.intersection(report_geom)
                     intersection_area = intersection.area() / 1000
                     new_f[self.NB_PATCHES] += 1
-                    if cbc_mode:
+                    if cut_mode:
                         net_product += f_area * intersection_area
                     else:
                         net_product += intersection_area * intersection_area

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1138</width>
-    <height>824</height>
+    <width>931</width>
+    <height>709</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -76,8 +76,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>903</width>
-            <height>730</height>
+            <width>696</width>
+            <height>615</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -87,6 +87,43 @@
            </sizepolicy>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="5">
+            <widget class="QToolButton" name="langEn">
+             <property name="toolTip">
+              <string>English</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../BioDispersal/resources.qrc">
+               <normaloff>:/plugins/eco_cont/icons/enFlag.svg</normaloff>:/plugins/eco_cont/icons/enFlag.svg</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="6">
+            <widget class="QToolButton" name="langFr">
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../BioDispersal/resources.qrc">
+               <normaloff>:/plugins/eco_cont/icons/frFlag.svg</normaloff>:/plugins/eco_cont/icons/frFlag.svg</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QToolButton" name="openProject">
              <property name="sizePolicy">
@@ -115,6 +152,36 @@
               <bool>true</bool>
              </property>
             </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QToolButton" name="aboutButton">
+             <property name="toolTip">
+              <string>À propos</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="../BioDispersal/resources.qrc">
+               <normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</iconset>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>790</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item row="0" column="1">
             <widget class="QToolButton" name="saveProjectAs">
@@ -156,73 +223,6 @@
              <property name="icon">
               <iconset resource="../BioDispersal/resources.qrc">
                <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QToolButton" name="aboutButton">
-             <property name="toolTip">
-              <string>À propos</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</iconset>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>790</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="6">
-            <widget class="QToolButton" name="langFr">
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/frFlag.svg</normaloff>:/plugins/eco_cont/icons/frFlag.svg</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
-            <widget class="QToolButton" name="langEn">
-             <property name="toolTip">
-              <string>English</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/enFlag.svg</normaloff>:/plugins/eco_cont/icons/enFlag.svg</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -463,8 +463,8 @@
               <attribute name="title">
                <string>2 - Occupation du sol</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_11">
+               <item row="0" column="0">
                 <widget class="QLabel" name="label_3">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -484,7 +484,7 @@
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="1" column="0">
                 <widget class="QFrame" name="selectionLayerFrame_2">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -495,7 +495,7 @@
                  <property name="minimumSize">
                   <size>
                    <width>200</width>
-                   <height>65</height>
+                   <height>86</height>
                   </size>
                  </property>
                  <property name="frameShape">
@@ -505,8 +505,24 @@
                   <enum>QFrame::Raised</enum>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_5">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_3">
+                  <item row="2" column="1">
+                   <widget class="QgsFileWidget" name="landuseLayer">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="selectionOpenLayerLabel_2">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -515,18 +531,28 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
+                      <width>67</width>
                       <height>16</height>
                      </size>
                     </property>
-                    <property name="font">
-                     <font>
-                      <weight>75</weight>
-                      <bold>true</bold>
-                     </font>
-                    </property>
                     <property name="text">
-                     <string>1 - Couche</string>
+                     <string>Ouvrir couche</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QgsMapLayerComboBox" name="landuseLayerCombo">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
                     </property>
                    </widget>
                   </item>
@@ -552,24 +578,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QgsMapLayerComboBox" name="landuseLayerCombo">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>60</width>
-                      <height>13</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="selectionOpenLayerLabel_2">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_3">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -578,47 +588,40 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>67</width>
+                      <width>0</width>
                       <height>16</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
                     <property name="text">
-                     <string>Ouvrir couche</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QgsFileWidget" name="landuseLayer">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>13</height>
-                     </size>
+                     <string>1 - Couche d'entrée</string>
                     </property>
                    </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item row="2" column="0">
                 <widget class="QFrame" name="frame_24">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout_7">
-                  <property name="topMargin">
-                   <number>6</number>
-                  </property>
-                  <item row="4" column="0" colspan="2">
+                 <layout class="QGridLayout" name="gridLayout_10">
+                  <item row="3" column="0" colspan="2">
                    <widget class="QFrame" name="frame_11">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -672,7 +675,7 @@
                         <enum>Qt::LeftToRight</enum>
                        </property>
                        <property name="text">
-                        <string>Lancer la classification</string>
+                        <string>Sélectionner l'occupation du sol</string>
                        </property>
                        <property name="icon">
                         <iconset resource="../BioDispersal/resources.qrc">
@@ -683,7 +686,21 @@
                     </layout>
                    </widget>
                   </item>
-                  <item row="0" column="0" colspan="2">
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="landuseSelectionMode">
+                    <item>
+                     <property name="text">
+                      <string>Par poste d'occupation du sol</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Par expression</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
                    <widget class="QLabel" name="selectionLayerLabel_9">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -704,50 +721,229 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>2 - Classification</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QgsFieldComboBox" name="landuseFieldCombo">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
+                     <string>2 - Sélection</string>
                     </property>
                    </widget>
                   </item>
                   <item row="1" column="0">
-                   <widget class="QLabel" name="label_5">
+                   <widget class="QLabel" name="label_9">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
-                      <width>138</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
                     <property name="text">
-                     <string>Sélectionner champ</string>
+                     <string>Mode de sélection</string>
                     </property>
                    </widget>
                   </item>
                   <item row="2" column="0" colspan="2">
-                   <widget class="QTableView" name="landuseView">
-                    <property name="minimumSize">
-                     <size>
-                      <width>300</width>
-                      <height>100</height>
-                     </size>
+                   <widget class="QStackedWidget" name="landuseSelectionStack">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
-                    <property name="alternatingRowColors">
-                     <bool>true</bool>
+                    <property name="currentIndex">
+                     <number>0</number>
                     </property>
-                    <property name="selectionBehavior">
-                     <enum>QAbstractItemView::SelectRows</enum>
-                    </property>
-                    <property name="sortingEnabled">
-                     <bool>true</bool>
-                    </property>
+                    <widget class="QWidget" name="page">
+                     <layout class="QGridLayout" name="gridLayout_7">
+                      <item row="0" column="0">
+                       <widget class="QLabel" name="label_5">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>Champ de sélection</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1">
+                       <widget class="QgsFieldComboBox" name="landuseSelectField">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_7">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>Champ de description [optionnel]</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="1">
+                       <widget class="QgsFieldComboBox" name="landuseDescrField">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="allowEmptyFieldName">
+                         <bool>false</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="0" colspan="2">
+                       <widget class="QFrame" name="frame_3">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>24</height>
+                         </size>
+                        </property>
+                        <property name="frameShape">
+                         <enum>QFrame::StyledPanel</enum>
+                        </property>
+                        <property name="frameShadow">
+                         <enum>QFrame::Raised</enum>
+                        </property>
+                        <layout class="QHBoxLayout" name="horizontalLayout">
+                         <property name="spacing">
+                          <number>0</number>
+                         </property>
+                         <property name="leftMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="topMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="rightMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
+                         <item>
+                          <widget class="QPushButton" name="landuseLoadFields">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="layoutDirection">
+                            <enum>Qt::LeftToRight</enum>
+                           </property>
+                           <property name="text">
+                            <string>Charger les champs sélectionnés</string>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="../BioDispersal/resources.qrc">
+                             <normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</iconset>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item row="3" column="0" colspan="2">
+                       <widget class="QTableView" name="landuseView">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>300</width>
+                          <height>100</height>
+                         </size>
+                        </property>
+                        <property name="alternatingRowColors">
+                         <bool>true</bool>
+                        </property>
+                        <property name="selectionBehavior">
+                         <enum>QAbstractItemView::SelectRows</enum>
+                        </property>
+                        <property name="sortingEnabled">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="0">
+                       <widget class="QToolButton" name="landuseRemove">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset resource="../BioDispersal/resources.qrc">
+                          <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
+                        </property>
+                        <property name="autoRaise">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                    <widget class="QWidget" name="page_2">
+                     <layout class="QGridLayout" name="gridLayout_12">
+                      <item row="0" column="0">
+                       <widget class="QLabel" name="selectionOpenLayerLabel_6">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>67</width>
+                          <height>16</height>
+                         </size>
+                        </property>
+                        <property name="text">
+                         <string>Expression</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1">
+                       <widget class="QgsFieldExpressionWidget" name="landuseSelectExpr"/>
+                      </item>
+                     </layout>
+                    </widget>
                    </widget>
                   </item>
                  </layout>
@@ -757,7 +953,7 @@
              </widget>
              <widget class="QWidget" name="tab">
               <attribute name="title">
-               <string>3 - Fragmentation</string>
+               <string>3 - Éléments fragmentants</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_7">
                <item>
@@ -776,7 +972,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Sélection des données</string>
+                  <string>Éléments fragmentants</string>
                  </property>
                 </widget>
                </item>
@@ -791,7 +987,7 @@
                  <property name="minimumSize">
                   <size>
                    <width>200</width>
-                   <height>65</height>
+                   <height>86</height>
                   </size>
                  </property>
                  <property name="frameShape">
@@ -800,7 +996,7 @@
                  <property name="frameShadow">
                   <enum>QFrame::Raised</enum>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout_23">
+                 <layout class="QGridLayout" name="gridLayout_13">
                   <item row="0" column="0">
                    <widget class="QLabel" name="selectionLayerLabel_4">
                     <property name="sizePolicy">
@@ -822,26 +1018,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>1 - Couche</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="selectionOpenLayerLabel_3">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>67</width>
-                      <height>16</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Ouvrir couche</string>
+                     <string>1 - Couche d'entrée</string>
                     </property>
                    </widget>
                   </item>
@@ -855,8 +1032,8 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>138</width>
-                      <height>16</height>
+                      <width>0</width>
+                      <height>0</height>
                      </size>
                     </property>
                     <property name="layoutDirection">
@@ -867,8 +1044,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1" colspan="2">
-                   <widget class="QgsFileWidget" name="fragmInLayer">
+                  <item row="1" column="1">
+                   <widget class="QgsMapLayerComboBox" name="fragmInLayerCombo">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -877,8 +1054,8 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>100</width>
-                      <height>13</height>
+                      <width>0</width>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -889,8 +1066,27 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1" colspan="2">
-                   <widget class="QgsMapLayerComboBox" name="fragmInLayerCombo">
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="selectionOpenLayerLabel_3">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Ouvrir couche</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QgsFileWidget" name="fragmInLayer">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -899,8 +1095,8 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>60</width>
-                      <height>13</height>
+                      <width>0</width>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -921,6 +1117,12 @@
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
@@ -977,14 +1179,14 @@
                    <widget class="QgsFieldExpressionWidget" name="fragmExpr">
                     <property name="minimumSize">
                      <size>
-                      <width>100</width>
-                      <height>13</height>
+                      <width>0</width>
+                      <height>0</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>16</height>
+                      <height>20</height>
                      </size>
                     </property>
                    </widget>
@@ -1012,14 +1214,14 @@
                    <widget class="QgsFieldExpressionWidget" name="fragmBuffer">
                     <property name="minimumSize">
                      <size>
-                      <width>100</width>
-                      <height>13</height>
+                      <width>0</width>
+                      <height>0</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>16</height>
+                      <height>20</height>
                      </size>
                     </property>
                    </widget>
@@ -1036,13 +1238,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>13</height>
+                      <height>0</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>16</height>
+                      <height>20</height>
                      </size>
                     </property>
                    </widget>
@@ -1179,6 +1381,12 @@
                   </item>
                   <item row="1" column="0" colspan="2">
                    <widget class="QTableView" name="fragmView">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>300</width>
@@ -1217,41 +1425,6 @@
                     <property name="autoRaise">
                      <bool>true</bool>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QFrame" name="frame_2">
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>22</height>
-                     </size>
-                    </property>
-                    <property name="frameShape">
-                     <enum>QFrame::NoFrame</enum>
-                    </property>
-                    <property name="frameShadow">
-                     <enum>QFrame::Raised</enum>
-                    </property>
-                    <widget class="QCheckBox" name="fragmRunSelectionMode">
-                     <property name="geometry">
-                      <rect>
-                       <x>280</x>
-                       <y>0</y>
-                       <width>239</width>
-                       <height>17</height>
-                      </rect>
-                     </property>
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Appliquer seulement aux lignes sélectionnées</string>
-                     </property>
-                    </widget>
                    </widget>
                   </item>
                   <item row="3" column="1">
@@ -1308,7 +1481,7 @@
                         <enum>Qt::LeftToRight</enum>
                        </property>
                        <property name="text">
-                        <string>Lancer les sélections</string>
+                        <string>Intégrer les éléments fragmentants</string>
                        </property>
                        <property name="icon">
                         <iconset resource="../BioDispersal/resources.qrc">
@@ -1329,6 +1502,51 @@
                <string>4 - Résultats</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_9">
+               <item row="2" column="3">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>30</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="1" colspan="2">
+                <widget class="QPushButton" name="resultsRun">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="text">
+                  <string>Calculer les indicateurs</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../BioDispersal/resources.qrc">
+                   <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_8">
                  <property name="sizePolicy">
@@ -1349,7 +1567,69 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0" colspan="3">
+               <item row="3" column="2">
+                <widget class="QLineEdit" name="resultsGlobalRes">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0" colspan="4">
+                <widget class="QTableView" name="resultsView"/>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLabel" name="label_10">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Taille effective de maille globale</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="3">
+                <spacer name="horizontalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>122</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="2" column="0">
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>30</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="3" column="0">
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>122</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="0" colspan="4">
                 <widget class="QFrame" name="selectionLayerFrame_4">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -1386,41 +1666,19 @@
                     </property>
                     <property name="font">
                      <font>
-                      <weight>75</weight>
-                      <bold>true</bold>
+                      <weight>50</weight>
+                      <bold>false</bold>
                      </font>
                     </property>
                     <property name="text">
-                     <string>1 - Couche de découpage</string>
+                     <string>Couche d'entrée</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_10">
+                  <item row="0" column="1">
+                   <widget class="QgsMapLayerComboBox" name="resultsInputLayer">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>138</width>
-                      <height>16</height>
-                     </size>
-                    </property>
-                    <property name="layoutDirection">
-                     <enum>Qt::LeftToRight</enum>
-                    </property>
-                    <property name="text">
-                     <string>Sélectionner couche</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QgsMapLayerComboBox" name="reportingLayerCombo">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
@@ -1428,19 +1686,67 @@
                     <property name="minimumSize">
                      <size>
                       <width>60</width>
-                      <height>13</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
                       <height>16</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QToolButton" name="toolButton">
+                    <property name="text">
+                     <string>...</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_10">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Sélection [optionnel]</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1" colspan="2">
+                   <widget class="QgsFieldExpressionWidget" name="resultsSelection">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>20</height>
                      </size>
                     </property>
                    </widget>
                   </item>
                   <item row="2" column="0">
-                   <widget class="QLabel" name="selectionOpenLayerLabel_4">
+                   <widget class="QLabel" name="selectionLayerLabel_12">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1449,39 +1755,33 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>67</width>
+                      <width>120</width>
                       <height>16</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
                     <property name="text">
-                     <string>Ouvrir couche</string>
+                     <string>Couche de découpage</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QgsFileWidget" name="reportingLayer">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
+                  <item row="2" column="1" colspan="2">
+                   <widget class="QgsFileWidget" name="resultsReportingLayer">
                     <property name="minimumSize">
                      <size>
-                      <width>100</width>
-                      <height>13</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>16</height>
+                      <width>0</width>
+                      <height>20</height>
                      </size>
                     </property>
                    </widget>
                   </item>
                   <item row="3" column="0">
-                   <widget class="QLabel" name="selectionOpenLayerLabel_5">
+                   <widget class="QLabel" name="selectionLayerLabel_13">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1490,49 +1790,36 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>67</width>
+                      <width>120</width>
                       <height>16</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
                     <property name="text">
-                     <string>Sélectionner champ</string>
+                     <string>Méthode de découpage</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
-                   <widget class="QgsFieldComboBox" name="reportingField"/>
+                  <item row="3" column="1" colspan="2">
+                   <widget class="QComboBox" name="resultsCutMode">
+                    <item>
+                     <property name="text">
+                      <string>CUT (Cutting-Out)</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>CBC (Cross-Boundary Connection)</string>
+                     </property>
+                    </item>
+                   </widget>
                   </item>
-                 </layout>
-                </widget>
-               </item>
-               <item row="2" column="0" colspan="2">
-                <widget class="QFrame" name="selectionLayerFrame_5">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>200</width>
-                   <height>16</height>
-                  </size>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout">
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
+                  <item row="4" column="0">
                    <widget class="QLabel" name="selectionLayerLabel_11">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1542,22 +1829,22 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>141</width>
+                      <width>80</width>
                       <height>16</height>
                      </size>
                     </property>
                     <property name="font">
                      <font>
-                      <weight>75</weight>
-                      <bold>true</bold>
+                      <weight>50</weight>
+                      <bold>false</bold>
                      </font>
                     </property>
                     <property name="text">
-                     <string>2 - Couche de sortie</string>
+                     <string>Couche de sortie</string>
                     </property>
                    </widget>
                   </item>
-                  <item>
+                  <item row="4" column="1" colspan="2">
                    <widget class="QgsFileWidget" name="resultsOutLayer">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1568,7 +1855,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
-                      <height>13</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -1577,71 +1864,22 @@
                       <height>16</height>
                      </size>
                     </property>
+                    <property name="accessibleName">
+                     <string/>
+                    </property>
+                    <property name="accessibleDescription">
+                     <string/>
+                    </property>
+                    <property name="dialogTitle">
+                     <string/>
+                    </property>
+                    <property name="defaultRoot">
+                     <string/>
+                    </property>
                    </widget>
                   </item>
                  </layout>
                 </widget>
-               </item>
-               <item row="3" column="0">
-                <spacer name="horizontalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>288</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="3" column="1">
-                <widget class="QPushButton" name="resultsRun">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>24</height>
-                  </size>
-                 </property>
-                 <property name="layoutDirection">
-                  <enum>Qt::LeftToRight</enum>
-                 </property>
-                 <property name="text">
-                  <string>Calculer la taille effective de maille</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../BioDispersal/resources.qrc">
-                   <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="2">
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>363</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="4" column="0" colspan="3">
-                <widget class="QTableView" name="resultsView"/>
                </item>
               </layout>
              </widget>

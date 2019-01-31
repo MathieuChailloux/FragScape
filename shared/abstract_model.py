@@ -336,12 +336,20 @@ class DictModel(AbstractGroupModel):
 
     def __init__(self,parent,fields):
         AbstractGroupModel.__init__(self,parent,fields)
-        
-    def itemExists(self,item):
+                
+    def getMatchingItem(self,item):
         for i in self.items:
             if i.equals(item):
-                return True
-        return False
+                return i
+        return None
+        
+    def itemExists(self,item):
+        matching_item = self.getMatchingItem(item)
+        return (matching_item != None)
+        # for i in self.items:
+            # if i.equals(item):
+                # return True
+        # return False
         
     def addItem(self,item):
         utils.debug("DictItem.addItem " + str(item))

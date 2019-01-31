@@ -92,7 +92,7 @@ class FragScapeAlgorithm(QgsProcessingAlgorithm):
         print("args ok")
         log_feedback.pushInfo("test")
         config_file = self.parameterAsFile(parameters,self.INPUT_CONFIG,context)
-        print("args ok")
+        print("args ok : " + str(config_file))
         config_tree = ET.parse(config_file)
         print("args ok")
         config_root = config_tree.getroot()

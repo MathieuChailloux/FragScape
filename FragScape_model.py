@@ -59,7 +59,7 @@ class FragScapeModel:
         self.reportingModel.runReportingWithContext(self.context,self.feedback)
         
     def toXML(self,indent=""):
-        xmlStr = indent + "<" + self.parser_name
+        xmlStr = indent + "<" + self.parser_name + ">"
         new_indent = " "
         if self.paramsModel:
             xmlStr += self.paramsModel.toXML(indent=new_indent)
@@ -70,6 +70,7 @@ class FragScapeModel:
         if self.reportingModel:
             xmlStr += self.reportingModel.toXML(indent=new_indent)
         xmlStr += indent + "</" + self.parser_name + ">"
+        return xmlStr
         
     def fromXMLRoot(self,root):
         for child in root:
