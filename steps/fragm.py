@@ -193,7 +193,7 @@ class FragmModel(abstract_model.DictModel):
         res = qgsTreatments.applyProcessingAlg(
             "Meff","applyFragm",parameters,
             context=context,feedback=feedback)
-        qgsUtils.loadVectorLayer(res_path,loadProject=False)
+        qgsUtils.loadVectorLayer(res_path,loadProject=True)
         progress.progressFeedback.endSection()
             
     def fromXMLRoot(self,root):
@@ -249,7 +249,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         name = self.dlg.fragmName.text()
         if not name:
             utils.user_error("Empty name")
-        dict = { FragmModel.PREPARE_INPUT : in_layer,
+        dict = { FragmModel.PREPARE_INPUT : in_layer_path,
                  FragmModel.PREPARE_SELECT_EXPR : expr,
                  FragmModel.PREPARE_BUFFER : buffer,
                  FragmModel.PREPARE_NAME : name }

@@ -82,7 +82,6 @@ class ReportingModel(abstract_model.DictModel):
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
         progress.progressFeedback.beginSection(reportingMsg)
-        landuseFragmPath = self.fsModel.fragmModel.getFinalLayer()
         input_layer = self.getInputLayer()
         if self.select_expr:
             selected = qgsTreatments.extractByExpression(
@@ -105,7 +104,7 @@ class ReportingModel(abstract_model.DictModel):
         res = qgsTreatments.applyProcessingAlg(
             "Meff","effectiveMeshSize",parameters,
             context=context,feedback=feedback)
-        qgsUtils.loadVectorLayer(res,loadProject=False)
+        qgsUtils.loadVectorLayer(res,loadProject=True)
         progress.progressFeedback.endSection()
         return results_path
                 
@@ -135,7 +134,7 @@ class ReportingModel(abstract_model.DictModel):
         if self.METHOD in attribs:
             self.method = int(attribs[self.METHOD])
         if self.OUTPUT in attribs:
-            self.model.setOutLayer(attribs[self.OUTPUT])
+            self.setOutLayer(attribs[self.OUTPUT])
         
     def fromXMLRoot(self,root):
         self.fromXMLAttribs(root.attrib)
@@ -146,7 +145,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
     def __init__(self,dlg,reportingModel):
         self.dlg = dlg
         self.parser_name = "Reporting"
-        self.model = reportingModel
+        #self.model = reportingModel
         #reportingModel = ReportingModel()
         super().__init__(reportingModel,self.dlg.resultsView)
         

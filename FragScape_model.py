@@ -62,14 +62,14 @@ class FragScapeModel:
         xmlStr = indent + "<" + self.parser_name + ">"
         new_indent = " "
         if self.paramsModel:
-            xmlStr += self.paramsModel.toXML(indent=new_indent)
+            xmlStr += "\n" + self.paramsModel.toXML(indent=new_indent)
         if self.landuseModel:
-            xmlStr += self.landuseModel.toXML(indent=new_indent)
+            xmlStr += "\n" + self.landuseModel.toXML(indent=new_indent)
         if self.fragmModel:
-            xmlStr += self.fragmModel.toXML(indent=new_indent)
+            xmlStr += "\n" + self.fragmModel.toXML(indent=new_indent)
         if self.reportingModel:
-            xmlStr += self.reportingModel.toXML(indent=new_indent)
-        xmlStr += indent + "</" + self.parser_name + ">"
+            xmlStr += "\n" + self.reportingModel.toXML(indent=new_indent)
+        xmlStr += "\n" + indent + "</" + self.parser_name + ">"
         return xmlStr
         
     def fromXMLRoot(self,root):

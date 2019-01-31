@@ -303,18 +303,18 @@ class AbstractGroupModel(QAbstractTableModel):
             
     # Order items based on 'idx' column/field
     # Reverse order at each call for a specific column
-    def orderItems(self,idx):
-        utils.debug("orderItems " + str(idx))
-        if idx in self.orders:
-            order_down = self.orders[idx]
-        else:
-            order_down = True
-            self.orders[idx] = order_down
-        self.items = sorted(self.items, key=lambda i: i.dict[i.idx_to_fields[idx]])
-        if not order_down:
-            self.items.reverse()
-        self.orders[idx] = not self.orders[idx]
-        self.layoutChanged.emit()
+    # def orderItems(self,idx):
+        # utils.debug("orderItems " + str(idx))
+        # if idx in self.orders:
+            # order_down = self.orders[idx]
+        # else:
+            # order_down = True
+            # self.orders[idx] = order_down
+        # self.items = sorted(self.items, key=lambda i: i.dict[i.idx_to_fields[idx]])
+        # if not order_down:
+            # self.items.reverse()
+        # self.orders[idx] = not self.orders[idx]
+        # self.layoutChanged.emit()
         
     def upgradeElem(self,row):
         utils.debug("upgradeElem " + str(row))
@@ -336,6 +336,13 @@ class DictModel(AbstractGroupModel):
 
     def __init__(self,parent,fields):
         AbstractGroupModel.__init__(self,parent,fields)
+        
+    def sort(self,col,order):
+        sorted_items = sorted(self.items, key=lambda i: i.dict[i.idx_to_fields[col]])
+        if order == Qt.DescendingOrder:
+            sorted_items.reverse()
+        self.items = sorted_items
+        self.layoutChanged.emit()
                 
     def getMatchingItem(self,item):
         for i in self.items:

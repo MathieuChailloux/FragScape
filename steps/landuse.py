@@ -93,7 +93,18 @@ class LanduseModel(abstract_model.DictModel):
         i = (dict[LanduseFieldItem.TO_SELECT_FIELD] == "True")
         return LanduseFieldItem(v,d,i)
         
+    def changeLayer(self,path):
+        if not utils.pathEquals(path,self.landuseLayer):
+            utils.debug("path = " + str(path))
+            utils.debug("old path = " + str(self.landuseLayer))
+            self.landuseLayer = path
+            self.setSelectField(None)
+            self.setDescrField(None)
+            self.setSelectExpr("")
+            
+        
     def setSelectField(self,fieldname):
+        utils.debug("Setting select_field to " + str(fieldname))
         self.select_field = fieldname
         
     def setDescrField(self,fieldname):
@@ -166,7 +177,7 @@ class LanduseModel(abstract_model.DictModel):
         res = qgsTreatments.applyProcessingAlg(
             "Meff","prepareLanduse",parameters,
             context,feedback)
-        qgsUtils.loadVectorLayer(dissolveLayer,loadProject=False)
+        qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
         progress.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
@@ -190,8 +201,10 @@ class LanduseModel(abstract_model.DictModel):
         return xmlStr
         
     def fromXMLAttribs(self,attribs):
+        utils.debug("attribs = " + str(attribs))
         if self.INPUT_FIELD in attribs:
             abs_layer = self.fsModel.getOrigPath(attribs[self.INPUT_FIELD])
+            utils.debug("abs_layer = " + str(abs_layer))
             self.landuseLayer = abs_layer
         if self.SELECT_MODE_FIELD in attribs:
             self.select_mode = int(attribs[self.SELECT_MODE_FIELD])
@@ -244,14 +257,19 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         #self.dlg.landuseSelectionMode.activated.connect(self.switchSelectionMode)
         
+    def setLayerUI(self,layer):
+        if layer:
+            #self.dlg.landuseLayerCombo.setLayer(layer)
+            self.dlg.landuseSelectField.setLayer(layer)
+            self.dlg.landuseDescrField.setLayer(layer)
+            self.dlg.landuseSelectExpr.setLayer(layer)
+        
     def setLayer(self,layer):
         if layer:
             utils.debug("setLayer " + str(layer.type))
             layer_path = qgsUtils.pathOfLayer(layer)
-            self.dlg.landuseSelectField.setLayer(layer)
-            self.dlg.landuseDescrField.setLayer(layer)
-            self.dlg.landuseSelectExpr.setLayer(layer)
-            self.model.landuseLayer = layer_path
+            self.model.changeLayer(layer_path)
+            self.setLayerUI(layer)
   
     def loadLayer(self,path):
         utils.debug("loadLayer")
@@ -270,7 +288,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
         new_items = []
         if self.model.descr_field:
             fieldsAssoc = qgsUtils.getLayerAssocs(curr_layer,self.model.select_field,self.model.descr_field)
-            new_items = [ LanduseFieldItem(v," -- ".join(l)) for v, l in fieldsAssoc.items() ]
+            new_items = [ LanduseFieldItem(v,str(l)) for v, l in fieldsAssoc.items() ]
             # for k, descriptions in fieldsAssoc.items():
                 # descr = descriptions.join(" -- ")
                 # new_item = LanduseItem(k,descr=descr)
@@ -307,8 +325,10 @@ class LanduseConnector(abstract_model.AbstractConnector):
         
     def updateUI(self):
         if self.model.landuseLayer:
-            self.loadLayer(self.model.landuseLayer)
+            loaded_layer = qgsUtils.loadVectorLayer(self.model.landuseLayer,loadProject=True)
+            self.dlg.landuseLayerCombo.setLayer(loaded_layer)
         if self.model.select_field:
+            utils.debug("setting select_field : " + str(self.model.select_field))
             self.dlg.landuseSelectField.setField(self.model.select_field)
         if self.model.descr_field:
             self.dlg.landuseDescrField.setField(self.model.descr_field)
