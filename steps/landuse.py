@@ -99,6 +99,9 @@ class LanduseModel(abstract_model.DictModel):
     def setDescrField(self,fieldname):
         self.descr_field = fieldname
         
+    def setSelectExpr(self,expr):
+        self.select_expr = expr
+        
     def checkLayerSelected(self):
         if not self.landuseLayer:
             utils.user_error("No layer selected")
@@ -211,8 +214,8 @@ class LanduseModel(abstract_model.DictModel):
         
 class LanduseConnector(abstract_model.AbstractConnector):
 
-    SELECTION_MODE_FIELD = 0
-    SELECTION_MODE_EXPR = 1
+    # SELECTION_MODE_FIELD = 0
+    # SELECTION_MODE_EXPR = 1
 
     def __init__(self,dlg,landuseModel):
         self.dlg = dlg
@@ -235,17 +238,20 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseSelectionMode.currentIndexChanged.connect(self.switchSelectionMode)
         self.dlg.landuseSelectField.fieldChanged.connect(self.model.setSelectField)
         self.dlg.landuseDescrField.fieldChanged.connect(self.model.setDescrField)
+        self.dlg.landuseSelectExpr.fieldChanged.connect(self.model.setSelectExpr)
         self.dlg.landuseLoadFields.clicked.connect(self.loadFields)
         #self.dlg.landuseRun.clicked.connect(self.applyItems)
         self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         #self.dlg.landuseSelectionMode.activated.connect(self.switchSelectionMode)
         
     def setLayer(self,layer):
-        utils.debug("setLayer " + str(layer.type))
-        layer_path = qgsUtils.pathOfLayer(layer)
-        self.dlg.landuseSelectField.setLayer(layer)
-        self.dlg.landuseDescrField.setLayer(layer)
-        self.model.landuseLayer = layer_path
+        if layer:
+            utils.debug("setLayer " + str(layer.type))
+            layer_path = qgsUtils.pathOfLayer(layer)
+            self.dlg.landuseSelectField.setLayer(layer)
+            self.dlg.landuseDescrField.setLayer(layer)
+            self.dlg.landuseSelectExpr.setLayer(layer)
+            self.model.landuseLayer = layer_path
   
     def loadLayer(self,path):
         utils.debug("loadLayer")
@@ -292,21 +298,24 @@ class LanduseConnector(abstract_model.AbstractConnector):
     def switchSelectionMode(self,index):
         if index == 0:
             self.dlg.landuseSelectionStack.setCurrentIndex(0)
-            self.model.select_mode = LanduseConnector.SELECTION_MODE_FIELD
+            self.model.select_mode = LanduseModel.SELECT_FIELD_MODE
         elif index == 1:
             self.dlg.landuseSelectionStack.setCurrentIndex(1)
-            self.model.select_mode = LanduseConnector.SELECTION_MODE_EXPR
+            self.model.select_mode = LanduseModel.SELECT_EXPR_MODE
         else:
             utils.internal_error("Unexpected index for landuse selection mode : " + str(index))
         
     def updateUI(self):
-        utils.debug("1")
         if self.model.landuseLayer:
-            utils.debug("2")
             self.loadLayer(self.model.landuseLayer)
         if self.model.select_field:
-            utils.debug("3")
             self.dlg.landuseSelectField.setField(self.model.select_field)
+        if self.model.descr_field:
+            self.dlg.landuseDescrField.setField(self.model.descr_field)
+        if self.model.select_expr:
+            self.dlg.landuseSelectExpr.setExpression(self.model.select_expr)
+        if self.model.select_mode:
+            self.switchSelectionMode(self.model.select_mode)
         
     def fromXMLRoot(self,root):
         self.model.fromXMLRoot(root)
