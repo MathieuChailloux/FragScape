@@ -104,7 +104,7 @@ def setProgressBar(progress_bar):
     global progressBar
     progressBar = progress_bar
         
-def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None):
+def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None,onlyOutput=True):
     # Dummy function to enable running an alg inside an alg
     def no_post_process(alg, context, feedback):
         pass
@@ -135,12 +135,15 @@ def applyProcessingAlg(provider,alg_name,parameters,context=None,feedback=None):
                     + ", performed in " + str(diff_time) + " seconds")
         progress.progressFeedback.endJob()
         feedback.pushDebugInfo("res = " + str(res))
-        if "OUTPUT" in res:
-            feedback.pushDebugInfo("output = " + str(res["OUTPUT"]))
-            feedback.pushDebugInfo("output type = " + str(type(res["OUTPUT"])))
-            return res["OUTPUT"]
+        if onlyOutput:
+            if "OUTPUT" in res:
+                feedback.pushDebugInfo("output = " + str(res["OUTPUT"]))
+                feedback.pushDebugInfo("output type = " + str(type(res["OUTPUT"])))
+                return res["OUTPUT"]
+            else:
+                return None
         else:
-            return None
+            return res
     except Exception as e:
         utils.warn ("Failed to call " + alg_name + " : " + str(e))
         raise e

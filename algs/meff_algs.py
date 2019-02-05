@@ -414,6 +414,8 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
     CUT_MODE = "CUT_MODE"
     OUTPUT = "OUTPUT"
     
+    OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
+    
     # Output layer fields
     ID = "fid"
     NB_PATCHES = "nb_patches"
@@ -509,12 +511,16 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException("Empty layer")
         progress_step = 100.0 / nb_feats
         curr_step = 0
+        first_pass = True
+        global_net_product = 0
+        global_area = 0
         # gna gna
         for report_feat in reporting.getFeatures():
             report_geom = report_feat.geometry()
             report_area = report_geom.area() / 1000
             if report_area == 0:
                 break
+            global_area += report_area
             report_area_sq = report_area * report_area
             new_f = QgsFeature(output_fields)
             new_f.setGeometry(report_geom)
@@ -525,7 +531,8 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             net_product = 0
             for f in source.getFeatures():
                 f_geom = f.geometry()
-                if f_geom.intersects(report_geom):
+                intersects_report = f_geom.intersects(report_geom)
+                if intersects_report:
                     f_area = f_geom.area() / 1000
                     intersection = f_geom.intersection(report_geom)
                     intersection_area = intersection.area() / 1000
@@ -535,6 +542,14 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                     else:
                         net_product += f_area * intersection_area
                     new_f[self.COHERENCE] += pow(f_area / report_area,2)
+                if first_pass:
+                    f_area = f_geom.area() / 1000
+                    intersection = f_geom.intersection(report_geom)
+                    intersection_area = intersection.area() / 1000
+                    if cut_mode:
+                        global_net_product += intersection_area * intersection_area
+                    else:
+                        global_net_product += f_area * intersection_area
             new_f[self.NET_PRODUCT] = net_product
             new_f[self.COHERENCE] = net_product / report_area_sq
             new_f[self.SPLITTING_DENSITY] = report_area / net_product if net_product > 0 else 0
@@ -543,7 +558,14 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             new_f[self.DIVI] = 1 - new_f[self.COHERENCE]
             sink.addFeature(new_f)
             curr_step += 1
+            first_pass = False
             feedback.setProgress(int(curr_step * progress_step))
-        return {self.OUTPUT: dest_id}
+        if global_area == 0:
+            utils.user_error("Empty area for reporting layer")
+        feedback.pushDebugInfo("global_net_product = " + str(global_net_product))
+        feedback.pushDebugInfo("global_area = " + str(global_area))
+        global_meff = global_net_product / global_area
+        #global_meff = 3
+        return {self.OUTPUT: dest_id, self.OUTPUT_GLOBAL_MEFF : global_meff }
 
         

@@ -105,10 +105,11 @@ class ReportingModel(abstract_model.DictModel):
                        meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT : results_path }
         res = qgsTreatments.applyProcessingAlg(
             "Meff","effectiveMeshSize",parameters,
-            context=context,feedback=feedback)
-        qgsUtils.loadVectorLayer(res,loadProject=True)
+            context=context,feedback=feedback,onlyOutput=False)
+        out_path = res[meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
+        qgsUtils.loadVectorLayer(out_path,loadProject=True)
         progress.progressFeedback.endSection()
-        return results_path
+        return res
                 
     def toXML(self,indent=" "):
         if not self.reporting_layer:
@@ -174,8 +175,11 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsRun.clicked.connect(self.runReporting)
         
     def runReporting(self):
-        out_layer = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
-        self.loaded_layer = qgsUtils.loadVectorLayer(out_layer)
+        res = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
+        out_path = res[meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
+        out_global_meff = res[meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT_GLOBAL_MEFF]
+        self.dlg.resultsGlobalRes.setText(str(out_global_meff))
+        self.loaded_layer = qgsUtils.loadVectorLayer(out_path)
         self.layer_cache = QgsVectorLayerCache(self.loaded_layer,24)
         self.attribute_model = QgsAttributeTableModel(self.layer_cache)
         self.attribute_model.loadLayer()
