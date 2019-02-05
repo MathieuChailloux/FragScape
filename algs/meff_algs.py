@@ -35,7 +35,8 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterBoolean,
                        QgsProcessingParameterCrs,
                        QgsProcessingParameterVectorDestination,
-                       QgsProcessingParameterFile)
+                       QgsProcessingParameterFile,
+                       QgsProperty)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
@@ -211,6 +212,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
         if buffer_expr is None:
             raise QgsProcessingException("Empty buffer")
+        buffer_expr_prep = QgsProperty.fromExpression(buffer_expr)
         output = parameters[self.OUTPUT]
         if clip is None:
             clipped = input
@@ -220,7 +222,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
             selected = clipped
         else:
             selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
-        buffered = qgsTreatments.applyBufferFromExpr(selected,buffer_expr,output,context,feedback)
+        buffered = qgsTreatments.applyBufferFromExpr(selected,buffer_expr_prep,output,context,feedback)
         #buffered = qgsTreatments.applyBufferFromExpr(selected,parameters[self.BUFFER],output,context,feedback)
         return {self.OUTPUT : buffered}
         

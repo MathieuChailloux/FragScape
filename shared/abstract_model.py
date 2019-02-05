@@ -24,7 +24,7 @@
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt, QCoreApplication
-from . import utils, progress
+from . import utils, progress, xmlUtils
 
 from abc import ABC, abstractmethod
 #class Abstract(ABC):
@@ -391,8 +391,10 @@ class DictModel(AbstractGroupModel):
         xmlStr = indent + "<" + self.parser_name
         if attribs_dict:
             for k,v in attribs_dict.items():
-                xmlStr += " " + str(k).replace('"','&quot;')
-                xmlStr += "=\"" + str(v).replace('"','&quot;') + "\""
+                # xmlStr += " " + str(k).replace('"','&quot;')
+                # xmlStr += "=\"" + str(v).replace('"','&quot;') + "\""
+                xmlStr += " " + xmlUtils.xmlEscape(str(k))
+                xmlStr += "=\"" + xmlUtils.xmlEscape(str(v)) + "\""
         xmlStr += ">\n"
         for i in self.items:
             xmlStr += i.toXML(indent=indent + " ") + "\n"

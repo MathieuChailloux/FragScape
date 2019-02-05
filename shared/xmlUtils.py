@@ -12,3 +12,10 @@ def getNbChildren(root):
     for c in root:
         res += 1
     return res
+    
+def xmlEscape( s ):
+    s = s.replace("&", "&amp;")
+    s = s.replace("<", "&lt;")
+    s = s.replace(">", "&gt;")
+    s = s.replace("\"", "&quot;")
+    return s

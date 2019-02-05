@@ -314,6 +314,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
         # self.model.layoutChanged.emit()
         
     def switchSelectionMode(self,index):
+        utils.debug("switchSelectMode : " + str(index))
         if index == 0:
             self.dlg.landuseSelectionStack.setCurrentIndex(0)
             self.model.select_mode = LanduseModel.SELECT_FIELD_MODE
@@ -334,7 +335,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
             self.dlg.landuseDescrField.setField(self.model.descr_field)
         if self.model.select_expr:
             self.dlg.landuseSelectExpr.setExpression(self.model.select_expr)
-        if self.model.select_mode:
+        if self.model.select_mode is not None:
             self.switchSelectionMode(self.model.select_mode)
         
     def fromXMLRoot(self,root):
