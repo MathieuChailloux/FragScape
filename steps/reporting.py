@@ -22,8 +22,9 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsMapLayerProxyModel, QgsField, QgsFeature, QgsProcessingFeedback
-from qgis.gui import QgsFileWidget
+from qgis.core import QgsMapLayerProxyModel, QgsField, QgsFeature, QgsProcessingFeedback, QgsVectorLayerCache
+from qgis.gui import QgsFileWidget, QgsAttributeTableModel, QgsAttributeTableView, QgsAttributeTableFilterModel
+from qgis.utils import iface
 from PyQt5.QtCore import QVariant
 from processing import QgsProcessingUtils
 
@@ -51,7 +52,7 @@ class ReportingModel(abstract_model.DictModel):
         self.reporting_layer = None
         self.method = self.CUT_METHOD
         self.out_layer = None
-        self.init_fields = ["meff"]
+        self.init_fields = []
         self.fields = self.init_fields
         super().__init__(self,self.fields)
         #super().__init__(self,self.fields)
@@ -158,6 +159,11 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsReportingLayer.setFilter(qgsUtils.getVectorFilters())
         self.dlg.resultsOutLayer.setStorageMode(QgsFileWidget.SaveFile)
         self.dlg.resultsOutLayer.setFilter(qgsUtils.getVectorFilters())
+        #self.attrView = QgsAttributeTableView(self.dlg)
+        #self.dlg.gridLayout_9.removeWidget(self.dlg.resultsView)
+       # self.dlg.gridLayout_9.addWidget(self.attrView)
+        #self.dlg.resultsView.hide()
+        #self.dlg.gridLayout_9.removeWidget(self.dlg.resultsView)
         
     def connectComponents(self):
         super().connectComponents()
@@ -168,7 +174,13 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsRun.clicked.connect(self.runReporting)
         
     def runReporting(self):
-        self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
+        out_layer = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
+        self.loaded_layer = qgsUtils.loadVectorLayer(out_layer)
+        self.layer_cache = QgsVectorLayerCache(self.loaded_layer,24)
+        self.attribute_model = QgsAttributeTableModel(self.layer_cache)
+        self.attribute_model.loadLayer()
+        self.dlg.resultsView.setModel(self.attribute_model)
+        #self.dlg.resultsView.show()
         
     # def setLayer(self,layer):
         # utils.debug("setLayer " + str(layer.type))
