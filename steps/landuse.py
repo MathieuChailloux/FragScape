@@ -60,6 +60,7 @@ class LanduseFieldItem(abstract_model.DictItem):
 class LanduseModel(abstract_model.DictModel):
 
     INPUT_FIELD = "in_layer"
+    CLIP_LAYER = "clip_layer"
     SELECT_MODE_FIELD = "select_mode"
     SELECT_FIELD_FIELD = "select_field"
     SELECT_DESCR_FIELD = "select_field"
@@ -79,7 +80,8 @@ class LanduseModel(abstract_model.DictModel):
         self.landuseLayer = None
         self.select_field = None
         self.descr_field = None
-        self.dataClipFlag = True
+        self.dataClipFlag = False
+        self.clip_layer = None
         self.select_mode = self.SELECT_FIELD_MODE
         self.select_expr = ""
         super().__init__(self,LanduseFieldItem.FIELDS)
@@ -98,16 +100,27 @@ class LanduseModel(abstract_model.DictModel):
             utils.debug("path = " + str(path))
             utils.debug("old path = " + str(self.landuseLayer))
             self.landuseLayer = path
-            self.setSelectField(None)
-            self.setDescrField(None)
+            if self.select_field:
+                loaded_layer = qgsUtils.loadLayer(path)
+                if self.select_field not in loaded_layer.fields().names():
+                    self.setSelectField(None)
+            if self.descr_field:
+                if self.descr_field not in loaded_layer.fields().names():
+                    self.setDescrField(None)
             self.setSelectExpr("")
             
+    def setDataClipFlag(self,flag):
+        self.dataClipFlag = flag
+            
+    def setDataClipLayer(self,layer_path):
+        self.clip_layer = layer_path
         
     def setSelectField(self,fieldname):
         utils.debug("Setting select_field to " + str(fieldname))
         self.select_field = fieldname
         
     def setDescrField(self,fieldname):
+        utils.debug("Setting descr to " + str(fieldname))
         self.descr_field = fieldname
         
     def setSelectExpr(self,expr):
@@ -130,9 +143,9 @@ class LanduseModel(abstract_model.DictModel):
     def getDissolveLayer(self):
         return self.fsModel.mkOutputFile("landuseSelectionDissolve.gpkg")
         
-    def switchDataClipFlag(self,state):
-        utils.debug("switchDataClipFlag")
-        self.dataClipFlag = not self.dataClipFlag
+    # def switchDataClipFlag(self,state):
+        # utils.debug("switchDataClipFlag")
+        # self.dataClipFlag = not self.dataClipFlag
 
     def mkSelectionExpr(self):
         expr = ""
@@ -164,7 +177,12 @@ class LanduseModel(abstract_model.DictModel):
         self.checkLayerSelected()
         self.checkFieldSelected()
         #in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
-        clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
+        #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
+        clip_layer = self.clip_layer if self.dataClipFlag else None
+        utils.debug("clip_layer1 = " + str(self.clip_layer))
+        utils.debug("dataflag = " + str(self.dataClipFlag))
+        utils.debug("clip_layer = " + str(clip_layer))
+        #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         expr = self.getSelectionExpr()
         #if not expr:
         #    utils.user_error("No expression selected : TODO select everything")
@@ -191,6 +209,8 @@ class LanduseModel(abstract_model.DictModel):
         layerRelPath = self.fsModel.normalizePath(self.landuseLayer)
         attribs_dict = { self.INPUT_FIELD : layerRelPath,
                          self.SELECT_MODE_FIELD : self.select_mode }
+        if self.dataClipFlag and self.clip_layer:
+            attribs_dict[self.CLIP_LAYER] = self.fsModel.normalizePath(self.clip_layer)
         if self.select_field:
             attribs_dict[self.SELECT_FIELD_FIELD] = self.select_field
         if self.descr_field:
@@ -206,9 +226,14 @@ class LanduseModel(abstract_model.DictModel):
             abs_layer = self.fsModel.getOrigPath(attribs[self.INPUT_FIELD])
             utils.debug("abs_layer = " + str(abs_layer))
             self.landuseLayer = abs_layer
+        if self.CLIP_LAYER in attribs:
+            self.dataClipFlag = True
+            self.clip_layer = self.fsModel.getOrigPath(attribs[self.CLIP_LAYER])
         if self.SELECT_MODE_FIELD in attribs:
             self.select_mode = int(attribs[self.SELECT_MODE_FIELD])
         if self.SELECT_FIELD_FIELD in attribs:
+            utils.debug("sf1 = " + str(self.select_field))
+            utils.debug("sf2 = " + str(attribs[self.SELECT_FIELD_FIELD]))
             self.select_field = attribs[self.SELECT_FIELD_FIELD]
         if self.SELECT_DESCR_FIELD in attribs:
             self.descr_field = attribs[self.SELECT_DESCR_FIELD]
@@ -240,46 +265,57 @@ class LanduseConnector(abstract_model.AbstractConnector):
                          runButton=self.dlg.landuseRun)
         
     def initGui(self):
-        self.dlg.landuseLayerCombo.setFilters(QgsMapLayerProxyModel.VectorLayer)
-        self.dlg.landuseLayer.setFilter(qgsUtils.getVectorFilters())
+        self.dlg.landuseInputLayerCombo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        #self.dlg.landuseInputLayer.setFilter(qgsUtils.getVectorFilters())
         self.dlg.landuseDescrField.setFilters(QgsFieldProxyModel.String)
         
     def connectComponents(self):
         super().connectComponents()
-        self.dlg.landuseLayerCombo.layerChanged.connect(self.setLayer)
-        self.dlg.landuseLayer.fileChanged.connect(self.loadLayer)
+        self.dlg.landuseInputLayerCombo.layerChanged.connect(self.setLayer)
+        #self.dlg.landuseInputLayer.fileChanged.connect(self.loadLayer)
+        self.layerComboDlg = qgsUtils.LayerComboDialog(self.dlg,
+                                                       self.dlg.landuseInputLayerCombo,
+                                                       self.dlg.landuseInputLayer)
         self.dlg.landuseSelectionMode.currentIndexChanged.connect(self.switchSelectionMode)
         self.dlg.landuseSelectField.fieldChanged.connect(self.model.setSelectField)
         self.dlg.landuseDescrField.fieldChanged.connect(self.model.setDescrField)
         self.dlg.landuseSelectExpr.fieldChanged.connect(self.model.setSelectExpr)
         self.dlg.landuseLoadFields.clicked.connect(self.loadFields)
         #self.dlg.landuseRun.clicked.connect(self.applyItems)
-        self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
+        self.dlg.landuseClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
+        self.dlg.landuseClipLayer.fileChanged.connect(self.model.setDataClipLayer)
         #self.dlg.landuseSelectionMode.activated.connect(self.switchSelectionMode)
         
+    def switchDataClipFlag(self,state):
+        utils.debug("switchDataClipFlag")
+        self.model.dataClipFlag = not self.model.dataClipFlag
+        self.dlg.landuseClipLayer.setEnabled(self.model.dataClipFlag)
+        
     def setLayerUI(self,layer):
+        utils.debug("setlayerUI")
         if layer:
-            #self.dlg.landuseLayerCombo.setLayer(layer)
+            #self.dlg.landuseInputLayerCombo.setLayer(layer)
             self.dlg.landuseSelectField.setLayer(layer)
             self.dlg.landuseDescrField.setLayer(layer)
             self.dlg.landuseSelectExpr.setLayer(layer)
         
     def setLayer(self,layer):
+        utils.debug("setLayer")
         if layer:
             utils.debug("setLayer " + str(layer.type))
             layer_path = qgsUtils.pathOfLayer(layer)
             self.model.changeLayer(layer_path)
             self.setLayerUI(layer)
   
-    def loadLayer(self,path):
-        utils.debug("loadLayer")
-        loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
-        self.setLayer(loaded_layer)
-        self.dlg.landuseLayerCombo.setLayer(loaded_layer)
+    # def loadLayer(self,path):
+        # utils.debug("loadLayer")
+        # loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
+        # self.setLayer(loaded_layer)
+        # self.dlg.landuseInputLayerCombo.setLayer(loaded_layer)
         
     def loadFields(self,fieldname):
         utils.debug("loadField")
-        curr_layer = self.dlg.landuseLayerCombo.currentLayer()
+        curr_layer = self.dlg.landuseInputLayerCombo.currentLayer()
         if not curr_layer:
             utils.internal_error("No layer selected in landuse tab")
         if not self.model.select_field:
@@ -327,7 +363,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
     def updateUI(self):
         if self.model.landuseLayer:
             loaded_layer = qgsUtils.loadVectorLayer(self.model.landuseLayer,loadProject=True)
-            self.dlg.landuseLayerCombo.setLayer(loaded_layer)
+            self.dlg.landuseInputLayerCombo.setLayer(loaded_layer)
         if self.model.select_field:
             utils.debug("setting select_field : " + str(self.model.select_field))
             self.dlg.landuseSelectField.setField(self.model.select_field)

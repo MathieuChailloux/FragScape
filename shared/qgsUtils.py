@@ -318,4 +318,30 @@ def normFids(layer):
     layer.commitChanges()
         
         
+# Layer ComboDialog
     
+class LayerComboDialog:
+
+    def __init__(self,parent,combo,button):
+        self.parent = parent
+        self.combo = combo
+        self.button = button
+        self.layer_name = None
+        self.layer = None
+        self.button.clicked.connect(self.openDialog)
+        
+    def openDialog(self):
+        fname = utils.openFileDialog(self.parent,
+                                     msg="Ouvrir la couche",
+                                     filter=getVectorFilters())
+        if fname:
+            self.layer_name = fname
+            self.layer = loadVectorLayer(fname,loadProject=True)
+            utils.debug("self.layer = " +str(self.layer))
+            self.combo.setLayer(self.layer)
+            #self.combo.layerChanged.emit(self.layer)
+        else:
+            utils.user_error("Could not open file " + str(fname))
+        
+    def getLayer(self):
+        return self.layer
