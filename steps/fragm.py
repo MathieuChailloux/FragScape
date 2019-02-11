@@ -219,12 +219,12 @@ class FragmConnector(abstract_model.AbstractConnector):
                         self.dlg.fragmRun)
 
     def initGui(self):
-        self.dlg.fragmInLayerCombo.setFilters(QgsMapLayerProxyModel.VectorLayer)
+        self.dlg.fragmInputLayerCombo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         
     def connectComponents(self):
         super().connectComponents()
         self.dlg.fragmInLayer.fileChanged.connect(self.setInLayer)
-        self.dlg.fragmInLayerCombo.layerChanged.connect(self.setInLayerFromCombo)
+        self.dlg.fragmInputLayerCombo.layerChanged.connect(self.setInLayerFromCombo)
         
     def setInLayerFromCombo(self,layer):
         self.dlg.fragmExpr.setLayer(layer)
@@ -234,11 +234,11 @@ class FragmConnector(abstract_model.AbstractConnector):
         utils.debug("setInLayer " + str(path))
         layer = qgsUtils.loadVectorLayer(path,loadProject=True)
         utils.debug("layer = " + str(layer))
-        self.dlg.fragmInLayerCombo.setLayer(layer)
+        self.dlg.fragmInputLayerCombo.setLayer(layer)
         #self.setInLayerFromCombo(layer)
         
     def mkItem(self):
-        in_layer = self.dlg.fragmInLayerCombo.currentLayer()
+        in_layer = self.dlg.fragmInputLayerCombo.currentLayer()
         if not in_layer:
             utils.user_error("No layer selected")
         in_layer_path = self.model.fsModel.normalizePath(qgsUtils.pathOfLayer(in_layer))
