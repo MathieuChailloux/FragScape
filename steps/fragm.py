@@ -205,6 +205,7 @@ class FragmModel(abstract_model.DictModel):
             context=context,feedback=feedback)
         qgsUtils.loadVectorLayer(res_path,loadProject=True)
         progress.progressFeedback.endSection()
+        return res
             
     def fromXMLRoot(self,root):
         utils.debug("fromXML")
@@ -242,6 +243,12 @@ class FragmConnector(abstract_model.AbstractConnector):
                                                        self.dlg.fragmInputLayer)
         self.dlg.fragmClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
         self.dlg.fragmClipLayer.fileChanged.connect(self.model.setDataClipLayer)
+        
+    def applyItems(self):
+        super().applyItems()
+        res_path = self.model.getFinalLayer()
+        res_layer = qgsUtils.loadVectorLayer(res_path)
+        self.dlg.resultsInputLayer.setLayer(res_layer)
         
     def setInLayerFromCombo(self,layer):
         self.dlg.fragmExpr.setLayer(layer)

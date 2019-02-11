@@ -288,7 +288,12 @@ class LanduseConnector(abstract_model.AbstractConnector):
         
     def switchDataClipFlag(self,state):
         utils.debug("switchDataClipFlag")
-        self.model.dataClipFlag = not self.model.dataClipFlag
+        if state == 0:
+            self.model.dataClipFlag = False
+        elif state == 2:
+            self.model.dataClipFlag = True
+        else:
+            utils.internal_error("Unexpected check state : " + str(state))
         self.dlg.landuseClipLayer.setEnabled(self.model.dataClipFlag)
         
     def setLayerUI(self,layer):
@@ -364,6 +369,14 @@ class LanduseConnector(abstract_model.AbstractConnector):
         if self.model.landuseLayer:
             loaded_layer = qgsUtils.loadVectorLayer(self.model.landuseLayer,loadProject=True)
             self.dlg.landuseInputLayerCombo.setLayer(loaded_layer)
+        utils.debug("clipflag1" + str(self.model.dataClipFlag))
+        if self.model.dataClipFlag:
+            self.dlg.landuseClipDataFlag.setCheckState(2)
+        else:
+            self.dlg.landuseClipDataFlag.setCheckState(0)
+        utils.debug("clipflag2" + str(self.model.dataClipFlag))
+        if self.model.clip_layer:
+            self.dlg.landuseClipLayer.setFilePath(self.model.clip_layer)
         if self.model.select_field:
             utils.debug("setting select_field : " + str(self.model.select_field))
             self.dlg.landuseSelectField.setField(self.model.select_field)
