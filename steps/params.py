@@ -108,7 +108,6 @@ class ParamsModel(QAbstractTableModel):
 
     WORKSPACE = "workspace"
     CLIP = "clip"
-    TERRITORY = "territoryLayer"
     PROJECT = "projectFile"
     CRS = "crs"
 
@@ -117,31 +116,17 @@ class ParamsModel(QAbstractTableModel):
         self.fsModel = fsModel
         self.workspace = None
         self.outputDir = None
-        self.territoryLayer = None
-        self.dataClipFlag = True
+        #self.dataClipFlag = True
         self.projectFile = ""
         self.crs = defaultCrs
-        self.fields = [self.WORKSPACE,self.TERRITORY,self.PROJECT,self.CRS]
+        self.fields = [self.WORKSPACE,self.PROJECT,self.CRS]
         QAbstractTableModel.__init__(self)
         
-    """ Getters and setters """
-    def setTerritoryLayer(self,path):
-        path = self.normalizePath(path)
-        utils.info("Setting territory layer to " + str(path))
-        self.territoryLayer = path
-        #self.layoutChanged.emit()
+    # def setDataClipFalg(self,val):
+        # self.dataClipFlag = val
         
-    def getTerritoryLayer(self):
-        if self.dataClipFlag:
-            return self.getOrigPath(self.territoryLayer)
-        else:
-            return None
-        
-    def setDataClipFalg(self,val):
-        self.dataClipFlag = val
-        
-    def switchDataClipFlag(self):
-        self.dataClipFlag = not self.dataClipFlag
+    # def switchDataClipFlag(self):
+        # self.dataClipFlag = not self.dataClipFlag
         
     def setCrs(self,crs):
         utils.info("Setting extent CRS to " + crs.description())
@@ -214,7 +199,6 @@ class ParamsModel(QAbstractTableModel):
               
     def getNItem(self,n):
         items = [self.workspace,
-                 self.territoryLayer,
                  self.projectFile,
                  self.crs.description(),
                  ""]
@@ -252,21 +236,19 @@ class ParamsModel(QAbstractTableModel):
         if self.WORKSPACE in dict:
             if os.path.isdir(dict[self.WORKSPACE]):
                 self.setWorkspace(dict[self.WORKSPACE])
-        if self.TERRITORY in dict:
-            self.setTerritoryLayer(dict[self.TERRITORY])
-        if self.CLIP in dict:
+        # if self.TERRITORY in dict:
+            # self.setTerritoryLayer(dict[self.TERRITORY])
+        #if self.CLIP in dict:
             # Cast with bool() not working
-            flag = dict[self.CLIP] == "True"
-            self.dataClipFlag = flag
+            # flag = dict[self.CLIP] == "True"
+            # self.dataClipFlag = flag
         #self.model.layoutChanged.emit()
         
     def toXML(self,indent=""):
         xmlStr = indent + "<" + self.parser_name
         if self.workspace:
             xmlStr += " " + self.WORKSPACE + "=\"" + str(self.workspace) + "\""
-        xmlStr += " " + self.CLIP + "=\"" + str(self.dataClipFlag) + "\""
-        if self.territoryLayer:
-            xmlStr += " " + self.TERRITORY + "=\"" + str(self.territoryLayer) + "\""
+        #xmlStr += " " + self.CLIP + "=\"" + str(self.dataClipFlag) + "\""
         xmlStr += "/>"
         return xmlStr
 
@@ -280,14 +262,11 @@ class ParamsConnector:
         
     def initGui(self):
         self.dlg.paramsView.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.dlg.territoryLayer.setFilter(qgsUtils.getVectorFilters())
         self.dlg.paramsCrs.setCrs(defaultCrs)
         
     def connectComponents(self):
         self.dlg.paramsView.setModel(self.model)
-        self.dlg.territoryLayer.setStorageMode(QgsFileWidget.GetFile)
-        self.dlg.territoryLayer.fileChanged.connect(self.model.setTerritoryLayer)
-        self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
+        #self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         self.dlg.workspace.setStorageMode(QgsFileWidget.GetDirectory)
         self.dlg.workspace.fileChanged.connect(self.model.setWorkspace)
         self.dlg.paramsCrs.crsChanged.connect(self.model.setCrs)
@@ -297,9 +276,8 @@ class ParamsConnector:
         
     def updateUI(self):
         self.dlg.workspace.setFilePath(self.model.workspace)
-        self.dlg.territoryLayer.setFilePath(self.model.territoryLayer)
-        checkState = 2 if self.model.dataClipFlag else 0
-        self.dlg.dataClipFlag.setCheckState(checkState)
+        # checkState = 2 if self.model.dataClipFlag else 0
+        # self.dlg.dataClipFlag.setCheckState(checkState)
         self.dlg.paramsCrs.setCrs(self.model.crs)
 
     def fromXMLRoot(self,root):

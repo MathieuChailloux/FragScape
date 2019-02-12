@@ -77,7 +77,7 @@
             <x>0</x>
             <y>0</y>
             <width>765</width>
-            <height>596</height>
+            <height>649</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -252,6 +252,28 @@
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout">
                <item>
+                <widget class="QFrame" name="frame_2">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_15">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_11">
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bienvenue dans FragScape 1.0 !&lt;/p&gt;&lt;p&gt;Ce plugin permet de calculer la taille effective de maille d'un territoire depuis les données d'entrée (occupation du sol, éléments fragmentants) en 4 étapes :&lt;br/&gt;  1) Définition des paramètres généraux&lt;br/&gt;2) Sélection des éléments non fragmentants de l'occupation du sol&lt;br/&gt;3) Intégration des éléments fragmentants&lt;br/&gt;4) Calcul des indicateurs de fragmentation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pensez à sauvegarder régulièrement la configuration du plugin.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Page web : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
                 <widget class="QLabel" name="paramlabel">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -267,7 +289,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Paramètres</string>
+                  <string>Paramètres globaux</string>
                  </property>
                 </widget>
                </item>
@@ -305,6 +327,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="2" column="1">
+                   <widget class="QCheckBox" name="saveTmpResultsFlag">
+                    <property name="layoutDirection">
+                     <enum>Qt::LeftToRight</enum>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="1">
                    <widget class="QgsFileWidget" name="workspace">
                     <property name="sizePolicy">
@@ -318,31 +353,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="boundsLayer">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Zone d'étude maximale (ZEM)</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QgsFileWidget" name="territoryLayer">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="2" column="0">
-                   <widget class="QLabel" name="boundsLayer_2">
+                   <widget class="QLabel" name="boundsLayer_3">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -350,20 +362,7 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Découper les données selon la ZEM</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QCheckBox" name="dataClipFlag">
-                    <property name="layoutDirection">
-                     <enum>Qt::LeftToRight</enum>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
+                     <string>Sauver les couches intermédiaires</string>
                     </property>
                    </widget>
                   </item>
@@ -387,32 +386,6 @@
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QLabel" name="boundsLayer_3">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Sauver les couches intermédiaires</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QCheckBox" name="saveTmpResultsFlag">
-                    <property name="layoutDirection">
-                     <enum>Qt::LeftToRight</enum>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="checked">
-                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
