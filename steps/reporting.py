@@ -58,9 +58,10 @@ class ReportingModel(abstract_model.DictModel):
         #super().__init__(self,self.fields)
                 
     def getInputLayer(self):
-        if not self.input_layer:
-            self.input_layer = self.fsModel.fragmModel.getFinalLayer()
-        return self.input_layer
+        return self.fsModel.fragmModel.getFinalLayer()
+        # if not self.input_layer:
+            # self.input_layer = self.fsModel.fragmModel.getFinalLayer()
+        # return self.input_layer
                 
     def setOutLayer(self,layer):
         self.out_layer = layer
@@ -90,6 +91,7 @@ class ReportingModel(abstract_model.DictModel):
                 context=context,feedback=feedback)
         else:
             selected = input_layer
+        crs = self.fsModel.paramsModel.crs
         results_path = self.getOutLayer()
         qgsUtils.removeVectorLayer(results_path)
         if self.method == self.CUT_METHOD:
@@ -101,6 +103,7 @@ class ReportingModel(abstract_model.DictModel):
         parameters = { meff_algs.EffectiveMeshSizeAlgorithm.INPUT : selected,
                        #meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
                        meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : self.reporting_layer,
+                       meff_algs.EffectiveMeshSizeAlgorithm.CRS : crs,
                        meff_algs.EffectiveMeshSizeAlgorithm.CUT_MODE : cut_mode,
                        meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT : results_path }
         res = qgsTreatments.applyProcessingAlg(
@@ -169,7 +172,8 @@ class ReportingConnector(abstract_model.AbstractConnector):
     def connectComponents(self):
         super().connectComponents()
         #self.dlg.reportingLayerCombo.layerChanged.connect(self.setLayer)
-        self.dlg.resultsReportingLayer.fileChanged.connect(self.loadLayer)
+        self.dlg.resultsInputLayer.layerChanged.connect(self.setInputLayer)
+        self.dlg.resultsReportingLayer.fileChanged.connect(self.setReportingLayer)
         self.dlg.resultsCutMode.currentIndexChanged.connect(self.setMethod)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
         self.dlg.resultsRun.clicked.connect(self.runReporting)
@@ -199,11 +203,17 @@ class ReportingConnector(abstract_model.AbstractConnector):
         else:
             utils.internal_error("Unexpected index for reporting method : " + str(idx))
     
-    def loadLayer(self,path):
-        utils.debug("loadLayer")
-        loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
+    def setInputLayer(self,layer):
+        utils.debug("setReportingLayer")
+        self.dlg.resultsSelection.setLayer(layer)
+        #self.dlg.resultsSelection.setLayer(loaded_layer)
+        #self.model.input_layer = path
+        
+    def setReportingLayer(self,path):
+        utils.debug("setReportingLayer")
+        #loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
         #self.dlg.reportingLayerCombo.setLayer(loaded_layer)
-        self.dlg.resultsSelection.setLayer(loaded_layer)
+        #self.dlg.resultsSelection.setLayer(loaded_layer)
         self.model.reporting_layer = path
         #self.setLayer(loaded_layer)
         

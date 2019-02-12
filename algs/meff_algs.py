@@ -42,7 +42,7 @@ from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 import processing
 import xml.etree.ElementTree as ET
 
-from ..shared import utils, qgsTreatments
+from ..shared import utils, qgsTreatments, qgsUtils
 from ..steps import params
 
 class MeffAlgorithmsProvider(QgsProcessingProvider):
@@ -411,6 +411,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
     # Algorithm parameters
     INPUT = "INPUT"
     REPORTING = "REPORTING"
+    CRS = "CRS"
     CUT_MODE = "CUT_MODE"
     OUTPUT = "OUTPUT"
     
@@ -456,6 +457,11 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Reporting layer"),
                 [QgsProcessing.TypeVectorPolygon]))
         self.addParameter(
+            QgsProcessingParameterCrs(
+                self.CRS,
+                description=self.tr("Output CRS"),
+                defaultValue=params.defaultCrs))
+        self.addParameter(
             QgsProcessingParameterBoolean(
                 self.CUT_MODE,
                 self.tr("Cross-boundary connection method")))
@@ -475,7 +481,23 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo("reporting = " + str(reporting))
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        crs = self.parameterAsCrs(parameters,self.CRS,context)
         cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
+        # CRS reprojection
+        source_crs = source.crs().authid()
+        reporting_crs = reporting.crs().authid()
+        feedback.pushDebugInfo("source_crs = " + str(source_crs))
+        feedback.pushDebugInfo("reporting_crs = " + str(reporting_crs))
+        feedback.pushDebugInfo("crs = " + str(crs.authid()))
+        if source_crs != crs.authid():
+            source_path = QgsProcessingUtils.generateTempFilename('source_reproject.gpkg')
+            qgsTreatments.applyReprojectLayer(source,crs,source_path,context,feedback)
+            source = qgsUtils.loadVectorLayer(source_path)
+        if reporting_crs != crs.authid():
+            reporting_path = QgsProcessingUtils.generateTempFilename('reporting_reproject.gpkg')
+            qgsTreatments.applyReprojectLayer(reporting,crs,reporting_path,context,feedback)
+            reporting = qgsUtils.loadVectorLayer(reporting_path)
+        # Output fields
         report_id_field = QgsField(self.ID, QVariant.Int)
         nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
         mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
@@ -500,10 +522,12 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             context,
             output_fields,
             reporting.wkbType(),
-            reporting.sourceCrs()
+            #reporting.sourceCrs()
+            crs
         )
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # Algorithm
         # progress step
         nb_feats = reporting.featureCount()
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
@@ -518,8 +542,11 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         for report_feat in reporting.getFeatures():
             report_geom = report_feat.geometry()
             report_area = report_geom.area() / 1000
+            feedback.pushDebugInfo("report_area = " + str(report_area))
             if report_area == 0:
-                break
+                raise QgsProcessingException("Empty reporting area")
+            else:
+                feedback.pushDebugInfo("ok")
             global_area += report_area
             report_area_sq = report_area * report_area
             new_f = QgsFeature(output_fields)

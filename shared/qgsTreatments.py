@@ -195,7 +195,7 @@ def extractByExpression(in_layer,expr,out_layer,context=None,feedback=None):
     parameters = { 'EXPRESSION' : expr,
                    'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","extractbyexpression",parameters,context=context,feedback=feedback)
+    res = applyProcessingAlg("native","extractbyexpression",parameters,context=context,feedback=feedback)
     return res
     
 def selectByExpression(in_layer,expr,context=None,feedback=None):
@@ -208,7 +208,7 @@ def selectByExpression(in_layer,expr,context=None,feedback=None):
 def saveSelectedAttributes(in_layer,out_layer,context=None,feedback=None):
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","saveselectedfeatures",parameters,context=context,feedback=feedback)
+    res = applyProcessingAlg("native","saveselectedfeatures",parameters,context=context,feedback=feedback)
     return res
     
 def cloneLayer(layer):
@@ -220,7 +220,7 @@ def multiToSingleGeom(in_layer,out_layer,context=None,feedback=None):
     progress.progressFeedback.setSubText("Multi to single geometry")
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","multiparttosingleparts",parameters,context=context,feedback=feedback)
+    res = applyProcessingAlg("native","multiparttosingleparts",parameters,context=context,feedback=feedback)
     return res
     
 def dissolveLayer(in_layer,out_layer,context=None,feedback=None):
@@ -250,7 +250,7 @@ def applyBufferFromExpr(in_layer,expr,out_layer,context=None,feedback=None):
                    'JOIN_STYLE' : 0,
                    'MITER_LIMIT' : 2,
                    'SEGMENTS' : 5 }
-    res = applyProcessingAlg("qgis","buffer",parameters,context,feedback)
+    res = applyProcessingAlg("native","buffer",parameters,context,feedback)
     return res
     
 def mergeVectorLayers(in_layers,crs,out_layer,context=None,feedback=None):
@@ -258,7 +258,7 @@ def mergeVectorLayers(in_layers,crs,out_layer,context=None,feedback=None):
     parameters = { 'CRS' : crs,
                    'LAYERS' : in_layers,
                    'OUTPUT' : out_layer }
-    res = applyProcessingAlg("qgis","mergevectorlayers",parameters,context,feedback)
+    res = applyProcessingAlg("native","mergevectorlayers",parameters,context,feedback)
     return res
                    
     
@@ -267,7 +267,7 @@ def applyDifference(in_layer,diff_layer,out_layer,context=None,feedback=None):
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'OVERLAY' : diff_layer }
-    res = applyProcessingAlg("qgis","difference",parameters,context=context,feedback=feedback)
+    res = applyProcessingAlg("native","difference",parameters,context=context,feedback=feedback)
     return res  
     
 def applyVectorClip(in_layer,clip_layer,out_layer,context=None,feedback=None):
@@ -275,8 +275,17 @@ def applyVectorClip(in_layer,clip_layer,out_layer,context=None,feedback=None):
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'OVERLAY' : clip_layer }
-    res = applyProcessingAlg("qgis","clip",parameters,context,feedback)
+    res = applyProcessingAlg("native","clip",parameters,context,feedback)
     return res
+    
+def applyReprojectLayer(in_layer,target_crs,out_layer,context=None,feedback=None):
+    progress.progressFeedback.setSubText("Reproject")
+    parameters = { 'INPUT' : in_layer,
+                   'OUTPUT' : out_layer,
+                   'TARGET_CRS' : target_crs }
+    res = applyProcessingAlg("native","reprojectlayer",parameters,context,feedback)
+    return res
+    
     
 # Apply rasterization on field 'field' of vector layer 'in_path'.
 # Output raster layer in 'out_path'.

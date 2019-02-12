@@ -177,6 +177,8 @@ class FragmModel(abstract_model.DictModel):
         #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         #clip_layer = self.clip_layer if self.dataClipFlag else None
         prepared_layers = []
+        res_path = self.getFinalLayer()
+        qgsUtils.removeVectorLayer(res_path)
         for item in self.items:
             in_layer_path = self.fsModel.getOrigPath(item.dict[self.PREPARE_INPUT])
             clip_layer = item.dict[self.PREPARE_CLIP_LAYER]
@@ -194,8 +196,8 @@ class FragmModel(abstract_model.DictModel):
                 context=context,feedback=feedback)
             prepared_layers.append(prepared)
         landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
-        res_path = self.getFinalLayer()
-        qgsUtils.removeVectorLayer(res_path)
+        #res_path = self.getFinalLayer()
+        #qgsUtils.removeVectorLayer(res_path)
         parameters = { self.APPLY_LANDUSE : landuseLayer,
                        self.APPLY_FRAGMENTATION : prepared_layers,
                        self.APPLY_CRS : params.defaultCrs,
@@ -245,6 +247,8 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.dlg.fragmClipLayer.fileChanged.connect(self.model.setDataClipLayer)
         
     def applyItems(self):
+        self.dlg.resultsInputLayer.setLayer(None)
+        self.dlg.resultsSelection.setLayer(None)
         super().applyItems()
         res_path = self.model.getFinalLayer()
         res_layer = qgsUtils.loadVectorLayer(res_path)
