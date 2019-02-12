@@ -36,7 +36,8 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterCrs,
                        QgsProcessingParameterVectorDestination,
                        QgsProcessingParameterFile,
-                       QgsProperty)
+                       QgsProperty,
+                       QgsWkbTypes)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
@@ -191,7 +192,8 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterExpression(
                 self.BUFFER,
                 description=self.tr("Buffer expression"),
-                parentLayerParameterName=self.INPUT))
+                parentLayerParameterName=self.INPUT,
+                optional=True))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
@@ -209,10 +211,10 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         #feedback.pushDebugInfo("select_expr : " + str(select_expr))
         #feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
         buffer_expr = self.parameterAsExpression(parameters,self.BUFFER,context)
-        feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
-        if buffer_expr is None:
-            raise QgsProcessingException("Empty buffer")
-        buffer_expr_prep = QgsProperty.fromExpression(buffer_expr)
+        #buffer_expr = ""
+        #feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
+        #if buffer_expr == "" and input.geometryType() != QgsWkbTypes.PolygonGeometry:
+        #    raise QgsProcessingException("Empty buffer with non-polygon layer")
         output = parameters[self.OUTPUT]
         if clip is None:
             clipped = input
@@ -221,9 +223,18 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         if select_expr == "":
             selected = clipped
         else:
-            selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
-        buffered = qgsTreatments.applyBufferFromExpr(selected,buffer_expr_prep,output,context,feedback)
+            selected_path = QgsProcessingUtils.generateTempFilename('tmp.gpkg')
+            selected = qgsTreatments.selectGeomByExpression(clipped,select_expr,selected_path,'tmp')
+            selected = selected_path
+            #selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
+        if buffer_expr == "":
+            buffered = selected
+        else:
+            buffer_expr_prep = QgsProperty.fromExpression(buffer_expr)
+            buffered = qgsTreatments.applyBufferFromExpr(selected,buffer_expr_prep,output,context,feedback)
         #buffered = qgsTreatments.applyBufferFromExpr(selected,parameters[self.BUFFER],output,context,feedback)
+        if buffered == input:
+            buffered = qgsUtils.pathOfLayer(buffered)
         return {self.OUTPUT : buffered}
         
 

@@ -154,7 +154,7 @@ def applyGrassAlg(parameters,alg_name):
     applyProcessingAlg("grass7",alg_name,parameters)
 
 def selectGeomByExpression(in_layer,expr,out_path,out_name):
-    utils.info("Calling 'selectGeomByExpression' algorithm")
+    #utils.info("Calling 'selectGeomByExpression' algorithm")
     start_time = time.time()
     qgsUtils.removeVectorLayer(out_path)
     out_layer = qgsUtils.createLayerFromExisting(in_layer,out_name)
@@ -180,8 +180,8 @@ def selectGeomByExpression(in_layer,expr,out_path,out_name):
     qgsUtils.writeVectorLayer(out_layer,out_path)
     end_time = time.time()
     diff_time = end_time - start_time
-    utils.info("Call to 'selectGeomByExpression' successful"
-               + ", performed in " + str(diff_time) + " seconds")
+    #utils.info("Call to 'selectGeomByExpression' successful"
+    #           + ", performed in " + str(diff_time) + " seconds")
     
 def joinToReportingLayer(init_layer,reporting_layer_path,out_name):
     init_pr = init_layer.dataProvider()

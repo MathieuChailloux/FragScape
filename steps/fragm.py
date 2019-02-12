@@ -184,6 +184,10 @@ class FragmModel(abstract_model.DictModel):
             clip_layer = item.dict[self.PREPARE_CLIP_LAYER]
             select_expr = item.dict[self.PREPARE_SELECT_EXPR]
             buffer_expr = item.dict[self.PREPARE_BUFFER]
+            utils.debug("select_expr : " + str(select_expr))
+            utils.debug("buffer_expr : " + str(buffer_expr))
+            #assert(buffer_expr != "")
+            #buffer_expr = ""
             selectionPath = item.getSelectionLayer()
             name = item.dict[self.PREPARE_NAME]
             parameters = { self.PREPARE_INPUT : in_layer_path,
@@ -194,6 +198,7 @@ class FragmModel(abstract_model.DictModel):
             prepared = qgsTreatments.applyProcessingAlg(
                 "Meff","prepareFragm",parameters,
                 context=context,feedback=feedback)
+            qgsUtils.loadVectorLayer(prepared,loadProject=True)
             prepared_layers.append(prepared)
         landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
         #res_path = self.getFinalLayer()
@@ -277,11 +282,12 @@ class FragmConnector(abstract_model.AbstractConnector):
         clip_layer = self.clip_layer if self.dataClipFlag else None
         expr = self.dlg.fragmExpr.expression()
         buffer = self.dlg.fragmBuffer.expression()
-        if not buffer:
-            utils.user_error("Empty buffer")
+        #if not buffer:
+        #    utils.user_error("Empty buffer")
         name = self.dlg.fragmName.text()
         if not name:
             utils.user_error("Empty name")
+            
         dict = { FragmModel.PREPARE_INPUT : in_layer_path,
                  FragmModel.PREPARE_CLIP_LAYER : clip_layer,
                  FragmModel.PREPARE_SELECT_EXPR : expr,

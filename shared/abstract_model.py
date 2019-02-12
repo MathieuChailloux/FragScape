@@ -133,8 +133,8 @@ class DictItem(AbstractGroupItem):
         utils.debug("item = " + str(self))
         for k,v in self.dict.items():
             utils.debug(str(v))
-            utils.debug(str(v))
-            xmlStr += indent + " " + k + "=\"" + str(v).replace('"','&quot;') + "\""
+            xmlStr += indent + " " + k + "=\"" + xmlUtils.xmlEscape(str(v)) + "\""
+            #xmlStr += indent + " " + k + "=\"" + str(v).replace('"','&quot;') + "\""
         xmlStr += "/>"
         return xmlStr
     
