@@ -182,6 +182,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         res = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
         out_path = res[meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
         out_global_meff = res[meff_algs.EffectiveMeshSizeAlgorithm.OUTPUT_GLOBAL_MEFF]
+        # UI update
         self.dlg.resultsGlobalRes.setText(str(out_global_meff))
         self.loaded_layer = qgsUtils.loadVectorLayer(out_path)
         self.layer_cache = QgsVectorLayerCache(self.loaded_layer,24)
