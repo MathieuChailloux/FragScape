@@ -136,13 +136,20 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         if clip_layer is None:
             clipped = input
         else:
-            clipped = qgsTreatments.applyVectorClip(input,clip_layer,'memory:',context,feedback)
-        selected = qgsTreatments.extractByExpression(
-            clipped,expr,'memory:',
-            context=context,feedback=feedback)
-        feedback.pushDebugInfo("selected = " + str(selected))
+            clipped_path = QgsProcessingUtils.generateTempFilename('landuseClipped.gpkg')
+            qgsTreatments.applyVectorClip(input,clip_layer,clipped_path,context,feedback)
+            clipped = qgsUtils.loadVectorLayer(clipped_path)
+            utils.debug("clipped  = " + str(clipped))
+            #clipped = clipped_path
+        selected_path = QgsProcessingUtils.generateTempFilename('landuseSelection.gpkg')
+        qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
+        #selected = qgsUtils.loadVectorLayer(selected_path)
+        #selected = qgsTreatments.extractByExpression(
+        #    clipped,expr,'memory:',
+        #    context=context,feedback=feedback)
+        feedback.pushDebugInfo("selected = " + str(selected_path))
         output = parameters[self.OUTPUT]
-        dissolved = qgsTreatments.dissolveLayer(selected,output,context=context,feedback=feedback)
+        dissolved = qgsTreatments.dissolveLayer(selected_path,output,context=context,feedback=feedback)
         dissolved = None
         return {self.OUTPUT : dissolved}
         
@@ -219,12 +226,15 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         if clip is None:
             clipped = input
         else:
-            clipped = qgsTreatments.applyVectorClip(input,clip,'memory:',context,feedback)
+            clipped_path = QgsProcessingUtils.generateTempFilename('fragmClipped.gpkg')
+            qgsTreatments.applyVectorClip(input,clip,clipped_path,context,feedback)
+            clipped = qgsUtils.loadVectorLayer(clipped_path)
         if select_expr == "":
             selected = clipped
         else:
             selected_path = QgsProcessingUtils.generateTempFilename('tmp.gpkg')
-            selected = qgsTreatments.selectGeomByExpression(clipped,select_expr,selected_path,'tmp')
+            qgsTreatments.selectGeomByExpression(clipped,select_expr,selected_path,'tmp')
+            #selected = qgsUtils.loadVectorLayer(selected_path)
             selected = selected_path
             #selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
         if buffer_expr == "":

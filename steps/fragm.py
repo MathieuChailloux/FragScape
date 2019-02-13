@@ -100,8 +100,6 @@ class FragmModel(abstract_model.DictModel):
     def __init__(self,fsModel):
         self.parser_name = "FragmModel"
         self.fsModel = fsModel
-        #self.dataClipFlag = False
-        #self.clip_layer = None
         super().__init__(self,self.FIELDS)
         
     def mkItemFromDict(self,dict):
@@ -117,9 +115,6 @@ class FragmModel(abstract_model.DictModel):
             if (self.PREPARE_CLIP_LAYER not in dict) or (dict[self.PREPARE_CLIP_LAYER] == "None"):
                 dict[self.PREPARE_CLIP_LAYER] = None
             return FragmItem(dict)
-        
-    def setDataClipLayer(self,layer_path):
-        self.clip_layer = layer_path
         
     def getFragmLayer(self):
         return QgsProcessingUtils.generateTempFilename("fragm.gpkg")
@@ -180,8 +175,13 @@ class FragmModel(abstract_model.DictModel):
         res_path = self.getFinalLayer()
         qgsUtils.removeVectorLayer(res_path)
         for item in self.items:
-            in_layer_path = self.fsModel.getOrigPath(item.dict[self.PREPARE_INPUT])
-            clip_layer = item.dict[self.PREPARE_CLIP_LAYER]
+            in_layer_path = item.dict[self.PREPARE_INPUT]
+            in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
+            clip_layer_path = item.dict[self.PREPARE_CLIP_LAYER]
+            if clip_layer_path:
+                clip_layer_abs_path = self.fsModel.getOrigPath(clip_layer_path)
+            else:
+                clip_layer_abs_path = None
             select_expr = item.dict[self.PREPARE_SELECT_EXPR]
             buffer_expr = item.dict[self.PREPARE_BUFFER]
             utils.debug("select_expr : " + str(select_expr))
@@ -190,8 +190,8 @@ class FragmModel(abstract_model.DictModel):
             #buffer_expr = ""
             selectionPath = item.getSelectionLayer()
             name = item.dict[self.PREPARE_NAME]
-            parameters = { self.PREPARE_INPUT : in_layer_path,
-                           self.PREPARE_CLIP_LAYER : clip_layer,
+            parameters = { self.PREPARE_INPUT : in_layer_abs_path,
+                           self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
                            self.PREPARE_SELECT_EXPR : select_expr,
                            self.PREPARE_BUFFER : buffer_expr,
                            self.PREPARE_OUTPUT : selectionPath }
@@ -249,7 +249,7 @@ class FragmConnector(abstract_model.AbstractConnector):
                                                        self.dlg.fragmInputLayerCombo,
                                                        self.dlg.fragmInputLayer)
         self.dlg.fragmClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
-        self.dlg.fragmClipLayer.fileChanged.connect(self.model.setDataClipLayer)
+        self.dlg.fragmClipLayer.fileChanged.connect(self.setDataClipLayer)
         
     def applyItems(self):
         self.dlg.resultsInputLayer.setLayer(None)
@@ -267,6 +267,9 @@ class FragmConnector(abstract_model.AbstractConnector):
         utils.debug("switchDataClipFlag")
         self.dataClipFlag = not self.dataClipFlag
         self.dlg.fragmClipLayer.setEnabled(self.dataClipFlag)
+        
+    def setDataClipLayer(self,layer_path):
+        self.clip_layer = self.model.fsModel.normalizePath(layer_path)
     
     # def setInLayer(self,path):
         # utils.debug("setInLayer " + str(path))
@@ -280,6 +283,8 @@ class FragmConnector(abstract_model.AbstractConnector):
             utils.user_error("No layer selected")
         in_layer_path = self.model.fsModel.normalizePath(qgsUtils.pathOfLayer(in_layer))
         clip_layer = self.clip_layer if self.dataClipFlag else None
+        utils.debug("clip_flag = " + str(self.dataClipFlag))
+        utils.debug("clip_layer = " + str(clip_layer))
         expr = self.dlg.fragmExpr.expression()
         buffer = self.dlg.fragmBuffer.expression()
         #if not buffer:

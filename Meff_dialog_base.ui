@@ -139,7 +139,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>Ouvrir un projet BioDispersal</string>
+              <string>Ouvrir un projet FragScape</string>
              </property>
              <property name="text">
               <string/>
@@ -192,7 +192,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Enregistrer le projet BioDispersal sous</string>
+              <string>Enregistrer le projet FragScape sous</string>
              </property>
              <property name="text">
               <string/>
@@ -215,7 +215,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Enregistrer le projet BioDispersal</string>
+              <string>Enregistrer le projet FragScape</string>
              </property>
              <property name="text">
               <string/>
