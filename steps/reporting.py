@@ -194,6 +194,15 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsView.setModel(self.attribute_model)
         #self.dlg.resultsView.show()
         
+    def unloadResults(self):
+        self.dlg.resultsGlobalRes.setText(str(0))
+        self.loaded_layer = None
+        self.layer_cache = None
+        self.attribute_model = None
+        #self.model.items = []
+        self.dlg.resultsView.setModel(None)
+        
+        
     # def setLayer(self,layer):
         # utils.debug("setLayer " + str(layer.type))
         # self.dlg.reportingLayerCombo.setLayer(layer)
@@ -208,8 +217,9 @@ class ReportingConnector(abstract_model.AbstractConnector):
             utils.internal_error("Unexpected index for reporting method : " + str(idx))
     
     def setInputLayer(self,layer):
-        utils.debug("setReportingLayer")
+        utils.debug("setInputLayer to " + str(layer))
         self.dlg.resultsSelection.setLayer(layer)
+        self.unloadResults()
         #self.dlg.resultsSelection.setLayer(loaded_layer)
         #self.model.input_layer = path
         
@@ -226,6 +236,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         
     def updateUI(self):
         abs_input_layer = self.model.getInputLayer()
+        utils.debug("")
         if os.path.isfile(abs_input_layer):
             loaded_layer = qgsUtils.loadVectorLayer(abs_input_layer,loadProject=True)
             self.dlg.resultsInputLayer.setLayer(loaded_layer)
