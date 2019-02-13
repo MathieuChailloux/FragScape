@@ -198,7 +198,7 @@ class FragmModel(abstract_model.DictModel):
             prepared = qgsTreatments.applyProcessingAlg(
                 "Meff","prepareFragm",parameters,
                 context=context,feedback=feedback)
-            qgsUtils.loadVectorLayer(prepared,loadProject=True)
+            #qgsUtils.loadVectorLayer(prepared,loadProject=True)
             prepared_layers.append(prepared)
         landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
         #res_path = self.getFinalLayer()

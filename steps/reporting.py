@@ -22,6 +22,8 @@
  ***************************************************************************/
 """
 
+import os.path
+
 from qgis.core import QgsMapLayerProxyModel, QgsField, QgsFeature, QgsProcessingFeedback, QgsVectorLayerCache
 from qgis.gui import QgsFileWidget, QgsAttributeTableModel, QgsAttributeTableView, QgsAttributeTableFilterModel
 from qgis.utils import iface
@@ -115,16 +117,16 @@ class ReportingModel(abstract_model.DictModel):
         return res
                 
     def toXML(self,indent=" "):
-        if not self.reporting_layer:
-            utils.warn("No reporting layer selected")
-            return ""
+        # if not self.reporting_layer:
+            # utils.warn("No reporting layer selected")
+            # return ""
         #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.layer))
         modelParams = {}
         # if self.input_layer:
             # pass
         if self.select_expr:
             modelParams[self.SELECT_EXPR] = self.select_expr
-        if self.method:
+        if self.method >= 0:
             modelParams[self.METHOD] = self.method
         if self.reporting_layer:
             layerRelPath = self.fsModel.normalizePath(self.reporting_layer)
@@ -173,6 +175,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         super().connectComponents()
         #self.dlg.reportingLayerCombo.layerChanged.connect(self.setLayer)
         self.dlg.resultsInputLayer.layerChanged.connect(self.setInputLayer)
+        self.dlg.resultsSelection.fieldChanged.connect(self.setSelectExpr)
         self.dlg.resultsReportingLayer.fileChanged.connect(self.setReportingLayer)
         self.dlg.resultsCutMode.currentIndexChanged.connect(self.setMethod)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
@@ -210,6 +213,9 @@ class ReportingConnector(abstract_model.AbstractConnector):
         #self.dlg.resultsSelection.setLayer(loaded_layer)
         #self.model.input_layer = path
         
+    def setSelectExpr(self,expr):
+        self.model.select_expr = expr
+        
     def setReportingLayer(self,path):
         utils.debug("setReportingLayer")
         #loaded_layer = qgsUtils.loadVectorLayer(path,loadProject=True)
@@ -219,9 +225,12 @@ class ReportingConnector(abstract_model.AbstractConnector):
         #self.setLayer(loaded_layer)
         
     def updateUI(self):
-        # if self.model.input_layer:
-            # abs_input_layer = qgsUtils.loadVectorLayer(self.model.input_layer,loadProject=True)
-            # self.dlg.resultsReportingLayer.setLayer(abs_input_layer)
+        abs_input_layer = self.model.getInputLayer()
+        if os.path.isfile(abs_input_layer):
+            loaded_layer = qgsUtils.loadVectorLayer(abs_input_layer,loadProject=True)
+            self.dlg.resultsInputLayer.setLayer(loaded_layer)
+        else:
+            utils.warn("Could not find results input layer : " + str(abs_input_layer))
         if self.model.select_expr:
             self.dlg.resultsSelection.setExpression(self.model.select_expr)
         if self.model.reporting_layer:
