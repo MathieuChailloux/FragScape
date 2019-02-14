@@ -29,7 +29,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
-#from .resources import *
+from .resources import *
 # Import the code for the dialog
 from .FragScape_dialog import FragScapeDialog
 from .shared import utils
@@ -207,7 +207,7 @@ class FragScape:
         self.dlg.connectComponents()
         # show the dialog
         self.dlg.show()
-        qgsTreatments.initGdalCommands()
+        #qgsTreatments.initGdalCommands()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
