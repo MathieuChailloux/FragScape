@@ -89,7 +89,7 @@ class ReportingModel(abstract_model.DictModel):
         input_layer = self.getInputLayer()
         if self.select_expr:
             select_path = QgsProcessingUtils.generateTempFilename("reportingSelection.gpkg")
-            qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path)
+            qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path,None,None)
             selected = select_path
         else:
             selected = input_layer
@@ -103,7 +103,6 @@ class ReportingModel(abstract_model.DictModel):
         else:
             utils.internal_error("Unepexted method : " + str(self.method))
         parameters = { meff_algs.EffectiveMeshSizeAlgorithm.INPUT : selected,
-                       #meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : qgsUtils.pathOfLayer(self.layer),
                        meff_algs.EffectiveMeshSizeAlgorithm.REPORTING : self.reporting_layer,
                        meff_algs.EffectiveMeshSizeAlgorithm.CRS : crs,
                        meff_algs.EffectiveMeshSizeAlgorithm.CUT_MODE : cut_mode,
@@ -192,7 +191,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.attribute_model = QgsAttributeTableModel(self.layer_cache)
         self.attribute_model.loadLayer()
         self.dlg.resultsView.setModel(self.attribute_model)
-        #self.dlg.resultsView.show()
+        self.dlg.resultsView.show()
         
     def unloadResults(self):
         self.dlg.resultsGlobalRes.setText(str(0))
