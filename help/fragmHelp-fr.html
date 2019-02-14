@@ -1,0 +1,31 @@
+  <head>
+    <meta name="qrichtext" content="1" />
+    <style type="text/css">p, li { white-space: pre-wrap;}</style>
+  </head>
+  <body style=" font-family:'MS Shell Dlg 2';font-size:8.25pt;font-weight:400;font-style:normal;">
+    <p><span style=" font-size:14pt;font-weight:600;">Fragmentation</span></p>
+    <br />
+    <p style= " font-size:8pt;">
+<b>Description</b>
+<br/>
+ Cette étape permet d'intégrer les éléments fragmentants à la couche produite en étape 2.
+<br/>
+ Pour chaque type d'élément ciblé, il faut renseigner tout ou partie des paramètres puis <i>Enregistrer la sélection</i>. Le paramétrage retenu apparaît alors comme une nouvelle ligne dans la table de visualisation.
+</p><p>
+<b>Paramètres</b>
+<br/>
+ La couche d'entrée contenant les éléments fragmentants peut être ponctuelle, linéaire ou surfaçique. Il est possible de découper cette couche comme en étape 2.
+<br/>
+ <i>Expression</i> : critère de sélection des entités depuis la couche d'entrée. Si l'expression n'est pas renseignée, toutes les entités sont sélectionnées.
+<br/>
+ <i>Tampon</i> : application d'une zone tampon autour des entités sélectionnées pour modéliser leur emprise au sol. Obligatoire pour les données ponctuelles et linéaiares.
+<br/>
+ <i>Identifiant</i>: identifiant unique du paramétrage courant
+ </p><p>
+<b>Résultat</b>
+<br/>
+Pour chaque paramétrage, les traitements associés (découpage, sélection, application de zone tampon) sont effectués et stockés dans une couche correspondant à l'identifiant.
+<br/>
+Toutes ces couches sont alors fusionnées, une différence géométrique est effectuée avec le résultat de l'étape 2 et les polygones résultants sont transformés en géométrie simple. Le résultat de ces traitements est sauvegardé dans la couche <i>DossierDeTravail/outputs/landuseFragmSingleGeom.gpkg</i>.
+    </p>
+  </body>

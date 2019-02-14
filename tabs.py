@@ -49,7 +49,7 @@ class TabItem:
 paramsTabItem = TabItem(0,"Paramètres","paramsHelp")
 landuseTabItem = TabItem(1,"Occupation du sol","landuseHelp")
 fragmTabItem = TabItem(2,"Fragm","fragmHelp")
-resTabItem = TabItem(3,"Résultats","resHelp")
+resTabItem = TabItem(3,"Résultats","reportingHelp")
 logTabItem = TabItem(4,"Journal","logHelp")
         
 class TabConnector:
@@ -74,8 +74,7 @@ class TabConnector:
         if n >= nb_tabs:
             utils.internal_error("[loadNTab] loading " + str(n) + " tab but nb_tabs = " + str(nb_tabs))
         else:
-            pass
-            #self.loadHelpFile()
+            self.loadHelpFile()
             #utils.debug("source : " + str(self.dlg.textShortHelp.source()))
 
     def loadHelpFile(self):
