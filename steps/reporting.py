@@ -65,8 +65,8 @@ class ReportingModel(abstract_model.DictModel):
             # self.input_layer = self.fsModel.fragmModel.getFinalLayer()
         # return self.input_layer
                 
-    def setOutLayer(self,layer):
-        self.out_layer = layer
+    def setOutLayer(self,layer_path):
+        self.out_layer = self.fsModel.normalizePath(layer_path)
         
     def getOutLayer(self):
         if self.out_layer:
@@ -89,7 +89,7 @@ class ReportingModel(abstract_model.DictModel):
         input_layer = self.getInputLayer()
         if self.select_expr:
             select_path = QgsProcessingUtils.generateTempFilename("reportingSelection.gpkg")
-            qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path,None,None)
+            qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path,None,feedback)
             selected = select_path
         else:
             selected = input_layer
