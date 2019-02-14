@@ -254,7 +254,7 @@ class FragmConnector(abstract_model.AbstractConnector):
     def applyItems(self):
         self.dlg.resultsInputLayer.setLayer(None)
         self.dlg.resultsSelection.setLayer(None)
-        #super().applyItems()
+        super().applyItems()
         res_path = self.model.getFinalLayer()
         res_layer = qgsUtils.loadVectorLayer(res_path)
         self.dlg.resultsInputLayer.setLayer(res_layer)

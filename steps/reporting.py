@@ -88,9 +88,9 @@ class ReportingModel(abstract_model.DictModel):
         progress.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
         if self.select_expr:
-            selected = qgsTreatments.extractByExpression(
-                input_layer,self.select_expr,'memory:',
-                context=context,feedback=feedback)
+            select_path = QgsProcessingUtils.generateTempFilename("reportingSelection.gpkg")
+            qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path)
+            selected = select_path
         else:
             selected = input_layer
         crs = self.fsModel.paramsModel.crs
