@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MeffDialogBase</class>
- <widget class="QDialog" name="MeffDialogBase">
+ <class>FragScapeDialogBase</class>
+ <widget class="QDialog" name="FragScapeDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Meff - Mesh effective size</string>
+   <string>FragScape - Landscape fragmentation</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_22">
    <item row="0" column="0" colspan="2">
@@ -82,8 +82,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>780</width>
-            <height>596</height>
+            <width>763</width>
+            <height>647</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -99,7 +99,7 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
+              <iconset>
                <normaloff>:/plugins/eco_cont/icons/frFlag.svg</normaloff>:/plugins/eco_cont/icons/frFlag.svg</iconset>
              </property>
              <property name="checkable">
@@ -125,8 +125,8 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSaveAs.svg</iconset>
+              <iconset>
+               <normaloff>icons/mActionFileSaveAs.svg</normaloff>icons/mActionFileSaveAs.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -148,7 +148,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
+              <iconset>
                <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
              </property>
              <property name="autoRaise">
@@ -165,7 +165,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
+              <iconset>
                <normaloff>:/plugins/eco_cont/icons/enFlag.svg</normaloff>:/plugins/eco_cont/icons/enFlag.svg</iconset>
              </property>
              <property name="checkable">
@@ -197,8 +197,8 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/eco_cont/icons/mActionFileOpen.svg</normaloff>:/plugins/eco_cont/icons/mActionFileOpen.svg</iconset>
+              <iconset>
+               <normaloff>icons/mActionFileOpen.svg</normaloff>icons/mActionFileOpen.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -214,7 +214,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
+              <iconset>
                <normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</normaloff>:/plugins/eco_cont/icons/iconHelpConsole.svg</iconset>
              </property>
              <property name="autoRaise">
@@ -714,7 +714,7 @@
                         <string>Lancer la sélection</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
+                        <iconset>
                          <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                        </property>
                       </widget>
@@ -910,7 +910,7 @@
                             <string>Afficher les valeurs de champ</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="../BioDispersal/resources.qrc">
+                            <iconset>
                              <normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</normaloff>:/plugins/eco_cont/icons/mActionRefresh.svg</iconset>
                            </property>
                           </widget>
@@ -949,7 +949,7 @@
                          <string/>
                         </property>
                         <property name="icon">
-                         <iconset resource="../BioDispersal/resources.qrc">
+                         <iconset>
                           <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                         </property>
                         <property name="autoRaise">
@@ -1442,7 +1442,7 @@
                         <string>Enregistrer la sélection</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
+                        <iconset>
                          <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
                        </property>
                       </widget>
@@ -1490,7 +1490,7 @@
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset resource="../BioDispersal/resources.qrc">
+                     <iconset>
                       <normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</normaloff>:/plugins/eco_cont/icons/mActionDeleteSelected.svg</iconset>
                     </property>
                     <property name="autoRaise">
@@ -1555,7 +1555,7 @@
                         <string>Intégrer les éléments fragmentants</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
+                        <iconset>
                          <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                        </property>
                       </widget>
@@ -1613,7 +1613,7 @@
                   <string>Calculer les indicateurs</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../BioDispersal/resources.qrc">
+                  <iconset>
                    <normaloff>:/plugins/eco_cont/icons/play.svg</normaloff>:/plugins/eco_cont/icons/play.svg</iconset>
                  </property>
                 </widget>
@@ -2019,7 +2019,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../BioDispersal/resources.qrc">
+                    <iconset>
                      <normaloff>:/plugins/eco_cont/icons/debug_icon/mActionAnnotation.svg</normaloff>:/plugins/eco_cont/icons/debug_icon/mActionAnnotation.svg</iconset>
                    </property>
                    <property name="checkable">
@@ -2039,7 +2039,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../BioDispersal/resources.qrc">
+                    <iconset>
                      <normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</normaloff>:/plugins/eco_cont/icons/mActionFileSave.svg</iconset>
                    </property>
                    <property name="autoRaise">
@@ -2056,7 +2056,7 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../BioDispersal/resources.qrc">
+                    <iconset>
                      <normaloff>:/plugins/eco_cont/icons/iconClearConsole.svg</normaloff>:/plugins/eco_cont/icons/iconClearConsole.svg</iconset>
                    </property>
                    <property name="autoRaise">
@@ -2182,7 +2182,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../BioDispersal/resources.qrc">:/plugins/eco_cont/icons/logoIrstea.png</pixmap>
+         <pixmap>:/plugins/eco_cont/icons/logoIrstea.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -2207,7 +2207,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../BioDispersal/resources.qrc">:/plugins/eco_cont/icons/logoTetis.png</pixmap>
+         <pixmap>:/plugins/eco_cont/icons/logoTetis.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
