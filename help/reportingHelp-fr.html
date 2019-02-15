@@ -12,16 +12,18 @@
 </p><p>
 <b>Paramètres</b>
 <br/>
- La couche d'entrée est automatiquement mise à jour et correspond au résultat de l'étape 3.
+ La <i>couche d'entrée</i> est automatiquement mise à jour et correspond au résultat de l'étape 3.
 <br/>
- Il est possible de filtrer les polygones de cette couche d'entrée, par exemple pour éliminer les petits polygones non significatifs, en renseignant l'expression correspondante.
+ Il est possible de <i>filtrer</i> les polygones de cette couche d'entrée, par exemple pour éliminer les petits polygones non significatifs, en renseignant l'expression correspondante.
 <br/>
- La couche de rapportage correspond à la couche de découpage en unités territoriales (région forestière, département, ...). Les indicateurs de fragmentation seront calculés pour chaque entité (il est possible de n'avoir qu'une seule entité correspondant à l'ensemble du territoire).
+ La <i>couche de rapportage</i> correspond à la couche de découpage en unités territoriales (région forestière, département, ...). Les indicateurs de fragmentation seront calculés pour chaque unité (il est possible de n'avoir qu'une seule entité correspondant à l'ensemble du territoire).
 <br/>
- La méthode de découpage TODO
+ La <i>méthode de découpage</i> détermine la manière de gérer les polygones intersectant la bordure de la couche de rapportage. La méthode <i>CUT</i> découpe ces polygones en ne considérant que l'intersection avec la couche de rapportage. La méthode <i>CBC</i> pondère cette intersection par l'aire du polygone initial. Pour appliquer la méthode <i>CBC</i> de façon pertinente, il faut alors que les données d'entrée du plugin couvre une emprise plus large que celle de la couche de rapportage.
 </p><p>
 <b>Résultat</b>
 <br/>
-TODO
+La taille effective de maille de l'ensemble du territoire est affichée dans l'interface graphique.
+<br/>
+La <i>couche de sortie</i> contien différents indicateurs de fragmentation liés entre eux, dont la taille effective de maille, pour chaque unité territoriale.
     </p>
   </body>

@@ -543,7 +543,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             dissolved_feat = f
         assert(dissolved_feat is not None)
         dissolved_geom = dissolved_feat.geometry()
-        dissolved_area = dissolved_geom.area() / 1000
+        dissolved_area = dissolved_geom.area() / 1000000
         # Output fields
         report_id_field = QgsField(self.ID, QVariant.Int)
         nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
