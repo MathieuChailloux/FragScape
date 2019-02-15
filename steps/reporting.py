@@ -89,6 +89,7 @@ class ReportingModel(abstract_model.DictModel):
         input_layer = self.getInputLayer()
         if self.select_expr:
             select_path = params.mkTmpLayerPath("reportingSelection.gpkg")
+            qgsUtils.removeVectorLayer(select_path)
             qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path,None,feedback)
             selected = select_path
         else:
