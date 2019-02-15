@@ -52,6 +52,11 @@ class FragmItem(abstract_model.DictItem):
     def equals(self,other):
         return (self.dict[self.NAME_FIELD] == other.dict[self.NAME_FIELD])
         
+    def getOutputLayer(self):
+        name = self.dict[self.NAME_FIELD]
+        self.outputLayer = params.mkTmpLayerPath(name + ".gpkg")
+        return self.outputLayer
+        
     def getSelectionLayer(self):
         if not self.selectionLayer:
             name = self.dict[self.NAME_FIELD]
@@ -181,25 +186,26 @@ class FragmModel(abstract_model.DictModel):
             utils.debug("buffer_expr : " + str(buffer_expr))
             #assert(buffer_expr != "")
             #buffer_expr = ""
-            selectionPath = item.getSelectionLayer()
+            outPath = item.getOutputLayer()
             name = item.dict[self.PREPARE_NAME]
             parameters = { self.PREPARE_INPUT : in_layer_abs_path,
                            self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
                            self.PREPARE_SELECT_EXPR : select_expr,
                            self.PREPARE_BUFFER : buffer_expr,
                            self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
-                           self.PREPARE_OUTPUT : selectionPath }
+                           self.PREPARE_OUTPUT : outPath }
             prepared = qgsTreatments.applyProcessingAlg(
                 "FragScape","prepareFragm",parameters,
                 context=context,feedback=feedback)
             #qgsUtils.loadVectorLayer(prepared,loadProject=True)
             prepared_layers.append(prepared)
         landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
+        crs = self.fsModel.paramsModel.crs
         #res_path = self.getFinalLayer()
         #qgsUtils.removeVectorLayer(res_path)
         parameters = { self.APPLY_LANDUSE : landuseLayer,
                        self.APPLY_FRAGMENTATION : prepared_layers,
-                       self.APPLY_CRS : params.defaultCrs,
+                       self.APPLY_CRS : crs,
                        self.APPLY_OUTPUT : res_path }
         res = qgsTreatments.applyProcessingAlg(
             "FragScape","applyFragm",parameters,
