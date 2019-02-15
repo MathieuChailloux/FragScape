@@ -187,6 +187,7 @@ class FragmModel(abstract_model.DictModel):
                            self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
                            self.PREPARE_SELECT_EXPR : select_expr,
                            self.PREPARE_BUFFER : buffer_expr,
+                           self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
                            self.PREPARE_OUTPUT : selectionPath }
             prepared = qgsTreatments.applyProcessingAlg(
                 "FragScape","prepareFragm",parameters,

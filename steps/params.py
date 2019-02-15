@@ -106,6 +106,7 @@ defaultCrs = QgsCoordinateReferenceSystem("EPSG:2154")
 def mkTmpLayerPath(layer_name):
     if params is None:
         utils.warn("Parameter module not initialized")
+        #assert(False)
         path = QgsProcessingUtils(layer_name)
     elif params.save_tmp:
         path = utils.joinPath(params.tmpDir,layer_name)

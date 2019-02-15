@@ -88,21 +88,31 @@ def isGeopackage(path):
 def getLayerByFilename(fname):
     #map_layers = QgsProject.instance().mapLayersByName(fname)
     map_layers = QgsProject.instance().mapLayers().values()
-    utils.debug("map_layers(" + fname + ") : " + str(map_layers))
+    #utils.debug("map_layers(" + fname + ") : " + str(map_layers))
     fname_parts = Path(fname).parts
-    utils.debug("fname_parts = " + str(fname_parts))
+    #utils.debug("fname_parts = " + str(fname_parts))
     for layer in map_layers:
         utils.debug("layer : " + str(layer))
         layer_path = pathOfLayer(layer)
         path_parts = Path(layer_path).parts
-        utils.debug("path_parts = " + str(path_parts))
+        #utils.debug("path_parts = " + str(path_parts))
         if fname_parts == path_parts:
             return layer
     else:
         return None
        
 def isLayerLoaded(fname):
-    return (getLayerByFilename(fname) != None)    
+    return (getLayerByFilename(fname) != None)
+    
+def normalizeEncoding(layer):
+    path = pathOfLayer(layer)
+    extension = os.path.splitext(path)[1]
+    if extension == ".shp" and (utils.platform_sys in ["Linux","Darwin"]):
+        layer.dataProvider().setEncoding('Latin-1')
+    elif extension == ".shp":
+        layer.dataProvider().setEncoding('System')
+    elif extension == ".gpkg":
+        layer.dataProvider().setEncoding('UTF-8')
        
 # Opens vector layer from path.
 # If loadProject is True, layer is added to QGIS project
@@ -112,15 +122,19 @@ def loadVectorLayer(fname,loadProject=False):
     if isLayerLoaded(fname):
        return getLayerByFilename(fname)
     layer = QgsVectorLayer(fname, layerNameOfPath(fname), "ogr")
-    extension = os.path.splitext(fname)[1]
+    #extension = os.path.splitext(fname)[1]
     if layer == None:
         utils.user_error("Could not load vector layer '" + fname + "'")
     if not layer.isValid():
         utils.user_error("Invalid vector layer '" + fname + "'")
-    if extension == ".shp" and (utils.platform_sys in ["Linux","Darwin"]):
-        layer.dataProvider().setEncoding('Latin-1')
-    else:
-        layer.dataProvider().setEncoding('System')
+    #utils.debug("extension '" + str(fname) + "': " + str(extension))
+    # if extension == ".shp" and (utils.platform_sys in ["Linux","Darwin"]):
+        # layer.dataProvider().setEncoding('Latin-1')
+    # elif extension == ".shp":
+        # layer.dataProvider().setEncoding('System')
+    # elif extension == ".gpkg":
+        # layer.dataProvider().setEncoding('UTF-8')
+    normalizeEncoding(layer)
     if loadProject:
         QgsProject.instance().addMapLayer(layer)
     return layer

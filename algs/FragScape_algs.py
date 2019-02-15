@@ -129,6 +129,7 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo("input = " + str(input))
         if input is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        qgsUtils.normalizeEncoding(input)
         feedback.pushDebugInfo("input ok")
         clip_layer = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
@@ -219,6 +220,8 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         input = self.parameterAsVectorLayer(parameters,self.INPUT,context)
         if input is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        qgsUtils.normalizeEncoding(input)
+        #input = qgsUtils.loadVectorLayer(parameters[self.INPUT])
         clip = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         clip_flag = (clip is None)
         select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
@@ -309,6 +312,7 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         landuse = self.parameterAsVectorLayer(parameters,self.LANDUSE,context)
         if landuse is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
+        qgsUtils.normalizeEncoding(landuse)
         fragm_layers = self.parameterAsLayerList(parameters,self.FRAGMENTATION,context)
         #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
         crs = self.parameterAsCrs(parameters,self.CRS,context)

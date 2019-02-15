@@ -275,7 +275,7 @@ def applyVectorClip(in_layer,clip_layer,out_layer,context=None,feedback=None):
     parameters = { 'INPUT' : in_layer,
                    'OUTPUT' : out_layer,
                    'OVERLAY' : clip_layer }
-    res = applyProcessingAlg("native","clip",parameters,context,feedback)
+    res = applyProcessingAlg("qgis","clip",parameters,context,feedback)
     return res
     
 def applyReprojectLayer(in_layer,target_crs,out_layer,context=None,feedback=None):
