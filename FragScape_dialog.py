@@ -75,7 +75,7 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         self.context.setFeedback(progress.progressFeedback)
         self.fsModel = FragScapeModel(self.context,progress.progressFeedback)
         self.paramsConnector = params.ParamsConnector(self,self.fsModel.paramsModel)
-        #params.params = self.paramsConnector.model
+        params.params = self.paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self,self.fsModel.landuseModel)
         #landuse.landuseModel = self.landuseConnector.model
         self.fragmConnector = fragm.FragmConnector(self,self.fsModel.fragmModel)

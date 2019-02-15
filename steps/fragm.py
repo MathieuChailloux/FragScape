@@ -55,13 +55,15 @@ class FragmItem(abstract_model.DictItem):
     def getSelectionLayer(self):
         if not self.selectionLayer:
             name = self.dict[self.NAME_FIELD]
-            self.selectionLayer = QgsProcessingUtils.generateTempFilename(name + ".gpkg")
+            self.selectionLayer = params.mkTmpLayerPath(name + ".gpkg")
+            #self.selectionLayer = QgsProcessingUtils.generateTempFilename(name + ".gpkg")
         return self.selectionLayer
        
     def getBufferLayer(self):
         if not self.bufferLayer:
             name = self.dict[self.NAME_FIELD]
-            self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
+            self.bufferLayer = params.mkTmpLayerPath(name + "_buf.gpkg")
+            #self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
         return self.bufferLayer
         
     # def instantiateSelectionLayer(self):
@@ -108,13 +110,13 @@ class FragmModel(abstract_model.DictModel):
             return FragmItem(dict)
         
     def getFragmLayer(self):
-        return QgsProcessingUtils.generateTempFilename("fragm.gpkg")
+        return params.mkTmpLayerPath("fragm.gpkg")
         
     def getBuffersMergedLayer(self):
-        return QgsProcessingUtils.generateTempFilename("fragmBuffersMerged.shp")
+        return params.mkTmpLayerPath("fragmBuffersMerged.shp")
         
     def getLanduseFragmLayer(self):
-        return QgsProcessingUtils.generateTempFilename("landuseFragm.gpkg")
+        return params.mkTmpLayerPath("landuseFragm.gpkg")
         
     def getFinalLayer(self):
         #return self.fsModel.mkOutputFile("landuseFragmSingleGeom.gpkg")

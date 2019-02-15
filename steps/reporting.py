@@ -72,7 +72,7 @@ class ReportingModel(abstract_model.DictModel):
         if self.out_layer:
             return self.fsModel.getOrigPath(self.out_layer)
         else:
-            return QgsProcessingUtils.generateTempFilename("reportingResults.gpkg")
+            return params.mkTmpLayerPath("reportingResults.gpkg")
         
     def mkIntersectionLayer(self):
         pass
@@ -88,7 +88,7 @@ class ReportingModel(abstract_model.DictModel):
         progress.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
         if self.select_expr:
-            select_path = QgsProcessingUtils.generateTempFilename("reportingSelection.gpkg")
+            select_path = params.mkTmpLayerPath("reportingSelection.gpkg")
             qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path,None,feedback)
             selected = select_path
         else:

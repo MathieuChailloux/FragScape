@@ -36,6 +36,7 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterCrs,
                        QgsProcessingParameterVectorDestination,
                        QgsProcessingParameterFile,
+                       QgsProcessingParameterString,
                        QgsProperty,
                        QgsWkbTypes)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
@@ -131,17 +132,17 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("input ok")
         clip_layer = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        select_layer = QgsProcessingUtils.generateTempFilename("select.gpkg")
+        select_layer = params.mkTmpLayerPath("select.gpkg")
         feedback.pushDebugInfo("select_layer = " + str(select_layer))
         if clip_layer is None:
             clipped = input
         else:
-            clipped_path = QgsProcessingUtils.generateTempFilename('landuseClipped.gpkg')
+            clipped_path = params.mkTmpLayerPath('landuseClipped.gpkg')
             qgsTreatments.applyVectorClip(input,clip_layer,clipped_path,context,feedback)
             clipped = qgsUtils.loadVectorLayer(clipped_path)
             utils.debug("clipped  = " + str(clipped))
             #clipped = clipped_path
-        selected_path = QgsProcessingUtils.generateTempFilename('landuseSelection.gpkg')
+        selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
         qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
         #selected = qgsUtils.loadVectorLayer(selected_path)
         #selected = qgsTreatments.extractByExpression(
@@ -160,6 +161,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
     CLIP_LAYER = "CLIP_LAYER"
     SELECT_EXPR = "SELECT_EXPR"
     BUFFER = "BUFFER_EXPR"
+    NAME = "NAME"
     OUTPUT = "OUTPUT"
     
     def tr(self, string):
@@ -202,6 +204,11 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
                 parentLayerParameterName=self.INPUT,
                 optional=True))
         self.addParameter(
+            QgsProcessingParameterString(
+                self.NAME,
+                description=self.tr("Identifier"),
+                optional=True))
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
                 description=self.tr("Output layer")))
@@ -218,6 +225,9 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         #feedback.pushDebugInfo("select_expr : " + str(select_expr))
         #feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
         buffer_expr = self.parameterAsExpression(parameters,self.BUFFER,context)
+        name = self.parameterAsString(parameters,self.NAME,context)
+        if not name:
+            name = 'fragm'
         #buffer_expr = ""
         #feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
         #if buffer_expr == "" and input.geometryType() != QgsWkbTypes.PolygonGeometry:
@@ -226,14 +236,14 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         if clip is None:
             clipped = input
         else:
-            clipped_path = QgsProcessingUtils.generateTempFilename('fragmClipped.gpkg')
+            clipped_path = params.mkTmpLayerPath(name + 'Clipped.gpkg')
             qgsTreatments.applyVectorClip(input,clip,clipped_path,context,feedback)
             clipped = qgsUtils.loadVectorLayer(clipped_path)
         if select_expr == "":
             selected = clipped
         else:
-            selected_path = QgsProcessingUtils.generateTempFilename('tmp.gpkg')
-            qgsTreatments.selectGeomByExpression(clipped,select_expr,selected_path,'tmp')
+            selected_path = params.mkTmpLayerPath(name + 'Selected.gpkg')
+            qgsTreatments.selectGeomByExpression(clipped,select_expr,selected_path,name)
             #selected = qgsUtils.loadVectorLayer(selected_path)
             selected = selected_path
             #selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
@@ -304,7 +314,7 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         crs = self.parameterAsCrs(parameters,self.CRS,context)
         output = parameters[self.OUTPUT]
         # Merge fragmentation layers
-        fragm_path = QgsProcessingUtils.generateTempFilename("fragm.gpkg")
+        fragm_path = params.mkTmpLayerPath("fragm.gpkg")
         fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,crs,fragm_path)
         feedback.pushDebugInfo("fragm_layer = " + str(fragm_layer))
         if fragm_layer is None:
@@ -513,15 +523,15 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("reporting_crs = " + str(reporting_crs))
         feedback.pushDebugInfo("crs = " + str(crs.authid()))
         if source_crs != crs.authid():
-            source_path = QgsProcessingUtils.generateTempFilename('source_reproject.gpkg')
+            source_path = params.mkTmpLayerPath('source_reproject.gpkg')
             qgsTreatments.applyReprojectLayer(source,crs,source_path,context,feedback)
             source = qgsUtils.loadVectorLayer(source_path)
         if reporting_crs != crs.authid():
-            reporting_path = QgsProcessingUtils.generateTempFilename('reporting_reproject.gpkg')
+            reporting_path = params.mkTmpLayerPath('reporting_reproject.gpkg')
             qgsTreatments.applyReprojectLayer(reporting,crs,reporting_path,context,feedback)
             reporting = qgsUtils.loadVectorLayer(reporting_path)
         # Dissolved
-        dissolved_path = QgsProcessingUtils.generateTempFilename('reporting_dissolved.gpkg')
+        dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
         dissolved = qgsTreatments.dissolveLayer(reporting,dissolved_path,context,feedback)
         dissolved_layer = qgsUtils.loadVectorLayer(dissolved)
         dissolved_feat = None

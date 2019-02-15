@@ -25,7 +25,7 @@
 import os.path
 import pathlib
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle, QgsProject, QgsCoordinateTransform
+from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle, QgsProject, QgsCoordinateTransform, QgsProcessingUtils
 from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QHeaderView
@@ -102,13 +102,23 @@ defaultCrs = QgsCoordinateReferenceSystem("EPSG:2154")
     # checkWorkspaceInit()
     # new_path = utils.joinPath(params.outputDir,name)
     # return new_path
+    
+def mkTmpLayerPath(layer_name):
+    if params is None:
+        utils.warn("Parameter module not initialized")
+        path = QgsProcessingUtils(layer_name)
+    elif params.save_tmp:
+        path = utils.joinPath(params.tmpDir,layer_name)
+    else:
+        path = QgsProcessingUtils.generateTempFilename(layer_name)
+    return path
         
 #class ParamsModel(abstract_model.AbstractGroupModel):
 class ParamsModel(QAbstractTableModel):
 
     WORKSPACE = "workspace"
-    CLIP = "clip"
     PROJECT = "projectFile"
+    SAVE_TMP = "saveTmpFiles"
     CRS = "crs"
 
     def __init__(self,fsModel):
@@ -116,8 +126,10 @@ class ParamsModel(QAbstractTableModel):
         self.fsModel = fsModel
         self.workspace = None
         self.outputDir = None
+        self.tmpDir = None
         #self.dataClipFlag = True
         self.projectFile = ""
+        self.save_tmp = False
         self.crs = defaultCrs
         self.fields = [self.WORKSPACE,self.PROJECT,self.CRS]
         QAbstractTableModel.__init__(self)
@@ -127,6 +139,14 @@ class ParamsModel(QAbstractTableModel):
         
     # def switchDataClipFlag(self):
         # self.dataClipFlag = not self.dataClipFlag
+        
+    def setSaveTmp(self,state):
+        if state == 0:
+            self.save_tmp = False
+        elif state == 2:
+            self.save_tmp = True
+        else:
+            utils.internal_error("Unexpected state for save_tmp checkbox : " + str(state))
         
     def setCrs(self,crs):
         utils.info("Setting extent CRS to " + crs.description())
@@ -152,6 +172,7 @@ class ParamsModel(QAbstractTableModel):
         if not os.path.isdir(norm_path):
             utils.user_error("Directory '" + norm_path + "' does not exist")
         self.outputDir = utils.createSubdir(norm_path,"outputs")
+        self.tmpDir = utils.createSubdir(norm_path,"tmp")
         
     """ Path/workspace utils """
     # Checks that workspace is intialized and is an existing directory.
@@ -269,6 +290,7 @@ class ParamsConnector:
         #self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         self.dlg.workspace.setStorageMode(QgsFileWidget.GetDirectory)
         self.dlg.workspace.fileChanged.connect(self.model.setWorkspace)
+        self.dlg.saveTmpResultsFlag.stateChanged.connect(self.model.setSaveTmp)
         self.dlg.paramsCrs.crsChanged.connect(self.model.setCrs)
         header = self.dlg.paramsView.horizontalHeader()     
         header.setSectionResizeMode(0, QHeaderView.Stretch)
