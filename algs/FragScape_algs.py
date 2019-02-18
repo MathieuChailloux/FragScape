@@ -590,6 +590,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         # first_pass = True
         global_net_product = 0
         global_area = 0
+        global_patches_area = 0
         global_nb_feats = 0
         # gna gna
         for report_feat in reporting.getFeatures():
@@ -628,6 +629,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                         net_product += f_area * intersection_area
                     new_f[self.COHERENCE] += pow(f_area / report_area,2)
                     if f.id() not in treated_fids:
+                        global_patches_area += f_area
                         intersection = f_geom.intersection(dissolved_geom)
                         intersection_area = intersection.area() / 1000000
                         if cut_mode:
@@ -642,7 +644,7 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                 report_area_sq = report_area * report_patches_area
             new_f[self.NET_PRODUCT] = net_product
             new_f[self.INTERSECTING_AREA] = intersecting_area
-            new_f[self.COHERENCE] = net_product / report_area_sq
+            new_f[self.COHERENCE] = net_product / report_area_sq if report_area_sq > 0 else 0
             new_f[self.SPLITTING_DENSITY] = report_area / net_product if net_product > 0 else 0
             new_f[self.MESH_SIZE] = net_product / report_area
             new_f[self.SPLITTING_INDEX] = report_area_sq / net_product if net_product > 0 else 0
