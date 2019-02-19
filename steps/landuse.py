@@ -42,7 +42,7 @@ class LanduseFieldItem(abstract_model.DictItem):
               TO_SELECT_FIELD]
 
     def __init__(self,val,descr="",toSelect=False):
-        dict = { self.VALUE_FIELD : val,
+        dict = { self.VALUE_FIELD : str(val),
                  self.DESCR_FIELD : descr,
                  self.TO_SELECT_FIELD : toSelect }
         super().__init__(dict)#,fields=self.FIELDS)
