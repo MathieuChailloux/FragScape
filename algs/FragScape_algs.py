@@ -621,13 +621,15 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                     report_patches_area += f_area
                     intersection = f_geom.intersection(report_geom)
                     intersection_area = intersection.area() / 1000000
+                    #feedback.pushDebugInfo("f_area : " + str(f_area))
+                    #feedback.pushDebugInfo("intersection_area : " + str(intersection_area))
+                    #assert(intersection_area <= f_area)
                     intersecting_area += intersection_area
                     new_f[self.NB_PATCHES] += 1
                     if cut_mode:
                         net_product += intersection_area * intersection_area
                     else:
                         net_product += f_area * intersection_area
-                    new_f[self.COHERENCE] += pow(f_area / report_area,2)
                     if f.id() not in treated_fids:
                         global_patches_area += f_area
                         intersection = f_geom.intersection(dissolved_geom)

@@ -72,7 +72,7 @@ class FragScape:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Mesh Effective Size')
+        self.menu = self.tr(u'&FragScape')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'FragScape')
         self.toolbar.setObjectName(u'FragScape')
@@ -173,7 +173,7 @@ class FragScape:
         icon_path = ':/plugins/FragScape/icons/vector_grid.svg'
         self.add_action(
             icon_path,
-            text=self.tr(u'Mesh Effective Size'),
+            text=self.tr(u'FragScape'),
             callback=self.run,
             parent=self.iface.mainWindow())
             
@@ -186,7 +186,7 @@ class FragScape:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Mesh Effective Size'),
+                self.tr(u'&FragScape'),
                 action)
             self.iface.removeToolBarIcon(action)
         # Exceptions hook 
