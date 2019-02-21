@@ -35,7 +35,7 @@ from PyQt5.QtCore import QTranslator, qVersion, QCoreApplication
 from qgis.gui import QgsFileWidget
 from qgis.core import QgsApplication, QgsProcessingContext
 
-from .shared import utils, progress, config_parsing, log, qgsTreatments
+from .qgis_lib_mc import utils, qgsUtils, feedbacks, config_parsing, log, qgsTreatments
 from .algs.FragScape_algs import FragScapeAlgorithmsProvider
 from .algs.FragScape_global_alg import FragScapeAlgorithm
 from .steps import params, landuse, fragm, reporting
@@ -68,12 +68,12 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         global progressFeedback
         logConnector = log.LogConnector(self)
         logConnector.initGui()
-        self.feedback =  progress.ProgressFeedback(self)
-        progress.progressFeedback = self.feedback
-        utils.debug("progressFeedback = " + str(progress.progressFeedback))
+        self.feedback =  feedbacks.ProgressFeedback(self)
+        feedbacks.progressFeedback = self.feedback
+        utils.debug("progressFeedback = " + str(feedbacks.progressFeedback))
         self.context = QgsProcessingContext()
-        self.context.setFeedback(progress.progressFeedback)
-        self.fsModel = FragScapeModel(self.context,progress.progressFeedback)
+        self.context.setFeedback(feedbacks.progressFeedback)
+        self.fsModel = FragScapeModel(self.context,feedbacks.progressFeedback)
         self.paramsConnector = params.ParamsConnector(self,self.fsModel.paramsModel)
         params.params = self.paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self,self.fsModel.landuseModel)
@@ -81,15 +81,15 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         self.fragmConnector = fragm.FragmConnector(self,self.fsModel.fragmModel)
         #fragm.fragmModel = self.fragmConnector.model
         self.reportingConnector = reporting.ReportingConnector(self,self.fsModel.reportingModel)
-        # progressConnector = progress.ProgressConnector(self)
-        # progress.progressConnector = progressConnector
+        # progressConnector = feedbacks.ProgressConnector(self)
+        # feedbacks.progressConnector = progressConnector
         tabConnector = tabs.TabConnector(self)
         self.connectors = {"Params" : self.paramsConnector,
                            "Log" : logConnector,
                            "Landuse" : self.landuseConnector,
                            "Fragm" : self.fragmConnector,
                            "Reporting" : self.reportingConnector,
-                           "Progress" : progress.progressFeedback,
+                           "Progress" : feedbacks.progressFeedback,
                            "Tabs" : tabConnector}
         self.recomputeParsers()
         
@@ -120,17 +120,17 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
             final_msg = tbinfo + "\n" + msg
             utils.error_msg(final_msg,prefix="Unexpected error")
         self.mTabWidget.setCurrentWidget(self.logTab)
-        #progress.progressConnector.clear()
+        #feedbacks.progressConnector.clear()
         
     # Connects view and model components for each tab.
     # Connects global elements such as project file and language management.
     def connectComponents(self):
         for k, tab in self.connectors.items():
             tab.connectComponents()
-        utils.debug("progressFeedback cc = " + str(progress.progressFeedback))
-        utils.debug("progressFeedback cc type = " + str(type(progress.progressFeedback)))
-        utils.debug("progressFeedback cc type = " + str(progress.progressFeedback.__class__))
-        utils.debug("progressFeedback cc type = " + str(progress.progressFeedback is None))
+        utils.debug("progressFeedback cc = " + str(feedbacks.progressFeedback))
+        utils.debug("progressFeedback cc type = " + str(type(feedbacks.progressFeedback)))
+        utils.debug("progressFeedback cc type = " + str(feedbacks.progressFeedback.__class__))
+        utils.debug("progressFeedback cc type = " + str(feedbacks.progressFeedback is None))
         # Main tab connectors
         self.saveProjectAs.clicked.connect(self.saveModelAsAction)
         self.saveProject.clicked.connect(self.saveModel)
@@ -138,9 +138,9 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         self.langEn.clicked.connect(self.switchLangEn)
         self.langFr.clicked.connect(self.switchLangFr)
         self.aboutButton.clicked.connect(self.openHelpDialog)
-        #progressFeedback = progress.ProgressFeedback(self)
-        progress.progressFeedback.connectComponents()
-        #progress.progressFeedback = progressFeedback
+        #progressFeedback = feedbacks.ProgressFeedback(self)
+        feedbacks.progressFeedback.connectComponents()
+        #feedbacks.progressFeedback = progressFeedback
         #qgsTreatments.setProgressFeedback(progressFeedback)
         sys.excepthook = self.bioDispHook
         
@@ -240,6 +240,6 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         utils.info("FragScape model loaded from file '" + fname + "'")
         
     def loadModelAction(self):
-        fname = utils.openFileDialog(parent=self,msg="Ouvrir le projet",filter="*.xml")
+        fname =qgsUtils.openFileDialog(parent=self,msg="Ouvrir le projet",filter="*.xml")
         if fname:
             self.loadModel(fname)

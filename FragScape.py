@@ -32,8 +32,7 @@ from PyQt5.QtWidgets import QAction
 from .resources import *
 # Import the code for the dialog
 from .FragScape_dialog import FragScapeDialog
-from .shared import utils
-from .shared import qgsTreatments
+from .qgis_lib_mc import utils, qgsTreatments
 
 from qgis.utils import qgis_excepthook
 

@@ -30,7 +30,7 @@ from qgis.utils import iface
 from PyQt5.QtCore import QVariant
 from processing import QgsProcessingUtils
 
-from ..shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
+from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
 from ..algs import FragScape_algs
 from . import params, fragm
 
@@ -85,7 +85,7 @@ class ReportingModel(abstract_model.DictModel):
                 
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
-        progress.progressFeedback.beginSection(reportingMsg)
+        feedbacks.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
         if self.select_expr:
             select_path = params.mkTmpLayerPath("reportingSelection.gpkg")
@@ -113,7 +113,7 @@ class ReportingModel(abstract_model.DictModel):
             context=context,feedback=feedback,onlyOutput=False)
         out_path = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
         qgsUtils.loadVectorLayer(out_path,loadProject=True)
-        progress.progressFeedback.endSection()
+        feedbacks.progressFeedback.endSection()
         return res
                 
     def toXML(self,indent=" "):

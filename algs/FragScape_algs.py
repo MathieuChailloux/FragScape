@@ -44,7 +44,7 @@ from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 import processing
 import xml.etree.ElementTree as ET
 
-from ..shared import utils, qgsTreatments, qgsUtils
+from ..qgis_lib_mc import utils, qgsTreatments, qgsUtils
 from ..steps import params
 
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):

@@ -35,7 +35,7 @@ from qgis.core import (QgsProcessingProvider,
 import processing
 import xml.etree.ElementTree as ET
 
-from ..shared import utils, qgsUtils, progress
+from ..qgis_lib_mc import utils, qgsUtils, feedbacks
 from ..FragScape_model import FragScapeModel
 
 class FragScapeAlgorithm(QgsProcessingAlgorithm):
@@ -88,7 +88,7 @@ class FragScapeAlgorithm(QgsProcessingAlgorithm):
             f.write("FragScape from configuration file " + str(log_file) + "\n")
             #raise QgsProcessingException("Log file " + str(log_file) + " already exists")
         print("args ok")
-        log_feedback = progress.FileFeedback(log_file)
+        log_feedback = feedbacks.FileFeedback(log_file)
         print("args ok")
         log_feedback.pushInfo("test")
         config_file = self.parameterAsFile(parameters,self.INPUT_CONFIG,context)

@@ -22,7 +22,7 @@
  ***************************************************************************/
 """
 
-from .shared import utils
+from .qgis_lib_mc import utils
 from .steps import params, landuse, fragm,  reporting
 
 class FragScapeModel:

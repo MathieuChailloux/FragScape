@@ -1,0 +1,4 @@
+qgis_lib_mc
+__pycache__/
+algs/__pycache__/
+steps/__pycache__/

@@ -29,7 +29,7 @@ from qgis.core import QgsProject, QgsMapLayerProxyModel, QgsVectorLayer, QgsProc
 import processing
 from processing import QgsProcessingUtils
 
-from ..shared import utils, abstract_model, qgsUtils, qgsTreatments, progress
+from ..qgis_lib_mc import utils, abstract_model, qgsUtils, qgsTreatments, feedbacks
 from ..algs import FragScape_algs
 from . import params, landuse
 
@@ -129,7 +129,7 @@ class FragmModel(abstract_model.DictModel):
         
     # def applyItemsOld(self,indexes):
         # fragmMsg = "Application of fragmentation data to landuse"
-        # progress.progressFeedback.beginSection(fragmMsg)
+        # feedbacks.progressFeedback.beginSection(fragmMsg)
         # for item in self.items:
             # in_layer_path = self.fsModel.getOrigPath(item.dict["in_layer"])
             # in_layer = qgsUtils.loadVectorLayer(in_layer_path)
@@ -162,11 +162,11 @@ class FragmModel(abstract_model.DictModel):
         # qgsUtils.normFids(singleGeomLayer)
         # qgsUtils.writeVectorLayer(singleGeomLayer,singleGeomPath)
         # qgsUtils.loadVectorLayer(singleGeomPath,loadProject=True)
-        # progress.progressFeedback.endSection()
+        # feedbacks.progressFeedback.endSection()
         
     def applyItemsWithContext(self,context,feedback,indexes=None):
         fragmMsg = "Application of fragmentation data to landuse"
-        progress.progressFeedback.beginSection(fragmMsg)
+        feedbacks.progressFeedback.beginSection(fragmMsg)
         #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         #clip_layer = self.clip_layer if self.dataClipFlag else None
         prepared_layers = []
@@ -211,7 +211,7 @@ class FragmModel(abstract_model.DictModel):
             "FragScape","applyFragm",parameters,
             context=context,feedback=feedback)
         qgsUtils.loadVectorLayer(res_path,loadProject=True)
-        progress.progressFeedback.endSection()
+        feedbacks.progressFeedback.endSection()
         return res
             
     def fromXMLRoot(self,root):

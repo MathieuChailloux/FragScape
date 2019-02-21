@@ -30,7 +30,7 @@ from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QHeaderView
 
-from ..shared import utils, qgsUtils, qgsTreatments, abstract_model
+from ..qgis_lib_mc import utils, qgsUtils, qgsTreatments, abstract_model
 
 # FragScape global parameters
 

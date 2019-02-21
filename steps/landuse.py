@@ -25,7 +25,7 @@
 from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsFieldProxyModel
 # from PyQt5 import QtGui, QtCore, QtWidgets
 # from PyQt5.QtCore import QCoreApplication
-from ..shared import utils, abstract_model, qgsUtils, progress, qgsTreatments
+from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
 from ..algs import FragScape_algs 
 from . import params
 
@@ -172,7 +172,7 @@ class LanduseModel(abstract_model.DictModel):
         return expr
                 
     def applyItemsWithContext(self,context,feedback):
-        progress.progressFeedback.beginSection("Landuse classification")
+        feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
         self.checkFieldSelected()
@@ -196,7 +196,7 @@ class LanduseModel(abstract_model.DictModel):
             "FragScape","prepareLanduse",parameters,
             context,feedback)
         qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
-        progress.progressFeedback.endSection()
+        feedbacks.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
