@@ -29,7 +29,7 @@ from PyQt5.QtCore import QCoreApplication, QVariant
 from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException
 from qgis.core import (QgsProcessingProvider,
                        QgsProcessingParameterVectorDestination,
-                       QgsProcessingParameterFile)
+                       QgsProcessingParameterFile, QgsProcessingParameterFileDestination)
 #from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
@@ -66,7 +66,7 @@ class FragScapeAlgorithm(QgsProcessingAlgorithm):
                 self.INPUT_CONFIG,
                 description=self.tr("Input configuration file")))
         self.addParameter(
-            QgsProcessingParameterFile(
+            QgsProcessingParameterFileDestination(
                 self.LOG_FILE,
                 description=self.tr("Log file")))
         self.addParameter(
