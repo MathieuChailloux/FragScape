@@ -87,7 +87,8 @@ class ReportingModel(abstract_model.DictModel):
         reportingMsg = "Reporting layer computation"
         feedbacks.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
-        if self.select_expr:
+        #if self.select_expr:
+        if False:
             select_path = params.mkTmpLayerPath("reportingSelection.gpkg")
             qgsUtils.removeVectorLayer(select_path)
             qgsTreatments.extractByExpression(input_layer,self.select_expr,select_path,None,feedback)
@@ -96,25 +97,49 @@ class ReportingModel(abstract_model.DictModel):
             selected = input_layer
         crs = self.fsModel.paramsModel.crs
         results_path = self.getOutLayer()
+        global_results_path = params.mkTmpLayerPath("reportingResultsGlobal.gpkg")
         qgsUtils.removeVectorLayer(results_path)
+        qgsUtils.removeVectorLayer(global_results_path)
         if self.method == self.CUT_METHOD:
             cut_mode = True
         elif self.method == self.CBC_METHOD:
             cut_mode = False
         else:
-            utils.internal_error("Unepexted method : " + str(self.method))
-        parameters = { FragScape_algs.EffectiveMeshSizeAlgorithm.INPUT : selected,
-                       FragScape_algs.EffectiveMeshSizeAlgorithm.REPORTING : self.reporting_layer,
-                       FragScape_algs.EffectiveMeshSizeAlgorithm.CRS : crs,
-                       FragScape_algs.EffectiveMeshSizeAlgorithm.CUT_MODE : cut_mode,
-                       FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT : results_path }
-        res = qgsTreatments.applyProcessingAlg(
-            "FragScape","effectiveMeshSize",parameters,
+            utils.internal_error("Unexpected method : " + str(self.method))
+        parameters1 = { FragScape_algs.EffectiveMeshSizeReportingAlgorithm.INPUT : selected,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.SELECT_EXPR : self.select_expr,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.REPORTING : self.reporting_layer,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.CRS : crs,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.CUT_MODE : cut_mode,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.OUTPUT : results_path }
+        res1 = qgsTreatments.applyProcessingAlg(
+            FragScape_algs.FragScapeAlgorithmsProvider.NAME,
+            FragScape_algs.EffectiveMeshSizeReportingAlgorithm.ALG_NAME,
+            parameters1,context=context,feedback=feedback,onlyOutput=False)
+        #qgsUtils.loadVectorLayer(results_path,loadProject=True)
+        #dissolved_path = params.mkTmpLayerPath("reporting_dissolved.gpkg")
+        #dissolved = qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
+        parameters2 = { FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.INPUT : selected,
+                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.SELECT_EXPR : self.select_expr,
+                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.BOUNDARY : self.reporting_layer,
+                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.CRS : crs,
+                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.CUT_MODE : cut_mode,
+                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.OUTPUT : global_results_path }
+        res2 = qgsTreatments.applyProcessingAlg(
+            FragScape_algs.FragScapeAlgorithmsProvider.NAME,
+            FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.ALG_NAME,
+            parameters2,
             context=context,feedback=feedback,onlyOutput=False)
-        out_path = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
-        qgsUtils.loadVectorLayer(out_path,loadProject=True)
+        # global_layer = qgsUtils.loadVectorLayer(global_results_path)
+        # if global_layer.featureCount() != 1:
+            # utils.internal_error("Unexpected number of features for global reporting layer "
+                                  # + str(global_results_path) + " : " + str(global_layer.featureCount()))
+        # for f in global_layer.dataProvider().getFeatures():
+            # global_meff = f[FragScape_algs.EffectiveMeshSizeAlgorithm.MESH_SIZE]
+        #global_meff = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT_GLOBAL_MEFF]
+        #out_path = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
         feedbacks.progressFeedback.endSection()
-        return res
+        return (res1,res2)
                 
     def toXML(self,indent=" "):
         # if not self.reporting_layer:
@@ -182,12 +207,12 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsRun.clicked.connect(self.runReporting)
         
     def runReporting(self):
-        res = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
-        out_path = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
-        out_global_meff = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT_GLOBAL_MEFF]
+        (res1, res2) = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
+        out_path = res1[FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.OUTPUT]
+        out_global_meff = res2[FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.OUTPUT_GLOBAL_MEFF]
         # UI update
         self.dlg.resultsGlobalRes.setText(str(out_global_meff))
-        self.loaded_layer = qgsUtils.loadVectorLayer(out_path)
+        self.loaded_layer = qgsUtils.loadVectorLayer(out_path,loadProject=True)
         self.layer_cache = QgsVectorLayerCache(self.loaded_layer,24)
         self.attribute_model = QgsAttributeTableModel(self.layer_cache)
         self.attribute_model.loadLayer()

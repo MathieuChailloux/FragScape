@@ -49,12 +49,15 @@ from ..steps import params
 
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):
 
+    NAME = "FragScape"
+
     def __init__(self):
         self.alglist = [PrepareLanduseAlgorithm(),
                         PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
-                        ReportingIntersection(),
-                        EffectiveMeshSizeAlgorithm()]
+                        #ReportingIntersection(),
+                        EffectiveMeshSizeReportingAlgorithm(),
+                        EffectiveMeshSizeGlobalAlgorithm()]
         for a in self.alglist:
             a.initAlgorithm()
         super().__init__()
@@ -63,10 +66,10 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
         pass
         
     def id(self):
-        return "FragScape"
+        return self.NAME
         
     def name(self):
-        return "FragScape"
+        return self.NAME
         
     def longName(self):
         return self.name()
@@ -77,6 +80,8 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
             
             
 class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
+
+    ALG_NAME = "prepareLanduse"
 
     INPUT = "INPUT"
     CLIP_LAYER = "CLIP_LAYER"
@@ -90,7 +95,7 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         return PrepareLanduseAlgorithm()
         
     def name(self):
-        return "prepareLanduse"
+        return self.ALG_NAME
         
     def displayName(self):
         return self.tr("1 - Prepare land use data")
@@ -158,6 +163,8 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         
 class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
 
+    ALG_NAME = "prepareFragm"
+
     INPUT = "INPUT"
     CLIP_LAYER = "CLIP_LAYER"
     SELECT_EXPR = "SELECT_EXPR"
@@ -172,7 +179,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         return PrepareFragmentationAlgorithm()
         
     def name(self):
-        return "prepareFragm"
+        return self.ALG_NAME
         
     def displayName(self):
         return self.tr("2.1 - Prepare Fragmentation")
@@ -264,6 +271,8 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         
 class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
 
+    ALG_NAME = "applyFragm"
+
     LANDUSE = "LANDUSE"
     FRAGMENTATION = "FRAGMENTATION"
     CRS = "CRS"
@@ -276,7 +285,7 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         return ApplyFragmentationAlgorithm()
         
     def name(self):
-        return "applyFragm"
+        return self.ALG_NAME
         
     def displayName(self):
         return self.tr("2.2 - Apply fragmentation")
@@ -440,12 +449,15 @@ class ReportingIntersection(QgsProcessingAlgorithm):
             #utils.debug("coh = " + str(coh))
         return {self.OUTPUT: dest_id}
 
-        
-class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
+
+class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
+
+    ALG_NAME = "effectiveMeshSizeGlobal"
 
     # Algorithm parameters
     INPUT = "INPUT"
-    REPORTING = "REPORTING"
+    SELECT_EXPR = "SELECT_EXPR"
+    BOUNDARY = "BOUNDARY"
     CRS = "CRS"
     CUT_MODE = "CUT_MODE"
     OUTPUT = "OUTPUT"
@@ -471,16 +483,16 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
         return QCoreApplication.translate('Processing', string)
         
     def createInstance(self):
-        return EffectiveMeshSizeAlgorithm()
+        return EffectiveMeshSizeGlobalAlgorithm()
         
     def name(self):
-        return "effectiveMeshSize"
+        return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("3 - Effective Mesh Size")
+        return self.tr("Effective Mesh Size (Boundary)")
         
     def shortHelpString(self):
-        return self.tr("Computes effective mesh size and other fragmentation indicators")
+        return self.tr("Computes effective mesh size from boundary layer")
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -489,9 +501,14 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Input layer"),
                 [QgsProcessing.TypeVectorPolygon]))
         self.addParameter(
+            QgsProcessingParameterExpression(
+                self.SELECT_EXPR,
+                self.tr("Filter expression"),
+                optional=True))
+        self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.REPORTING,
-                self.tr("Reporting layer"),
+                self.BOUNDARY,
+                self.tr("Boundary layer"),
                 [QgsProcessing.TypeVectorPolygon]))
         self.addParameter(
             QgsProcessingParameterCrs(
@@ -508,42 +525,55 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("begin")
+        feedback.pushInfo("Start " + str(self.name()))
         # Parameters
         source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        feedback.pushInfo("source = " + str(source))
+        feedback.pushDebugInfo("source = " + str(source))
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
-        feedback.pushInfo("reporting = " + str(reporting))
-        if reporting is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
+        boundary = self.parameterAsVectorLayer(parameters,self.BOUNDARY,context)
+        feedback.pushDebugInfo("boundary = " + str(boundary))
+        if boundary is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.BOUNDARY))
         crs = self.parameterAsCrs(parameters,self.CRS,context)
         cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
         # CRS reprojection
         source_crs = source.crs().authid()
-        reporting_crs = reporting.crs().authid()
+        boundary_crs = boundary.crs().authid()
         feedback.pushDebugInfo("source_crs = " + str(source_crs))
-        feedback.pushDebugInfo("reporting_crs = " + str(reporting_crs))
+        feedback.pushDebugInfo("boundary_crs = " + str(boundary_crs))
         feedback.pushDebugInfo("crs = " + str(crs.authid()))
         if source_crs != crs.authid():
-            source_path = params.mkTmpLayerPath('source_reproject.gpkg')
+            source_path = params.mkTmpLayerPath('res_source_reproject.gpkg')
             qgsTreatments.applyReprojectLayer(source,crs,source_path,context,feedback)
             source = qgsUtils.loadVectorLayer(source_path)
-        if reporting_crs != crs.authid():
-            reporting_path = params.mkTmpLayerPath('reporting_reproject.gpkg')
-            qgsTreatments.applyReprojectLayer(reporting,crs,reporting_path,context,feedback)
-            reporting = qgsUtils.loadVectorLayer(reporting_path)
-        # Dissolved
-        dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
-        dissolved = qgsTreatments.dissolveLayer(reporting,dissolved_path,context,feedback)
-        dissolved_layer = qgsUtils.loadVectorLayer(dissolved)
-        dissolved_feat = None
-        for f in dissolved_layer.getFeatures():
-            dissolved_feat = f
-        assert(dissolved_feat is not None)
-        dissolved_geom = dissolved_feat.geometry()
-        dissolved_area = dissolved_geom.area() / 1000000
+        if boundary_crs != crs.authid():
+            boundary_path = params.mkTmpLayerPath('res_boundary_reproject.gpkg')
+            qgsTreatments.applyReprojectLayer(boundary,crs,boundary_path,context,feedback)
+            boundary = qgsUtils.loadVectorLayer(boundary_path)
+        # Clip
+        if cut_mode:
+            clipped_path = params.mkTmpLayerPath('res_source_clipped.gpkg')
+            qgsTreatments.applyVectorClip(source,boundary,clipped_path,context,feedback)
+            sg_path = params.mkTmpLayerPath('res_source_single_geom.gpkg')
+            qgsTreatments.multiToSingleGeom(clipped_path,sg_path,context,feedback)
+            source = qgsUtils.loadVectorLayer(sg_path)
+        else:
+            intersected_path = params.mkTmpLayerPath('res_source_intersected.gpkg')
+            qgsTreatments.selectIntersection(source,boundary,context,feedback)
+            qgsTreatments.saveSelectedFeatures(source,intersected_path,context,feedback)
+            source = qgsUtils.loadVectorLayer(intersected_path)
+        # Selected
+        if select_expr != "":
+            selected_path = params.mkTmpLayerPath('res_source_selected.gpkg')
+            qgsTreatments.extractByExpression(source,select_expr,selected_path,context,feedback)
+            source = qgsUtils.loadVectorLayer(selected_path)
+        # Dissolve
+        if boundary.featureCount() > 1:
+            dissolved_path = params.mkTmpLayerPath('res_boundary_dissolved.gpkg')
+            qgsTreatments.dissolveLayer(boundary,dissolved_path,context,feedback)
+            boundary = qgsUtils.loadVectorLayer(dissolved_path)
         # Output fields
         report_id_field = QgsField(self.ID, QVariant.Int)
         nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
@@ -572,12 +602,174 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             self.OUTPUT,
             context,
             output_fields,
-            reporting.wkbType(),
+            boundary.wkbType(),
             #reporting.sourceCrs()
             crs
         )
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # Algorithm
+        # progress step
+        nb_feats = source.featureCount()
+        feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
+        if nb_feats == 0:
+            raise QgsProcessingException("Empty layer")
+        progress_step = 100.0 / nb_feats
+        curr_step = 0
+        # Reporting area
+        for report_feat in boundary.getFeatures():
+            report_geom = report_feat.geometry()
+        report_area = report_geom.area() / 1000000
+        sum_Ai = 0
+        feedback.pushDebugInfo("report_area = " + str(report_area))
+        if report_area == 0:
+            raise QgsProcessingException("Empty reporting area")
+        else:
+            feedback.pushDebugInfo("ok")
+        # Iteration over source features
+        res_feat = QgsFeature(output_fields)
+        res_feat = QgsFeature(output_fields)
+        res_feat.setGeometry(report_geom)
+        res_feat[self.ID] = report_feat.id()
+        res_feat[self.NB_PATCHES] = 0
+        res_feat[self.REPORT_AREA] = report_area
+        res_feat[self.COHERENCE] = 0
+        net_product = 0
+        intersecting_area = 0
+        for f in source.getFeatures():
+            f_geom = f.geometry()
+            f_area = f_geom.area() / 1000000
+            sum_Ai += f_area
+            intersection = f_geom.intersection(report_geom)
+            intersection_area = intersection.area() / 1000000
+            intersecting_area += intersection_area
+            res_feat[self.NB_PATCHES] += 1
+            if cut_mode:
+                net_product += intersection_area * intersection_area
+            else:
+                net_product += f_area * intersection_area
+            # Progress update
+            curr_step += 1
+            feedback.setProgress(int(curr_step * progress_step))
+        if cut_mode:
+            report_area_sq = report_area * report_area
+        else:
+            report_area_sq = report_area * sum_Ai
+        res_feat[self.NET_PRODUCT] = net_product
+        res_feat[self.INTERSECTING_AREA] = intersecting_area
+        res_feat[self.COHERENCE] = net_product / report_area_sq if report_area_sq > 0 else 0
+        res_feat[self.SPLITTING_DENSITY] = report_area / net_product if net_product > 0 else 0
+        res_feat[self.MESH_SIZE] = net_product / report_area
+        res_feat[self.SPLITTING_INDEX] = report_area_sq / net_product if net_product > 0 else 0
+        res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
+        sink.addFeature(res_feat)
+        return {self.OUTPUT: dest_id, self.OUTPUT_GLOBAL_MEFF : res_feat[self.MESH_SIZE]}
+
+        
+
+class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
+
+    ALG_NAME = "effectiveMeshSizeReporting"
+
+    # Algorithm parameters
+    INPUT = "INPUT"
+    SELECT_EXPR = "SELECT_EXPR"
+    REPORTING = "REPORTING"
+    CRS = "CRS"
+    CUT_MODE = "CUT_MODE"
+    OUTPUT = "OUTPUT"
+    
+    OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
+    
+    # Output layer fields
+    ID = "fid"
+    NB_PATCHES = "nb_patches"
+    REPORT_AREA = "report_area"
+    INTERSECTING_AREA = "intersecting_area"
+    # Main measures
+    MESH_SIZE = "effective_mesh_size"
+    DIVI = "landscape_division"
+    SPLITTING_INDEX = "splitting_index"
+    # Auxiliary measures
+    COHERENCE = "coherence"
+    SPLITTING_DENSITY = "splitting_density"
+    NET_PRODUCT = "net_product"
+    
+    
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
+        
+    def createInstance(self):
+        return EffectiveMeshSizeReportingAlgorithm()
+        
+    def name(self):
+        return self.ALG_NAME
+        
+    def displayName(self):
+        return self.tr("3 - Effective Mesh Size (Reporting)")
+        
+    def shortHelpString(self):
+        return self.tr("Computes effective mesh size and other fragmentation indicators")
+
+    def initAlgorithm(self, config=None):
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                self.tr("Input layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterExpression(
+                self.SELECT_EXPR,
+                self.tr("Filter expression"),
+                optional=True))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.REPORTING,
+                self.tr("Reporting layer"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterCrs(
+                self.CRS,
+                description=self.tr("Output CRS"),
+                defaultValue=params.defaultCrs))
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.CUT_MODE,
+                self.tr("Cross-boundary connection method")))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer")))
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        feedback.pushInfo("begin")
+        # Parameters
+        source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
+        feedback.pushInfo("source = " + str(source))
+        if source is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
+        reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
+        feedback.pushInfo("reporting = " + str(reporting))
+        if reporting is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        crs = self.parameterAsCrs(parameters,self.CRS,context)
+        cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
+        output = parameters[self.OUTPUT]
+        # CRS reprojection
+        # source_crs = source.crs().authid()
+        # reporting_crs = reporting.crs().authid()
+        # feedback.pushDebugInfo("source_crs = " + str(source_crs))
+        # feedback.pushDebugInfo("reporting_crs = " + str(reporting_crs))
+        # feedback.pushDebugInfo("crs = " + str(crs.authid()))
+        # if source_crs != crs.authid():
+            # source_path = params.mkTmpLayerPath('source_reproject.gpkg')
+            # qgsTreatments.applyReprojectLayer(source,crs,source_path,context,feedback)
+            # source = qgsUtils.loadVectorLayer(source_path)
+        # if reporting_crs != crs.authid():
+            # reporting_path = params.mkTmpLayerPath('reporting_reproject.gpkg')
+            # qgsTreatments.applyReprojectLayer(reporting,crs,reporting_path,context,feedback)
+            # reporting = qgsUtils.loadVectorLayer(reporting_path)
         # Algorithm
         # progress step
         nb_feats = reporting.featureCount()
@@ -586,82 +778,24 @@ class EffectiveMeshSizeAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException("Empty layer")
         progress_step = 100.0 / nb_feats
         curr_step = 0
-        treated_fids = set()
-        # first_pass = True
-        global_net_product = 0
-        global_area = 0
-        global_patches_area = 0
-        global_nb_feats = 0
         # gna gna
+        report_layers = []
         for report_feat in reporting.getFeatures():
-            report_geom = report_feat.geometry()
-            report_area = report_geom.area() / 1000000
-            report_patches_area = 0
-            feedback.pushDebugInfo("report_area = " + str(report_area))
-            if report_area == 0:
-                raise QgsProcessingException("Empty reporting area")
-            else:
-                feedback.pushDebugInfo("ok")
-            global_area += report_area
-            report_area_sq = report_area * report_area
-            new_f = QgsFeature(output_fields)
-            new_f.setGeometry(report_geom)
-            new_f[self.ID] = report_feat.id()
-            new_f[self.NB_PATCHES] = 0
-            new_f[self.REPORT_AREA] = report_area
-            new_f[self.NET_PRODUCT] = 0
-            new_f[self.COHERENCE] = 0
-            net_product = 0
-            intersecting_area = 0
-            for f in source.getFeatures():
-                f_geom = f.geometry()
-                intersects_report = f_geom.intersects(report_geom)
-                if intersects_report:
-                    f_area = f_geom.area() / 1000000
-                    report_patches_area += f_area
-                    intersection = f_geom.intersection(report_geom)
-                    intersection_area = intersection.area() / 1000000
-                    #feedback.pushDebugInfo("f_area : " + str(f_area))
-                    #feedback.pushDebugInfo("intersection_area : " + str(intersection_area))
-                    #assert(intersection_area <= f_area)
-                    intersecting_area += intersection_area
-                    new_f[self.NB_PATCHES] += 1
-                    if cut_mode:
-                        net_product += intersection_area * intersection_area
-                    else:
-                        net_product += f_area * intersection_area
-                    if f.id() not in treated_fids:
-                        global_patches_area += f_area
-                        intersection = f_geom.intersection(dissolved_geom)
-                        intersection_area = intersection.area() / 1000000
-                        if cut_mode:
-                            global_net_product += intersection_area * intersection_area
-                        else:
-                            global_net_product += f_area * intersection_area
-                        global_nb_feats += 1
-                        treated_fids.add(f.id())
-            if cut_mode:
-                report_area_sq = report_area * report_area
-            else:
-                report_area_sq = report_area * report_patches_area
-            new_f[self.NET_PRODUCT] = net_product
-            new_f[self.INTERSECTING_AREA] = intersecting_area
-            new_f[self.COHERENCE] = net_product / report_area_sq if report_area_sq > 0 else 0
-            new_f[self.SPLITTING_DENSITY] = report_area / net_product if net_product > 0 else 0
-            new_f[self.MESH_SIZE] = net_product / report_area
-            new_f[self.SPLITTING_INDEX] = report_area_sq / net_product if net_product > 0 else 0
-            new_f[self.DIVI] = 1 - new_f[self.COHERENCE]
-            sink.addFeature(new_f)
-            curr_step += 1
-            # first_pass = False
-            feedback.setProgress(int(curr_step * progress_step))
-        if global_area == 0:
-            utils.user_error("Empty area for reporting layer")
-        feedback.pushDebugInfo("global_nb_feats = " + str(global_nb_feats))
-        feedback.pushDebugInfo("global_net_product = " + str(global_net_product))
-        feedback.pushDebugInfo("global_area = " + str(global_area))
-        global_meff = global_net_product / dissolved_area
-        #global_meff = 3
-        return {self.OUTPUT: dest_id, self.OUTPUT_GLOBAL_MEFF : global_meff }
+            report_id = report_feat.id()
+            reporting.selectByIds([report_id])
+            select_path = params.mkTmpLayerPath("reportingSelection" + str(report_feat.id()) + ".gpkg")
+            qgsTreatments.saveSelectedFeatures(reporting,select_path,context,feedback)
+            report_computed_path = params.mkTmpLayerPath("reportingComputed" + str(report_feat.id()) + ".gpkg")
+            parameters = { EffectiveMeshSizeGlobalAlgorithm.INPUT : source,
+                           EffectiveMeshSizeGlobalAlgorithm.SELECT_EXPR : select_expr,
+                           EffectiveMeshSizeGlobalAlgorithm.BOUNDARY : select_path,
+                           EffectiveMeshSizeGlobalAlgorithm.CRS : crs,
+                           EffectiveMeshSizeGlobalAlgorithm.CUT_MODE : cut_mode,
+                           EffectiveMeshSizeGlobalAlgorithm.OUTPUT : report_computed_path }
+            qgsTreatments.applyProcessingAlg(FragScapeAlgorithmsProvider.NAME,
+                                             EffectiveMeshSizeGlobalAlgorithm.ALG_NAME,
+                                             parameters,context,feedback)
+            report_layers.append(report_computed_path)
+        qgsTreatments.mergeVectorLayers(report_layers,crs,output)
+        return {self.OUTPUT: output}
 
-        
