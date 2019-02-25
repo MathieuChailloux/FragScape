@@ -215,7 +215,7 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         utils.info("FragScape model saved into file '" + fname + "'")
         
     def saveModelAsAction(self):
-        fname = utils.saveFileDialog(parent=self,msg="Sauvegarder le projet sous",filter="*.xml")
+        fname = qgsUtils.saveFileDialog(parent=self,msg="Sauvegarder le projet sous",filter="*.xml")
         if fname:
             self.saveModelAs(fname)
         
