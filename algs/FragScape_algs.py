@@ -37,6 +37,7 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterVectorDestination,
                        QgsProcessingParameterFile,
                        QgsProcessingParameterString,
+                       QgsProcessingParameterEnum,
                        QgsProperty,
                        QgsWkbTypes)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
@@ -460,7 +461,10 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
     BOUNDARY = "BOUNDARY"
     CRS = "CRS"
     CUT_MODE = "CUT_MODE"
+    UNIT = "UNIT"
     OUTPUT = "OUTPUT"
+    
+    UNIT_DIVISOR = [1, 100, 10000, 1000000]
     
     OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
     
@@ -495,6 +499,11 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
         return self.tr("Computes effective mesh size from boundary layer")
 
     def initAlgorithm(self, config=None):
+        self.unit_options = [
+            self.tr("m² (square meters)"),
+            self.tr("dm² (square decimeters / ares)"),
+            self.tr("hm² (square hectometers / hectares)"),
+            self.tr("km² (square kilometers)")]
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -520,6 +529,11 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
                 self.CUT_MODE,
                 self.tr("Cross-boundary connection method")))
         self.addParameter(
+            QgsProcessingParameterEnum(
+                self.UNIT,
+                description=self.tr("Report areas unit"),
+                options=self.unit_options))
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
                 self.tr("Output layer")))
@@ -538,6 +552,10 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.invalidSourceError(parameters, self.BOUNDARY))
         crs = self.parameterAsCrs(parameters,self.CRS,context)
         cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
+        unit = self.parameterAsEnum(parameters,self.UNIT,context)
+        utils.debug("unit : " + str(unit))
+        unit_divisor = self.UNIT_DIVISOR[unit]
+        utils.debug("unit divisor : " + str(unit_divisor))
         # CRS reprojection
         source_crs = source.crs().authid()
         boundary_crs = boundary.crs().authid()
@@ -619,7 +637,7 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
         # Reporting area
         for report_feat in boundary.getFeatures():
             report_geom = report_feat.geometry()
-        report_area = report_geom.area() / 1000000
+        report_area = report_geom.area() / unit_divisor
         sum_Ai = 0
         feedback.pushDebugInfo("report_area = " + str(report_area))
         if report_area == 0:
@@ -638,10 +656,10 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
         intersecting_area = 0
         for f in source.getFeatures():
             f_geom = f.geometry()
-            f_area = f_geom.area() / 1000000
+            f_area = f_geom.area() / unit_divisor
             sum_Ai += f_area
             intersection = f_geom.intersection(report_geom)
-            intersection_area = intersection.area() / 1000000
+            intersection_area = intersection.area() / unit_divisor
             intersecting_area += intersection_area
             res_feat[self.NB_PATCHES] += 1
             if cut_mode:
@@ -677,6 +695,7 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
     REPORTING = "REPORTING"
     CRS = "CRS"
     CUT_MODE = "CUT_MODE"
+    UNIT = "UNIT"
     OUTPUT = "OUTPUT"
     
     OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
@@ -712,6 +731,11 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
         return self.tr("Computes effective mesh size and other fragmentation indicators")
 
     def initAlgorithm(self, config=None):
+        self.unit_options = [
+            self.tr("m² (square meters)"),
+            self.tr("dm² (square decimeters / ares)"),
+            self.tr("hm² (square hectometers / hectares)"),
+            self.tr("km² (square kilometers)")]
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -737,6 +761,11 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
                 self.CUT_MODE,
                 self.tr("Cross-boundary connection method")))
         self.addParameter(
+            QgsProcessingParameterEnum(
+                self.UNIT,
+                description=self.tr("Report areas unit"),
+                options=self.unit_options))
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
                 self.tr("Output layer")))
@@ -755,6 +784,7 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
         crs = self.parameterAsCrs(parameters,self.CRS,context)
         cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
+        unit = self.parameterAsEnum(parameters,self.UNIT,context)
         output = parameters[self.OUTPUT]
         # CRS reprojection
         # source_crs = source.crs().authid()
@@ -791,6 +821,7 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
                            EffectiveMeshSizeGlobalAlgorithm.BOUNDARY : select_path,
                            EffectiveMeshSizeGlobalAlgorithm.CRS : crs,
                            EffectiveMeshSizeGlobalAlgorithm.CUT_MODE : cut_mode,
+                           EffectiveMeshSizeGlobalAlgorithm.UNIT : unit,
                            EffectiveMeshSizeGlobalAlgorithm.OUTPUT : report_computed_path }
             qgsTreatments.applyProcessingAlg(FragScapeAlgorithmsProvider.NAME,
                                              EffectiveMeshSizeGlobalAlgorithm.ALG_NAME,

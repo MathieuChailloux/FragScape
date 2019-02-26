@@ -41,6 +41,7 @@ class ReportingModel(abstract_model.DictModel):
     SELECT_EXPR = "select_expr"
     REPORTING = "reporting_layer"
     METHOD = "method"
+    UNIT = "unit"
     OUTPUT = "output"
     
     CUT_METHOD = 0
@@ -53,6 +54,7 @@ class ReportingModel(abstract_model.DictModel):
         self.select_expr = None
         self.reporting_layer = None
         self.method = self.CUT_METHOD
+        self.unit = 0
         self.out_layer = None
         self.init_fields = []
         self.fields = self.init_fields
@@ -111,6 +113,7 @@ class ReportingModel(abstract_model.DictModel):
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.REPORTING : self.reporting_layer,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.CRS : crs,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.CUT_MODE : cut_mode,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.UNIT : self.unit,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.OUTPUT : results_path }
         res1 = qgsTreatments.applyProcessingAlg(
             FragScape_algs.FragScapeAlgorithmsProvider.NAME,
@@ -124,6 +127,7 @@ class ReportingModel(abstract_model.DictModel):
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.BOUNDARY : self.reporting_layer,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.CRS : crs,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.CUT_MODE : cut_mode,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.UNIT : self.unit,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.OUTPUT : global_results_path }
         res2 = qgsTreatments.applyProcessingAlg(
             FragScape_algs.FragScapeAlgorithmsProvider.NAME,
@@ -153,6 +157,8 @@ class ReportingModel(abstract_model.DictModel):
             modelParams[self.SELECT_EXPR] = self.select_expr
         if self.method >= 0:
             modelParams[self.METHOD] = self.method
+        if self.unit:
+            modelParams[self.UNIT] = self.unit
         if self.reporting_layer:
             layerRelPath = self.fsModel.normalizePath(self.reporting_layer)
             modelParams[self.REPORTING] = layerRelPath
@@ -168,6 +174,8 @@ class ReportingModel(abstract_model.DictModel):
             self.reporting_layer = self.fsModel.getOrigPath(attribs[self.REPORTING])
         if self.METHOD in attribs:
             self.method = int(attribs[self.METHOD])
+        if self.UNIT in attribs:
+            self.unit = int(attribs[self.UNIT])
         if self.OUTPUT in attribs:
             self.setOutLayer(attribs[self.OUTPUT])
         
@@ -203,6 +211,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsSelection.fieldChanged.connect(self.setSelectExpr)
         self.dlg.resultsReportingLayer.fileChanged.connect(self.setReportingLayer)
         self.dlg.resultsCutMode.currentIndexChanged.connect(self.setMethod)
+        self.dlg.resultsUnit.currentIndexChanged.connect(self.setUnit)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
         self.dlg.resultsRun.clicked.connect(self.runReporting)
         
@@ -240,6 +249,9 @@ class ReportingConnector(abstract_model.AbstractConnector):
             self.model.method = ReportingModel.CBC_METHOD
         else:
             utils.internal_error("Unexpected index for reporting method : " + str(idx))
+            
+    def setUnit(self,idx):
+        self.model.unit = idx
     
     def setInputLayer(self,layer):
         utils.debug("setInputLayer to " + str(layer))
@@ -274,6 +286,8 @@ class ReportingConnector(abstract_model.AbstractConnector):
             self.dlg.resultsReportingLayer.setFilePath(self.model.reporting_layer)
         if self.model.method:
             self.dlg.resultsCutMode.setCurrentIndex(int(self.model.method))
+        if self.model.unit:
+            self.dlg.resultsUnit.setCurrentIndex(int(self.model.unit))
         if self.model.out_layer:
             self.dlg.resultsOutLayer.setFilePath(self.model.out_layer)
 

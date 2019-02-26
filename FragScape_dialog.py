@@ -45,11 +45,11 @@ from .FragScape_model import FragScapeModel
 #from FragScapeAbout_dialog import FragScapeAboutDialog
 from .FragScape_dialog_base import Ui_FragScapeDialogBase
 
-#FORM_CLASS, _ = uic.loadUiType(os.path.join(
-#    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
 
 
-class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
+class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):#Ui_FragScapeDialogBase):
     def __init__(self, parent=None):
         """Constructor."""
         super(FragScapeDialog, self).__init__(parent)
