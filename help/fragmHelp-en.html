@@ -1,0 +1,31 @@
+  <head>
+    <meta name="qrichtext" content="1" />
+    <style type="text/css">p, li { white-space: pre-wrap;}</style>
+  </head>
+  <body style=" font-family:'MS Shell Dlg 2';font-size:8.25pt;font-weight:400;font-style:normal;">
+    <p><span style=" font-size:14pt;font-weight:600;">Fragmentation</span></p>
+    <br />
+    <p style= " font-size:8pt;">
+<b>Description</b>
+<br/>
+ Cette &eacute;tape permet d'int&eacute;grer les &eacute;l&eacute;ments fragmentants à la couche produite en &eacute;tape 2.
+<br/>
+ Pour chaque type d'&eacute;l&eacute;ment cibl&eacute;, il faut renseigner tout ou partie des param&egrave;tres puis <i>Enregistrer la s&eacute;lection</i>. Le param&eacute;trage retenu appara&icirc;t alors comme une nouvelle ligne dans la table de visualisation.
+</p><p>
+<b>Param&egrave;tres</b>
+<br/>
+ La couche d'entr&eacute;e contenant les &eacute;l&eacute;ments fragmentants peut être ponctuelle, lin&eacute;aire ou surfacique. Il est possible de d&eacute;couper cette couche comme en &eacute;tape 2.
+<br/>
+ <i>Expression</i> : crit&egrave;re de s&eacute;lection des entit&eacute;s depuis la couche d'entr&eacute;e. Si l'expression n'est pas renseign&eacute;e, toutes les entit&eacute;s sont s&eacute;lectionn&eacute;es.
+<br/>
+ <i>Tampon</i> : application d'une zone tampon autour des entit&eacute;s s&eacute;lectionn&eacute;es pour mod&eacute;liser leur emprise au sol. Obligatoire pour les donn&eacute;es ponctuelles et lin&eacute;aiares.
+<br/>
+ <i>Identifiant</i>: identifiant unique du param&eacute;trage courant
+ </p><p>
+<b>R&eacute;sultat</b>
+<br/>
+Pour chaque param&eacute;trage, les traitements associ&eacute;s (d&eacute;coupage, s&eacute;lection, application de zone tampon) sont effectu&eacute;s et stock&eacute;s dans une couche correspondant à l'identifiant.
+<br/>
+Toutes ces couches sont alors fusionn&eacute;es, une diff&eacute;rence g&eacute;om&eacute;trique est effectu&eacute;e avec le r&eacute;sultat de l'&eacute;tape 2 et les polygones r&eacute;sultants sont transform&eacute;s en g&eacute;om&eacute;trie simple. Le r&eacute;sultat de ces traitements est sauvegard&eacute; dans la couche <i>DossierDeTravail/outputs/landuseFragmSingleGeom.gpkg</i>.
+    </p>
+  </body>

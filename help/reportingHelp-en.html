@@ -1,0 +1,29 @@
+  <head>
+    <meta name="qrichtext" content="1" />
+    <style type="text/css">p, li { white-space: pre-wrap;}</style>
+  </head>
+  <body style=" font-family:'MS Shell Dlg 2';font-size:8.25pt;font-weight:400;font-style:normal;">
+    <p><span style=" font-size:14pt;font-weight:600;">Param&egrave;tres </span></p>
+    <br />
+    <p style= " font-size:8pt;">
+<b>Description</b>
+<br/>
+ Cette &eacute;tape finale permet de calculer les indicateur de fragmentation.
+</p><p>
+<b>Param&egrave;tres</b>
+<br/>
+ La <i>couche d'entr&eacute;e</i> est automatiquement mise à jour et correspond au r&eacute;sultat de l'&eacute;tape 3.
+<br/>
+ Il est possible de <i>filtrer</i> les polygones de cette couche d'entr&eacute;e, par exemple pour &eacute;liminer les petits polygones non significatifs, en renseignant l'expression correspondante.
+<br/>
+ La <i>couche de rapportage</i> correspond à la couche de d&eacute;coupage en unit&eacute;s territoriales (r&eacute;gion foresti&egrave;re, d&eacute;partement, ...). Les indicateurs de fragmentation seront calcul&eacute;s pour chaque unit&eacute; (il est possible de n'avoir qu'une seule entit&eacute; correspondant à l'ensemble du territoire).
+<br/>
+ La <i>m&eacute;thode de d&eacute;coupage</i> d&eacute;termine la mani&egrave;re de g&eacute;rer les polygones intersectant la bordure de la couche de rapportage. La m&eacute;thode <i>CUT</i> d&eacute;coupe ces polygones en ne consid&eacute;rant que l'intersection avec la couche de rapportage. La m&eacute;thode <i>CBC</i> pond&egrave;re cette intersection par l'aire du polygone initial. Pour appliquer la m&eacute;thode <i>CBC</i> de façon pertinente, il faut alors que les donn&eacute;es d'entr&eacute;e du plugin couvre une emprise plus large que celle de la couche de rapportage.
+</p><p>
+<b>R&eacute;sultat</b>
+<br/>
+La taille effective de maille de l'ensemble du territoire est affich&eacute;e dans l'interface graphique.
+<br/>
+La <i>couche de sortie</i> contient diff&eacute;rents indicateurs de fragmentation li&eacute;s entre eux, dont la taille effective de maille, pour chaque unit&eacute; territoriale.
+    </p>
+  </body>
