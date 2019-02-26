@@ -583,7 +583,7 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
             qgsTreatments.saveSelectedFeatures(source,intersected_path,context,feedback)
             source = qgsUtils.loadVectorLayer(intersected_path)
         # Selected
-        if select_expr != "":
+        if select_expr:# != "":
             selected_path = params.mkTmpLayerPath('res_source_selected.gpkg')
             qgsTreatments.extractByExpression(source,select_expr,selected_path,context,feedback)
             source = qgsUtils.loadVectorLayer(selected_path)
@@ -631,8 +631,11 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
         nb_feats = source.featureCount()
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
         if nb_feats == 0:
-            raise QgsProcessingException("Empty layer")
-        progress_step = 100.0 / nb_feats
+            utils.warn("Empty layer : " + qgsUtils.pathOfLayer(source))
+            progress_step = 1
+            #raise QgsProcessingException("Empty layer : " + qgsUtils.pathOfLayer(source))
+        else:
+            progress_step = 100.0 / nb_feats
         curr_step = 0
         # Reporting area
         for report_feat in boundary.getFeatures():

@@ -105,9 +105,13 @@ defaultCrs = QgsCoordinateReferenceSystem("EPSG:2154")
     
 def mkTmpLayerPath(layer_name):
     if params is None:
-        utils.warn("Parameter module not initialized")
+        utils.warn.generateTempFilename("Parameter module not initialized")
         #assert(False)
         path = QgsProcessingUtils(layer_name)
+    elif params.tmpDir is None:
+        utils.warn("Output directories not initialized")
+        #assert(False)
+        path = QgsProcessingUtils.generateTempFilename(layer_name)
     elif params.save_tmp:
         path = utils.joinPath(params.tmpDir,layer_name)
     else:
@@ -130,7 +134,7 @@ class ParamsModel(QAbstractTableModel):
         self.tmpDir = None
         #self.dataClipFlag = True
         self.projectFile = ""
-        self.save_tmp = False
+        self.save_tmp = True
         self.crs = defaultCrs
         self.fields = [self.WORKSPACE,self.PROJECT,self.CRS]
         QAbstractTableModel.__init__(self)
@@ -173,7 +177,9 @@ class ParamsModel(QAbstractTableModel):
         if not os.path.isdir(norm_path):
             utils.user_error("Directory '" + norm_path + "' does not exist")
         self.outputDir = utils.createSubdir(norm_path,"outputs")
+        utils.info("Outputs directory set to '" + str(norm_path))
         self.tmpDir = utils.createSubdir(norm_path,"tmp")
+        utils.info("Temporary directory set to '" + str(self.tmpDir))
         
     """ Path/workspace utils """
     # Checks that workspace is intialized and is an existing directory.
