@@ -45,11 +45,11 @@ from .FragScape_model import FragScapeModel
 #from FragScapeAbout_dialog import FragScapeAboutDialog
 from .FragScape_dialog_base import Ui_FragScapeDialogBase
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
+#FORM_CLASS, _ = uic.loadUiType(os.path.join(
+#    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
 
 
-class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):#Ui_FragScapeDialogBase):
+class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
     def __init__(self, parent=None):
         """Constructor."""
         super(FragScapeDialog, self).__init__(parent)
@@ -160,8 +160,6 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):#Ui_FragScapeDialogBase):
         utils.debug("switchLang " + str(lang))
         plugin_dir = os.path.dirname(__file__)
         lang_path = os.path.join(plugin_dir,'i18n','FragScape_' + lang + '.qm')
-        #self.langEn.setChecked(True)
-        #self.langFr.setChecked(False)
         if os.path.exists(lang_path):
             self.translator = QTranslator()
             self.translator.load(lang_path)
@@ -178,9 +176,13 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):#Ui_FragScapeDialogBase):
         
     def switchLangEn(self):
         self.switchLang("en")
+        self.langEn.setChecked(True)
+        self.langFr.setChecked(False)
         
     def switchLangFr(self):
         self.switchLang("fr")
+        self.langEn.setChecked(False)
+        self.langFr.setChecked(True)
         
     def openHelpDialog(self):
         utils.debug("openHelpDialog")
