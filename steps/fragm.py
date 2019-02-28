@@ -25,7 +25,7 @@
 import os.path
 import time
 
-from qgis.core import QgsProject, QgsMapLayerProxyModel, QgsVectorLayer, QgsProcessingFeedback
+from qgis.core import QgsProject, QgsMapLayerProxyModel, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingMultiStepFeedback
 import processing
 from processing import QgsProcessingUtils
 
@@ -172,6 +172,9 @@ class FragmModel(abstract_model.DictModel):
         prepared_layers = []
         res_path = self.getFinalLayer()
         qgsUtils.removeVectorLayer(res_path)
+        nb_items = len(self.items)
+        curr_step = 1
+        step_feedback = QgsProcessingMultiStepFeedback(nb_items,feedback)
         for item in self.items:
             in_layer_path = item.dict[self.PREPARE_INPUT]
             in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
@@ -196,7 +199,9 @@ class FragmModel(abstract_model.DictModel):
                            self.PREPARE_OUTPUT : outPath }
             prepared = qgsTreatments.applyProcessingAlg(
                 "FragScape","prepareFragm",parameters,
-                context=context,feedback=feedback)
+                context=context,feedback=step_feedback)
+            curr_step += 1
+            step_feedback.setCurrentStep(curr_step)
             #qgsUtils.loadVectorLayer(prepared,loadProject=True)
             prepared_layers.append(prepared)
         landuseLayer = self.fsModel.landuseModel.getDissolveLayer()

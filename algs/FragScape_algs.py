@@ -39,7 +39,8 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterString,
                        QgsProcessingParameterEnum,
                        QgsProperty,
-                       QgsWkbTypes)
+                       QgsWkbTypes,
+                       QgsProcessingMultiStepFeedback)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
 import processing
@@ -132,7 +133,7 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         # def no_post_process(alg, context, feedback):
             # pass
         input = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        feedback.pushInfo("input = " + str(input))
+        feedback.pushDebugInfo("input = " + str(input))
         if input is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
         qgsUtils.normalizeEncoding(input)
@@ -147,7 +148,7 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
             clipped_path = params.mkTmpLayerPath('landuseClipped.gpkg')
             qgsTreatments.applyVectorClip(input,clip_layer,clipped_path,context,feedback)
             clipped = qgsUtils.loadVectorLayer(clipped_path)
-            utils.debug("clipped  = " + str(clipped))
+            feedback.pushDebugInfo("clipped  = " + str(clipped))
             #clipped = clipped_path
         selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
         qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
@@ -316,9 +317,8 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("begin")
         # Parameters
-        feedback.pushInfo("parameters = " + str(parameters))
+        #feedback.pushInfo("parameters = " + str(parameters))
         landuse = self.parameterAsVectorLayer(parameters,self.LANDUSE,context)
         if landuse is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
@@ -345,7 +345,6 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
             context=context,feedback=feedback)
         if fragm_layer is None:
             raise QgsProcessingException("Multi to single part failed")
-        feedback.pushInfo("end")
         return {self.OUTPUT : singleGeomLayer}
         
                 
@@ -812,8 +811,10 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
         progress_step = 100.0 / nb_feats
         curr_step = 0
         # gna gna
+        multi_feedback = QgsProcessingMultiStepFeedback(nb_feats, feedback)
         report_layers = []
-        for report_feat in reporting.getFeatures():
+        for count, report_feat in enumerate(reporting.getFeatures()):
+            multi_feedback.setCurrentStep(count)
             report_id = report_feat.id()
             reporting.selectByIds([report_id])
             select_path = params.mkTmpLayerPath("reportingSelection" + str(report_feat.id()) + ".gpkg")
@@ -828,7 +829,7 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
                            EffectiveMeshSizeGlobalAlgorithm.OUTPUT : report_computed_path }
             qgsTreatments.applyProcessingAlg(FragScapeAlgorithmsProvider.NAME,
                                              EffectiveMeshSizeGlobalAlgorithm.ALG_NAME,
-                                             parameters,context,feedback)
+                                             parameters,context,multi_feedback)
             report_layers.append(report_computed_path)
         qgsTreatments.mergeVectorLayers(report_layers,crs,output)
         return {self.OUTPUT: output}
