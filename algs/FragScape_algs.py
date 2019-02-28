@@ -386,14 +386,14 @@ class ReportingIntersection(QgsProcessingAlgorithm):
                 self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("begin")
+        feedback.pushDebugInfo("begin")
         # Parameters
         source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        feedback.pushInfo("source = " + str(source))
+        feedback.pushDebugInfo("source = " + str(source))
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
         reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
-        feedback.pushInfo("reporting = " + str(reporting))
+        feedback.pushDebugInfo("reporting = " + str(reporting))
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
         patch_id_field = QgsField("patch_id", QVariant.Int)
@@ -538,7 +538,7 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("Start " + str(self.name()))
+        feedback.pushDebugInfo("Start " + str(self.name()))
         # Parameters
         source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
         feedback.pushDebugInfo("source = " + str(source))
@@ -773,15 +773,15 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
                 self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushInfo("begin")
+        feedback.pushDebugInfo("begin")
         # Parameters
         source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        feedback.pushInfo("source = " + str(source))
+        feedback.pushDebugInfo("source = " + str(source))
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
         select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
-        feedback.pushInfo("reporting = " + str(reporting))
+        feedback.pushDebugInfo("reporting = " + str(reporting))
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
         crs = self.parameterAsCrs(parameters,self.CRS,context)
