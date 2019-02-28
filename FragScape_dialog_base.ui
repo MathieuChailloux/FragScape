@@ -1894,12 +1894,12 @@
                     </item>
                     <item>
                      <property name="text">
-                      <string>dm² (décimètres carrés / ares)</string>
+                      <string>dam²/a (décamètres carrés / ares)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>hm² (hectomètres carrés / hectares)</string>
+                      <string>hm²/ha (hectomètres carrés / hectares)</string>
                      </property>
                     </item>
                     <item>

@@ -44,6 +44,13 @@ from .FragScape_model import FragScapeModel
 
 #from FragScapeAbout_dialog import FragScapeAboutDialog
 from .FragScape_dialog_base import Ui_FragScapeDialogBase
+from .FragScapeAbout_dialog_base import Ui_FragScapeAbout
+
+class FragScapeAboutDialog(QtWidgets.QDialog,Ui_FragScapeAbout):
+
+    def __init__(self,parent=None):
+        super(FragScapeAboutDialog,self).__init__(parent)
+        self.setupUi(self)
 
 #FORM_CLASS, _ = uic.loadUiType(os.path.join(
 #    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
