@@ -95,6 +95,9 @@
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="6">
             <widget class="QToolButton" name="langFr">
+             <property name="toolTip">
+              <string>Français</string>
+             </property>
              <property name="text">
               <string>...</string>
              </property>
@@ -106,7 +109,7 @@
               <bool>true</bool>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -122,7 +125,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Enregistrer le projet FragScape sous</string>
+              <string>Save FragScape project as</string>
              </property>
              <property name="text">
               <string/>
@@ -145,7 +148,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Enregistrer le projet FragScape</string>
+              <string>Save FragScape project</string>
              </property>
              <property name="text">
               <string/>
@@ -174,6 +177,9 @@
              <property name="checkable">
               <bool>true</bool>
              </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
              <property name="autoRaise">
               <bool>true</bool>
              </property>
@@ -194,7 +200,7 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>Ouvrir un projet FragScape</string>
+              <string>Open FragScape project</string>
              </property>
              <property name="text">
               <string/>
@@ -211,7 +217,7 @@
            <item row="0" column="3">
             <widget class="QToolButton" name="aboutButton">
              <property name="toolTip">
-              <string>À propos</string>
+              <string>About</string>
              </property>
              <property name="text">
               <string/>
@@ -263,10 +269,10 @@
              </property>
              <widget class="QWidget" name="paramsTab">
               <attribute name="title">
-               <string>1 - Paramètres</string>
+               <string>1 - Parameters</string>
               </attribute>
-              <layout class="QVBoxLayout" name="verticalLayout">
-               <item>
+              <layout class="QGridLayout" name="gridLayout_16">
+               <item row="0" column="0">
                 <widget class="QFrame" name="frame_2">
                  <property name="frameShape">
                   <enum>QFrame::StyledPanel</enum>
@@ -278,7 +284,7 @@
                   <item row="0" column="0">
                    <widget class="QLabel" name="label_11">
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bienvenue dans FragScape 1.0 !&lt;/p&gt;&lt;p&gt;Ce plugin permet de calculer la taille effective de maille d'un territoire depuis les données d'entrée vectorielles (occupation du sol, éléments fragmentants) en 4 étapes :&lt;br/&gt;1) Définition des paramètres généraux&lt;br/&gt;2) Sélection des éléments non fragmentants de l'occupation du sol&lt;br/&gt;3) Intégration des éléments fragmentants&lt;br/&gt;4) Calcul des indicateurs de fragmentation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pensez à sauvegarder régulièrement la configuration du plugin (boutons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; en haut à gauche de l'interface).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Page web : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 1.0 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory from vector input data (land cover, elements of fragmentation) in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification&lt;br/&gt;3) Fragmentation elements integration&lt;br/&gt;4) Fragmentation metrics computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="wordWrap">
                      <bool>true</bool>
@@ -288,7 +294,7 @@
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item row="1" column="0">
                 <widget class="QLabel" name="paramlabel">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -304,11 +310,11 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Paramètres globaux</string>
+                  <string>Global parameters</string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="2" column="0">
                 <widget class="QFrame" name="paramsFrame">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -338,7 +344,7 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Dossier de travail</string>
+                     <string>Workspace</string>
                     </property>
                    </widget>
                   </item>
@@ -364,7 +370,7 @@
                      </sizepolicy>
                     </property>
                     <property name="toolTip">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Dossier de travail&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Contient les couches produites par FragScape. Les chemins relatifs sont construits à partir ce dossier.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Workspace&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Contains FragScape output layers. Relative paths are built from this directory.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                    </widget>
                   </item>
@@ -377,7 +383,7 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Sauver les couches intermédiaires</string>
+                     <string>Save intermediate layers</string>
                     </property>
                    </widget>
                   </item>
@@ -407,7 +413,7 @@
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item row="3" column="0">
                 <widget class="QTableView" name="paramsView">
                  <property name="enabled">
                   <bool>true</bool>
@@ -447,7 +453,7 @@
                  </property>
                 </widget>
                </item>
-               <item>
+               <item row="4" column="0">
                 <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -464,7 +470,7 @@
              </widget>
              <widget class="QWidget" name="landuseTab">
               <attribute name="title">
-               <string>2 - Occupation du sol</string>
+               <string>2 - Land cover</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_11">
                <item row="0" column="0">
@@ -483,7 +489,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Occupation du sol</string>
+                  <string>Land cover</string>
                  </property>
                 </widget>
                </item>
@@ -529,7 +535,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>1 - Couche d'entrée</string>
+                     <string>1 - Input layer</string>
                     </property>
                    </widget>
                   </item>
@@ -551,7 +557,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Couche d'entrée</string>
+                     <string>Input layer</string>
                     </property>
                    </widget>
                   </item>
@@ -596,7 +602,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Couper les données d'entrée</string>
+                     <string>Clip input data</string>
                     </property>
                    </widget>
                   </item>
@@ -631,7 +637,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Couche de découpage</string>
+                     <string>Clip layer</string>
                     </property>
                    </widget>
                   </item>
@@ -714,7 +720,7 @@
                         <enum>Qt::LeftToRight</enum>
                        </property>
                        <property name="text">
-                        <string>Lancer la sélection</string>
+                        <string>Launch selection</string>
                        </property>
                        <property name="icon">
                         <iconset resource="resources.qrc">
@@ -729,12 +735,12 @@
                    <widget class="QComboBox" name="landuseSelectionMode">
                     <item>
                      <property name="text">
-                      <string>Par valeur de champ</string>
+                      <string>By field values</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>Par expression</string>
+                      <string>By expression</string>
                      </property>
                     </item>
                    </widget>
@@ -760,7 +766,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>2 - Sélection</string>
+                     <string>2 - Selection</string>
                     </property>
                    </widget>
                   </item>
@@ -779,7 +785,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>Mode de sélection</string>
+                     <string>Selection mode</string>
                     </property>
                    </widget>
                   </item>
@@ -811,7 +817,7 @@
                          </size>
                         </property>
                         <property name="text">
-                         <string>Champ de selection</string>
+                         <string>Selection field</string>
                         </property>
                        </widget>
                       </item>
@@ -845,7 +851,7 @@
                          </font>
                         </property>
                         <property name="text">
-                         <string>Champ de description [optionnel]</string>
+                         <string>Description field [optional]</string>
                         </property>
                        </widget>
                       </item>
@@ -910,7 +916,7 @@
                             <enum>Qt::LeftToRight</enum>
                            </property>
                            <property name="text">
-                            <string>Afficher les valeurs de champ</string>
+                            <string>Show field values</string>
                            </property>
                            <property name="icon">
                             <iconset resource="resources.qrc">
@@ -948,6 +954,9 @@
                       </item>
                       <item row="4" column="0">
                        <widget class="QToolButton" name="landuseRemove">
+                        <property name="toolTip">
+                         <string>Delete selected lines</string>
+                        </property>
                         <property name="text">
                          <string/>
                         </property>
@@ -997,7 +1006,7 @@
              </widget>
              <widget class="QWidget" name="tab">
               <attribute name="title">
-               <string>3 - Éléments fragmentants</string>
+               <string>3 - Fragmentation</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_14">
                <item row="0" column="0">
@@ -1016,7 +1025,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Éléments fragmentants</string>
+                  <string>Fragmentation data</string>
                  </property>
                 </widget>
                </item>
@@ -1062,7 +1071,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>1 - Couche d'entrée</string>
+                     <string>1 - Input layer</string>
                     </property>
                    </widget>
                   </item>
@@ -1084,7 +1093,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Couche d'entrée</string>
+                     <string>Input layer</string>
                     </property>
                    </widget>
                   </item>
@@ -1135,7 +1144,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Couper les données d'entrée</string>
+                     <string>Clip input data</string>
                     </property>
                    </widget>
                   </item>
@@ -1170,7 +1179,7 @@
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="text">
-                     <string>Couche de découpage</string>
+                     <string>Clip layer</string>
                     </property>
                    </widget>
                   </item>
@@ -1232,7 +1241,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>2 - Sélection</string>
+                     <string>2 - Selection</string>
                     </property>
                    </widget>
                   </item>
@@ -1275,7 +1284,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>Tampon</string>
+                     <string>Buffer</string>
                     </property>
                    </widget>
                   </item>
@@ -1345,7 +1354,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>Sélection fragmentante</string>
+                     <string>Fragmentation selection</string>
                     </property>
                    </widget>
                   </item>
@@ -1368,7 +1377,7 @@
                   <item row="3" column="0">
                    <widget class="QLabel" name="label_6">
                     <property name="text">
-                     <string>Identifiant</string>
+                     <string>Identifier</string>
                     </property>
                    </widget>
                   </item>
@@ -1453,7 +1462,7 @@
                         <enum>Qt::LeftToRight</enum>
                        </property>
                        <property name="text">
-                        <string>Enregistrer la sélection</string>
+                        <string>Save selection</string>
                        </property>
                        <property name="icon">
                         <iconset resource="resources.qrc">
@@ -1498,7 +1507,7 @@
                      </sizepolicy>
                     </property>
                     <property name="toolTip">
-                     <string>Supprimer les lignes sélectionnées</string>
+                     <string>Delete selected lines</string>
                     </property>
                     <property name="text">
                      <string/>
@@ -1566,7 +1575,7 @@
                         <enum>Qt::LeftToRight</enum>
                        </property>
                        <property name="text">
-                        <string>Intégrer les éléments fragmentants</string>
+                        <string>Apply fragmentation</string>
                        </property>
                        <property name="icon">
                         <iconset resource="resources.qrc">
@@ -1584,7 +1593,7 @@
              </widget>
              <widget class="QWidget" name="fusionTab">
               <attribute name="title">
-               <string>4 - Résultats</string>
+               <string>4 - Results</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_9">
                <item row="0" column="0">
@@ -1603,7 +1612,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Résultats</string>
+                  <string>Results</string>
                  </property>
                 </widget>
                </item>
@@ -1649,7 +1658,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Couche d'entrée</string>
+                     <string>Input layer</string>
                     </property>
                    </widget>
                   </item>
@@ -1706,7 +1715,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Filtrer les patchs [opt.]</string>
+                     <string>Filter patches [opt.]</string>
                     </property>
                    </widget>
                   </item>
@@ -1747,7 +1756,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Couche de rapportage</string>
+                     <string>Reporting layer</string>
                     </property>
                    </widget>
                   </item>
@@ -1782,7 +1791,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Méthode de découpage</string>
+                     <string>Cut method</string>
                     </property>
                    </widget>
                   </item>
@@ -1822,7 +1831,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Couche de sortie [opt.]</string>
+                     <string>Output layer [opt.]</string>
                     </property>
                    </widget>
                   </item>
@@ -1881,7 +1890,7 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Unité de surface</string>
+                     <string>Unit of area</string>
                     </property>
                    </widget>
                   </item>
@@ -1889,22 +1898,22 @@
                    <widget class="QComboBox" name="resultsUnit">
                     <item>
                      <property name="text">
-                      <string>m² (mètres carrés)</string>
+                      <string>m² (square meters)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>dam²/a (décamètres carrés / ares)</string>
+                      <string>dam²/a (square decameters / ares)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>hm²/ha (hectomètres carrés / hectares)</string>
+                      <string>hm²/ha (square hectometers / hectares)</string>
                      </property>
                     </item>
                     <item>
                      <property name="text">
-                      <string>km² (kilomètres carrés)</string>
+                      <string>km² (square kilometers)</string>
                      </property>
                     </item>
                    </widget>
@@ -1949,7 +1958,7 @@
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="text">
-                  <string>Calculer les indicateurs</string>
+                  <string>Compute metrics</string>
                  </property>
                  <property name="icon">
                   <iconset resource="resources.qrc">
@@ -1992,7 +2001,7 @@
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>Taille effective de maille globale</string>
+                  <string>Global effective mesh size</string>
                  </property>
                 </widget>
                </item>
@@ -2043,7 +2052,7 @@
              </widget>
              <widget class="QWidget" name="logTab">
               <attribute name="title">
-               <string>Journal</string>
+               <string>Log</string>
               </attribute>
               <layout class="QVBoxLayout" name="verticalLayout_3">
                <property name="spacing">
@@ -2089,7 +2098,7 @@
                  <item>
                   <widget class="QToolButton" name="debugButton">
                    <property name="toolTip">
-                    <string>Activer le mode debug</string>
+                    <string>Activate debug mode</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -2109,7 +2118,7 @@
                  <item>
                   <widget class="QToolButton" name="logSaveAs">
                    <property name="toolTip">
-                    <string>Enregistrer le journal sous</string>
+                    <string>Save log as</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -2126,7 +2135,7 @@
                  <item>
                   <widget class="QToolButton" name="logClear">
                    <property name="toolTip">
-                    <string>Effacer le journal</string>
+                    <string>Clear log</string>
                    </property>
                    <property name="text">
                     <string>...</string>

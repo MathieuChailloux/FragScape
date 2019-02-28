@@ -102,6 +102,7 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         
     def initGui(self):
         QgsApplication.processingRegistry().addProvider(self.provider)
+        #self.switchLangEn()
         for k, tab in self.connectors.items():
             tab.initGui()
         
