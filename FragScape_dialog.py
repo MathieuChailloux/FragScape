@@ -102,7 +102,7 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
         
     def initGui(self):
         QgsApplication.processingRegistry().addProvider(self.provider)
-        #self.switchLangEn()
+        self.switchLangEn()
         for k, tab in self.connectors.items():
             tab.initGui()
         
@@ -172,7 +172,7 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
             self.translator = QTranslator()
             self.translator.load(lang_path)
             if qVersion() > '4.3.3':
-                utils.debug("Installing translator")
+                utils.debug("Installing translator " + str(lang_path))
                 QCoreApplication.installTranslator(self.translator)
             else:
                 utils.internal_error("Unexpected qVersion : " + str(qVersion()))
