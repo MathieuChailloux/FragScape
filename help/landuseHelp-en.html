@@ -3,25 +3,25 @@
     <style type="text/css">p, li { white-space: pre-wrap;}</style>
   </head>
   <body style=" font-family:'MS Shell Dlg 2';font-size:8.25pt;font-weight:400;font-style:normal;">
-    <p><span style=" font-size:14pt;font-weight:600;">Occupation du sol </span></p>
+    <p><span style=" font-size:14pt;font-weight:600;">Land cover </span></p>
     <br />
     <p style= " font-size:8pt;">
 <b>Description</b>
 <br/>
- Cette &eacute;tape permet de s&eacute;lectionner les &eacute;l&eacute;ments non fragmentants à partir d'une couche d'occupation du sol (par exemple les espaces naturels).
+ This step aims to select target features from land cover layer (such as natural areas).
 </p><p>
-<b>Param&egrave;tres</b>
+<b>Parameters</b>
 <br/>
- La couche d'occupation du sol doit couvrir l'int&eacute;gralit&eacute; du territoire mais il peut s'av&eacute;rer n&eacute;cessaire d'utiliser une couche couvrant un plus large territoire si la m&eacute;thode CBC (cf &eacute;tape 4) est utilis&eacute;e afin de limiter l'effet fronti&egrave;re.
+ Land cover layer must cover the whole study area but it might be necessary to use a larger extent when using CBC method (see step 4) to mitigate "boundary problem".
 <br/>
- Il est possible de couper les donn&eacute;es d'entr&eacute;e pour diminuer les temps de traitement.
+ Input data can be clipped to decrease processing execution time.
 <br/>
- Le mode de s&eacute;lection <i>Par valeur de champ</i> permet d'extraire automatiquement les postes d'occupation du sol depuis le champ renseign&eacute; puis de cocher les &eacute;l&eacute;ments non fragmentants. Le champ de description correspond à un champ de description des types d'occupation du sol s'il existe mais est optionnel.
+ Selection mode <i>By field values</i> automatically extracts land cover classes from specified field. Classes to select must be checked. Description field contains land cover classes description and is optional.
 <br/>
- Si les crit&egrave;res de s&eacute;lection sont plus complexes (d&eacute;pendant de la g&eacute;om&eacute;trie ou de plusieurs champs combin&eacute;s), il faut alors utiliser le mode de s&eacute;lection <i>Par expression</i>.
+ If selection criteria is more complex (depending on several field for instance), <i>By expression</i> mode must be used and corresponding expression specified.
 </p><p>
-<b>R&eacute;sultat</b>
+<b>Results</b>
 <br/>
- Lancer la s&eacute;lection en appuyant sur le bouton correspondant. Les &eacute;l&eacute;ments non fragmentants sont alors s&eacute;lectionn&eacute;s et regroup&eacute;s <span style=" font-size:8pt;color:red;font-weight:600">(cette &eacute;tape peut être longue pour de larges territoires)</span>. Le r&eacute;sultat est charg&eacute; dans QGIS et sauvegard&eacute; dans la couche <i>DossierDeTravail/outputs/landuseSelectionDissolve.gpkg</i>.
+ Launch selection by clicking corresponding button. Features are selected and then dissolved <span style=" font-size:8pt;color:red;font-weight:600">(dissolve process can be very slow for huge territories)</span>. Result layer is loaded in QGIS and stored in <i>Workspace/outputs/landuseSelectionDissolve.gpkg</i> file.
     </p>
   </body>

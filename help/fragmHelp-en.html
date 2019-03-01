@@ -8,24 +8,24 @@
     <p style= " font-size:8pt;">
 <b>Description</b>
 <br/>
- Cette &eacute;tape permet d'int&eacute;grer les &eacute;l&eacute;ments fragmentants à la couche produite en &eacute;tape 2.
+ This step aims to integrate fragmentation features to step2 output layer.
 <br/>
- Pour chaque type d'&eacute;l&eacute;ment cibl&eacute;, il faut renseigner tout ou partie des param&egrave;tres puis <i>Enregistrer la s&eacute;lection</i>. Le param&eacute;trage retenu appara&icirc;t alors comme une nouvelle ligne dans la table de visualisation.
+ For each feature type, selection parameters must be set then saved by clicking button <i>Save selection</i>. Saved parameters are displayed as a new line in visualisation table.
 </p><p>
-<b>Param&egrave;tres</b>
+<b>Parameters</b>
 <br/>
- La couche d'entr&eacute;e contenant les &eacute;l&eacute;ments fragmentants peut être ponctuelle, lin&eacute;aire ou surfacique. Il est possible de d&eacute;couper cette couche comme en &eacute;tape 2.
+ Input layer can contain point, line or surface features. Input layer can be clipped as in step2.
 <br/>
- <i>Expression</i> : crit&egrave;re de s&eacute;lection des entit&eacute;s depuis la couche d'entr&eacute;e. Si l'expression n'est pas renseign&eacute;e, toutes les entit&eacute;s sont s&eacute;lectionn&eacute;es.
+ <i>Expression</i>: selection expression applied to input features. If expression is empty, all features are selected.
 <br/>
- <i>Tampon</i> : application d'une zone tampon autour des entit&eacute;s s&eacute;lectionn&eacute;es pour mod&eacute;liser leur emprise au sol. Obligatoire pour les donn&eacute;es ponctuelles et lin&eacute;aiares.
+ <i>Buffer</i>: buffer expression to modelize physical footprint. Mandatory for punctual and linear data.
 <br/>
- <i>Identifiant</i>: identifiant unique du param&eacute;trage courant
+ <i>Identifier</i>: unique identifier of current selection
  </p><p>
-<b>R&eacute;sultat</b>
+<b>Results</b>
 <br/>
-Pour chaque param&eacute;trage, les traitements associ&eacute;s (d&eacute;coupage, s&eacute;lection, application de zone tampon) sont effectu&eacute;s et stock&eacute;s dans une couche correspondant à l'identifiant.
+ Each selection is processed (clip, selection, buffer) and resulting layer (with identifier name) is stored in temporary directory.
 <br/>
-Toutes ces couches sont alors fusionn&eacute;es, une diff&eacute;rence g&eacute;om&eacute;trique est effectu&eacute;e avec le r&eacute;sultat de l'&eacute;tape 2 et les polygones r&eacute;sultants sont transform&eacute;s en g&eacute;om&eacute;trie simple. Le r&eacute;sultat de ces traitements est sauvegard&eacute; dans la couche <i>DossierDeTravail/outputs/landuseFragmSingleGeom.gpkg</i>.
+ These layers are then merged, difference with step2 result is performed and cast to single geometry. Result layer is stored in <i>Workspace/outputs/landuseFragmSingleGeom.gpkg</i> file.
     </p>
   </body>
