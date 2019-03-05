@@ -25,6 +25,7 @@
         <file>icons/logoIrstea.png</file>
         <file>icons/logoMTES.png</file>
         <file>icons/logoTetis.png</file>
+        <file>icons/logoAgroParisTech.png</file>
         <file>icons/iconHelpConsole.svg</file>
     </qresource>
 </RCC>

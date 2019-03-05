@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>FragScape - Landscape fragmentation</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_22">
+  <layout class="QGridLayout" name="gridLayout_17">
    <item row="0" column="0" colspan="2">
     <widget class="QFrame" name="frame">
      <property name="sizePolicy">
@@ -2268,6 +2268,31 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="pixmap">
          <pixmap resource="resources.qrc">:/plugins/FragScape/icons/logoIrstea.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_13">
+        <property name="minimumSize">
+         <size>
+          <width>122</width>
+          <height>61</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>122</width>
+          <height>61</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="resources.qrc">:/plugins/FragScape/icons/logoAgroParisTech.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
