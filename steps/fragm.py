@@ -174,7 +174,7 @@ class FragmModel(abstract_model.DictModel):
         qgsUtils.removeVectorLayer(res_path)
         nb_items = len(self.items)
         curr_step = 1
-        step_feedback = QgsProcessingMultiStepFeedback(nb_items,feedback)
+        step_feedback = feedbacks.ProgressMultiStepFeedback(nb_items,feedback)
         for item in self.items:
             in_layer_path = item.dict[self.PREPARE_INPUT]
             in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)

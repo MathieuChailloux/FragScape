@@ -46,7 +46,7 @@ from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 import processing
 import xml.etree.ElementTree as ET
 
-from ..qgis_lib_mc import utils, qgsTreatments, qgsUtils
+from ..qgis_lib_mc import utils, qgsTreatments, qgsUtils, feedbacks
 from ..steps import params
 
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):
@@ -225,6 +225,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
                 
     def processAlgorithm(self,parameters,context,feedback):
         # Parameters
+        #assert(False)
         feedback.pushDebugInfo("parameters = " + str(parameters))
         input = self.parameterAsVectorLayer(parameters,self.INPUT,context)
         if input is None:
@@ -811,7 +812,7 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
         progress_step = 100.0 / nb_feats
         curr_step = 0
         # gna gna
-        multi_feedback = QgsProcessingMultiStepFeedback(nb_feats, feedback)
+        multi_feedback = feedbacks.ProgressMultiStepFeedback(nb_feats, feedback)
         report_layers = []
         for count, report_feat in enumerate(reporting.getFeatures()):
             multi_feedback.setCurrentStep(count)
