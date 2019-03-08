@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1015</width>
-    <height>690</height>
+    <width>869</width>
+    <height>695</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -68,7 +68,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>580</height>
+           <height>0</height>
           </size>
          </property>
          <property name="frameShape">
@@ -82,8 +82,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>767</width>
-            <height>671</height>
+            <width>635</width>
+            <height>601</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -93,23 +93,29 @@
            </sizepolicy>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <item row="0" column="6">
-            <widget class="QToolButton" name="langFr">
+           <item row="0" column="0">
+            <widget class="QToolButton" name="openProject">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="toolTip">
-              <string>Français</string>
+              <string>Open FragScape project</string>
              </property>
              <property name="text">
-              <string>...</string>
+              <string/>
              </property>
              <property name="icon">
               <iconset resource="resources.qrc">
-               <normaloff>:/plugins/FragScape/icons/frFlag.svg</normaloff>:/plugins/FragScape/icons/frFlag.svg</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
+               <normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -147,6 +153,18 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>23</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="toolTip">
               <string>Save FragScape project</string>
              </property>
@@ -156,58 +174,6 @@
              <property name="icon">
               <iconset resource="resources.qrc">
                <normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</iconset>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
-            <widget class="QToolButton" name="langEn">
-             <property name="toolTip">
-              <string>English</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/plugins/FragScape/icons/enFlag.svg</normaloff>:/plugins/FragScape/icons/enFlag.svg</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QToolButton" name="openProject">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="toolTip">
-              <string>Open FragScape project</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -244,6 +210,52 @@
              </property>
             </spacer>
            </item>
+           <item row="0" column="5">
+            <widget class="QToolButton" name="langEn">
+             <property name="toolTip">
+              <string>English</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/enFlag.svg</normaloff>:/plugins/FragScape/icons/enFlag.svg</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="6">
+            <widget class="QToolButton" name="langFr">
+             <property name="toolTip">
+              <string>Français</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/frFlag.svg</normaloff>:/plugins/FragScape/icons/frFlag.svg</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0" colspan="7">
             <widget class="QTabWidget" name="mTabWidget">
              <property name="sizePolicy">
@@ -254,7 +266,7 @@
              </property>
              <property name="minimumSize">
               <size>
-               <width>550</width>
+               <width>0</width>
                <height>550</height>
               </size>
              </property>
@@ -268,53 +280,23 @@
               <number>0</number>
              </property>
              <widget class="QWidget" name="paramsTab">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <attribute name="title">
                <string>1 - Parameters</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_16">
-               <item row="0" column="0" rowspan="2" colspan="2">
-                <widget class="QFrame" name="frame_2">
-                 <property name="frameShape">
-                  <enum>QFrame::StyledPanel</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_15">
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_11">
-                    <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 1.0 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory from vector input data (land cover, elements of fragmentation) in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification&lt;br/&gt;3) Fragmentation elements integration&lt;br/&gt;4) Fragmentation metrics computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                    </property>
-                    <property name="wordWrap">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="paramlabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>10</pointsize>
-                   <weight>75</weight>
-                   <bold>true</bold>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Global parameters</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0" colspan="2">
                 <widget class="QFrame" name="paramsFrame">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -350,6 +332,18 @@
                   </item>
                   <item row="2" column="1">
                    <widget class="QCheckBox" name="saveTmpResultsFlag">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
                     </property>
@@ -368,6 +362,18 @@
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
                     </property>
                     <property name="toolTip">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Workspace&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Contains FragScape output layers. Relative paths are built from this directory.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -408,12 +414,24 @@
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                    </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
-               <item row="4" column="0" colspan="2">
+               <item row="3" column="0">
                 <widget class="QTableView" name="paramsView">
                  <property name="enabled">
                   <bool>true</bool>
@@ -453,18 +471,65 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0">
-                <spacer name="verticalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
+               <item row="0" column="0">
+                <widget class="QFrame" name="frame_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
-                 <property name="sizeHint" stdset="0">
+                 <property name="maximumSize">
                   <size>
-                   <width>20</width>
-                   <height>42</height>
+                   <width>16777215</width>
+                   <height>254</height>
                   </size>
                  </property>
-                </spacer>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_15">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_11">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 1.0 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory from vector input data (land cover, elements of fragmentation) in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification&lt;br/&gt;3) Fragmentation elements integration&lt;br/&gt;4) Fragmentation metrics computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="wordWrap">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="paramlabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>10</pointsize>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Global parameters</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -564,7 +629,7 @@
                   <item row="1" column="1">
                    <widget class="QgsMapLayerComboBox" name="landuseInputLayerCombo">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
@@ -572,7 +637,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>0</height>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -608,6 +679,18 @@
                   </item>
                   <item row="2" column="1">
                    <widget class="QCheckBox" name="landuseClipDataFlag">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
                     </property>
@@ -645,6 +728,24 @@
                    <widget class="QgsFileWidget" name="landuseClipLayer">
                     <property name="enabled">
                      <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
                     </property>
                    </widget>
                   </item>
@@ -733,6 +834,18 @@
                   </item>
                   <item row="1" column="1">
                    <widget class="QComboBox" name="landuseSelectionMode">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <item>
                      <property name="text">
                       <string>By field values</string>
@@ -829,6 +942,18 @@
                           <verstretch>0</verstretch>
                          </sizepolicy>
                         </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>21</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>21</height>
+                         </size>
+                        </property>
                        </widget>
                       </item>
                       <item row="1" column="0">
@@ -862,6 +987,18 @@
                           <horstretch>0</horstretch>
                           <verstretch>0</verstretch>
                          </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>21</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>21</height>
+                         </size>
                         </property>
                         <property name="allowEmptyFieldName">
                          <bool>true</bool>
@@ -1100,7 +1237,7 @@
                   <item row="1" column="1">
                    <widget class="QgsMapLayerComboBox" name="fragmInputLayerCombo">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
@@ -1108,13 +1245,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>0</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>16777215</height>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1150,6 +1287,18 @@
                   </item>
                   <item row="2" column="1">
                    <widget class="QCheckBox" name="fragmClipDataFlag">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <property name="layoutDirection">
                      <enum>Qt::LeftToRight</enum>
                     </property>
@@ -1188,10 +1337,22 @@
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>0</height>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1293,13 +1454,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>0</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>20</height>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1309,13 +1470,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>0</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>20</height>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1325,13 +1486,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>0</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>20</height>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1676,13 +1837,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>60</width>
-                      <height>20</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>16</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="currentIndex">
@@ -1730,7 +1891,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>20</height>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1765,7 +1932,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>20</height>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
                      </size>
                     </property>
                    </widget>
@@ -1797,6 +1970,18 @@
                   </item>
                   <item row="3" column="1">
                    <widget class="QComboBox" name="resultsCutMode">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <item>
                      <property name="text">
                       <string>CUT (Cutting-Out)</string>
@@ -1846,13 +2031,13 @@
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
-                      <height>20</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
-                      <height>16</height>
+                      <height>21</height>
                      </size>
                     </property>
                     <property name="accessibleName">
@@ -1896,6 +2081,18 @@
                   </item>
                   <item row="5" column="1">
                    <widget class="QComboBox" name="resultsUnit">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
                     <item>
                      <property name="text">
                       <string>m² (square meters)</string>
