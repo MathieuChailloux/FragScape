@@ -284,6 +284,8 @@ class LanduseConnector(abstract_model.AbstractConnector):
         #self.dlg.landuseRun.clicked.connect(self.applyItems)
         self.dlg.landuseClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
         self.dlg.landuseClipLayer.fileChanged.connect(self.model.setDataClipLayer)
+        self.dlg.landuseOpenTable.clicked.connect(self.importFields)
+        self.dlg.landuseSaveTable.clicked.connect(self.saveFields)
         #self.dlg.landuseSelectionMode.activated.connect(self.switchSelectionMode)
         
     def switchDataClipFlag(self,state):
@@ -325,34 +327,36 @@ class LanduseConnector(abstract_model.AbstractConnector):
             utils.internal_error("No layer selected in landuse tab")
         if not self.model.select_field:
             utils.user_error("No selection field selected")
-        #fieldVals = qgsUtils.getLayerFieldUniqueValues(curr_layer,fieldname)
         new_items = []
-        if self.model.descr_field:
+        if self.model.descr_field and self.model.descr_field != self.model.select_field:
+            keepDescr = False
             fieldsAssoc = qgsUtils.getLayerAssocs(curr_layer,self.model.select_field,self.model.descr_field)
             new_items = [ LanduseFieldItem(v,str(l)) for v, l in fieldsAssoc.items() ]
-            # for k, descriptions in fieldsAssoc.items():
-                # descr = descriptions.join(" -- ")
-                # new_item = LanduseItem(k,descr=descr)
-                # old_item = self.model.getMatchingItem(new_item)
-                # if old_item:
-                    # new_item[LanduseFieldItem.TO_SELECT_FIELD] = old_item[LanduseFieldItem.TO_SELECT_FIELD]
-                # new_items.append(new_item)
         else:
+            keepDescr = True
             fieldVals = qgsUtils.getLayerFieldUniqueValues(curr_layer,self.model.select_field)
             new_items = [LanduseFieldItem(v) for v in fieldVals]
         for new_item in new_items:
             old_item = self.model.getMatchingItem(new_item)
             if old_item:
                 new_item.dict[LanduseFieldItem.TO_SELECT_FIELD] = old_item.dict[LanduseFieldItem.TO_SELECT_FIELD]
+                if keepDescr:
+                   new_item.dict[LanduseFieldItem.DESCR_FIELD] = old_item.dict[LanduseFieldItem.DESCR_FIELD]
         self.model.items = new_items
         self.model.layoutChanged.emit()
-        # self.model.items = []
-        # for fieldVal in fieldVals:
-            # utils.debug("fieldVal : " + str(fieldVal))
-            # item = LanduseFieldItem.fromVals(fieldVal,False)
-            # self.model.addItem(item)
-        # self.model.select_field = fieldname
-        # self.model.layoutChanged.emit()
+        
+    def importFields(self):
+        fname = qgsUtils.openFileDialog(parent=self.dlg,msg="Open field values CSV file",filter="*.csv")
+        if fname:
+            self.model.fromCSV(fname)
+            
+    def saveFields(self):
+        fname = qgsUtils.saveFileDialog(parent=self.dlg,
+                                      msg="Save field values as CSV file",
+                                      filter="*.csv")
+        if fname:
+            self.model.saveCSV(fname)
+        
         
     def switchSelectionMode(self,index):
         utils.debug("switchSelectMode : " + str(index))

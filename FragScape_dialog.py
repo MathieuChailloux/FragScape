@@ -52,8 +52,8 @@ class FragScapeAboutDialog(QtWidgets.QDialog,Ui_FragScapeAbout):
         super(FragScapeAboutDialog,self).__init__(parent)
         self.setupUi(self)
 
-#FORM_CLASS, _ = uic.loadUiType(os.path.join(
-#    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
+# FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    # os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
 
 
 class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):

@@ -38,7 +38,7 @@ from ..qgis_lib_mc import utils, qgsUtils, qgsTreatments, abstract_model
 params = None
 
 # Default CRS is set to epsg:2154 (France area, metric system)
-defaultCrs = QgsCoordinateReferenceSystem("EPSG:2154")
+defaultCrs = QgsCoordinateReferenceSystem("epsg:2154")
 
 # Checks that workspace is intialized and is an existing directory.
 # def checkWorkspaceInit():
@@ -261,9 +261,12 @@ class ParamsModel(QAbstractTableModel):
         return self.fromXMLDict(dict)
 
     def fromXMLDict(self,dict):
-        if self.WORKSPACE in dict:
-            if os.path.isdir(dict[self.WORKSPACE]):
-                self.setWorkspace(dict[self.WORKSPACE])
+        if self.CRS in dict:
+            crs = QgsCoordinateReferenceSystem(dict[self.CRS])
+            self.setCrs(crs)
+        #if self.WORKSPACE in dict:
+        #    if os.path.isdir(dict[self.WORKSPACE]):
+        #        self.setWorkspace(dict[self.WORKSPACE])
         # if self.TERRITORY in dict:
             # self.setTerritoryLayer(dict[self.TERRITORY])
         #if self.CLIP in dict:
@@ -276,9 +279,11 @@ class ParamsModel(QAbstractTableModel):
         xmlStr = indent + "<" + self.parser_name
         if self.workspace:
             xmlStr += " " + self.WORKSPACE + "=\"" + str(self.workspace) + "\""
+        xmlStr += " " + self.CRS + "=\"" + self.getCrsStr() + "\""
         #xmlStr += " " + self.CLIP + "=\"" + str(self.dataClipFlag) + "\""
         xmlStr += "/>"
         return xmlStr
+        
 
 class ParamsConnector:
 

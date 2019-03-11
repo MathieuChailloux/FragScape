@@ -68,7 +68,8 @@ class ReportingModel(abstract_model.DictModel):
         # return self.input_layer
                 
     def setOutLayer(self,layer_path):
-        self.out_layer = self.fsModel.normalizePath(layer_path)
+        self.out_layer = layer_path
+        #self.out_layer = self.fsModel.normalizePath(layer_path)
         
     def getOutLayer(self):
         if self.out_layer:
@@ -177,7 +178,8 @@ class ReportingModel(abstract_model.DictModel):
         if self.UNIT in attribs:
             self.unit = int(attribs[self.UNIT])
         if self.OUTPUT in attribs:
-            self.setOutLayer(attribs[self.OUTPUT])
+            out_layer = self.fsModel.getOrigPath(attribs[self.OUTPUT])
+            self.setOutLayer(out_layer)
         
     def fromXMLRoot(self,root):
         self.fromXMLAttribs(root.attrib)
