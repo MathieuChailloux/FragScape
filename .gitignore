@@ -2,6 +2,8 @@ qgis_lib_mc
 __pycache__/
 algs/__pycache__/
 steps/__pycache__/
-sample_data/EPCI_Clermontais_2012/outputs/
-sample_data/EPCI_Clermontais_2012/tmp/
+sample_data/EPCI_Clermontais_2012/CBC/outputs/
+sample_data/EPCI_Clermontais_2012/CBC/tmp/
+sample_data/EPCI_Clermontais_2012/CUT/outputs/
+sample_data/EPCI_Clermontais_2012/CUT/tmp/
 sample_data/EPCI_Clermontais_2012/test.csv

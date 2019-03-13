@@ -1,0 +1,49 @@
+<FragScapeModel>
+ <Params workspace="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/FragScape/sample_data/EPCI_Clermontais_2012" crs="epsg:2154"/>
+ <Landuse in_layer="../Source/CLC/CLC12_D034_RGF_clipped.gpkg" select_mode="0" clip_layer="../Source/ZoneEtude/EPCIClermontais.gpkg" select_field="CODE_12">
+  <LanduseFieldItem   value="111"   description="Continuous urban fabric"   toSelect="False"/>
+  <LanduseFieldItem   value="112"   description="Discontinuous urban fabric"   toSelect="False"/>
+  <LanduseFieldItem   value="121"   description="Industrial or commercial units"   toSelect="False"/>
+  <LanduseFieldItem   value="122"   description="Road and rail networks and associated land"   toSelect="False"/>
+  <LanduseFieldItem   value="123"   description="Port areas"   toSelect="False"/>
+  <LanduseFieldItem   value="124"   description="Airports"   toSelect="False"/>
+  <LanduseFieldItem   value="131"   description="Mineral extraction sites"   toSelect="False"/>
+  <LanduseFieldItem   value="132"   description="Dump sites"   toSelect="False"/>
+  <LanduseFieldItem   value="133"   description="Construction sites"   toSelect="False"/>
+  <LanduseFieldItem   value="141"   description="Green urban areas"   toSelect="False"/>
+  <LanduseFieldItem   value="142"   description="Sport and leisure facilities"   toSelect="False"/>
+  <LanduseFieldItem   value="211"   description="Non-irrigated arable land"   toSelect="False"/>
+  <LanduseFieldItem   value="213"   description="Rice fields"   toSelect="False"/>
+  <LanduseFieldItem   value="221"   description="Vineyards"   toSelect="False"/>
+  <LanduseFieldItem   value="222"   description="Fruit trees and berry plantations"   toSelect="False"/>
+  <LanduseFieldItem   value="223"   description="Olive groves"   toSelect="False"/>
+  <LanduseFieldItem   value="231"   description="Pastures"   toSelect="True"/>
+  <LanduseFieldItem   value="242"   description="Complex cultivation patterns"   toSelect="False"/>
+  <LanduseFieldItem   value="243"   description="Land principally occupied by agriculture, with significant areas of natural vegetation"   toSelect="True"/>
+  <LanduseFieldItem   value="311"   description="Broad-leaved forest"   toSelect="True"/>
+  <LanduseFieldItem   value="312"   description="Coniferous forest"   toSelect="True"/>
+  <LanduseFieldItem   value="313"   description="Mixed forest"   toSelect="True"/>
+  <LanduseFieldItem   value="321"   description="Natural grasslands"   toSelect="True"/>
+  <LanduseFieldItem   value="322"   description="Moors and heathland"   toSelect="True"/>
+  <LanduseFieldItem   value="323"   description="Sclerophyllous vegetation"   toSelect="True"/>
+  <LanduseFieldItem   value="324"   description="Transitional woodland-shrub"   toSelect="True"/>
+  <LanduseFieldItem   value="331"   description="Inland marshes"   toSelect="True"/>
+  <LanduseFieldItem   value="332"   description="Peat bogs"   toSelect="True"/>
+  <LanduseFieldItem   value="333"   description="Salt marshes"   toSelect="True"/>
+  <LanduseFieldItem   value="411"   description="Salines"   toSelect="True"/>
+  <LanduseFieldItem   value="421"   description="Intertidal flats"   toSelect="True"/>
+  <LanduseFieldItem   value="422"   description="Water courses"   toSelect="True"/>
+  <LanduseFieldItem   value="511"   description="Water bodies"   toSelect="True"/>
+  <LanduseFieldItem   value="512"   description="Coastal lagoons"   toSelect="True"/>
+  <LanduseFieldItem   value="521"   description="Estuaries"   toSelect="True"/>
+  <LanduseFieldItem   value="523"   description="Sea and ocean"   toSelect="False"/>
+ </Landuse>
+ <FragmModel>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="../Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison locale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="7.5"   NAME="road1"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="../Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison régionale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="15"   NAME="road2"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="../Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison principale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="22.5"   NAME="road3"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="../Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Type autoroutier' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="30"   NAME="road4"/>
+ </FragmModel>
+ <Reporting select_expr=" $area &gt;= 1000" method="0" reporting_layer="../Source/ZoneEtude/EPCIClermontaisCommunes.shp" output="../outputs/resultsCUT.gpkg">
+ </Reporting>
+</FragScapeModel>

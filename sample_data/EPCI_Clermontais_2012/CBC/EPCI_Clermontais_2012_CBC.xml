@@ -1,6 +1,6 @@
 <FragScapeModel>
- <Params workspace="D:/Projets/Meff/Tests/EPCI_Clermontais/EPCI_Clermontais_2012" crs="epsg:2154"/>
- <Landuse in_layer="Source/CLC/CLC12_D034_RGF_clipped.gpkg" select_mode="0" clip_layer="Source/ZoneEtude/EPCIClermontais.gpkg" select_field="CODE_12">
+ <Params workspace="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/FragScape/sample_data/EPCI_Clermontais_2012" crs="epsg:2154"/>
+ <Landuse in_layer="../Source/CLC/CLC12_D034_RGF_clipped.gpkg" select_mode="0" select_field="CODE_12">
   <LanduseFieldItem   value="111"   description="Continuous urban fabric"   toSelect="False"/>
   <LanduseFieldItem   value="112"   description="Discontinuous urban fabric"   toSelect="False"/>
   <LanduseFieldItem   value="121"   description="Industrial or commercial units"   toSelect="False"/>
@@ -39,11 +39,11 @@
   <LanduseFieldItem   value="523"   description="Sea and ocean"   toSelect="False"/>
  </Landuse>
  <FragmModel>
-  <FragmItem   INPUT="Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;NB_VOIES&quot;  =  '1 voie ou 2 voies étroites' "   BUFFER_EXPR="4.75"   NAME="road1"/>
-  <FragmItem   INPUT="Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;NB_VOIES&quot;  =   '2 voies larges' "   BUFFER_EXPR="6.5"   NAME="road2"/>
-  <FragmItem   INPUT="Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;NB_VOIES&quot;  =    '3 voies' "   BUFFER_EXPR="8.25"   NAME="road3"/>
-  <FragmItem   INPUT="Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   CLIP_LAYER="Source/ZoneEtude/EPCIClermontais.gpkg"   SELECT_EXPR=" &quot;NB_VOIES&quot;  =  '4 voies' "   BUFFER_EXPR="10"   NAME="road4"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg" SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison locale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="7.5"   NAME="road1"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg" SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison régionale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="15"   NAME="road2"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg" SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison principale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="22.5"   NAME="road3"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg" SELECT_EXPR=" &quot;VOCATION&quot;  =  'Type autoroutier' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="30"   NAME="road4"/>
  </FragmModel>
- <Reporting select_expr=" $area &gt;= 1000" method="0" reporting_layer="Source/ZoneEtude/EPCIClermontaisCommunes.shp" output="outputs/resultsCUT.gpkg">
+ <Reporting select_expr=" $area &gt;= 1000" method="1" reporting_layer="../Source/ZoneEtude/EPCIClermontaisCommunes.shp" output="../outputs/resultsCBC.gpkg">
  </Reporting>
 </FragScapeModel>
