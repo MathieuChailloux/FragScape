@@ -30,7 +30,7 @@ tags=python
 
 homepage=http://homepage
 category=Plugins
-icon=icon.png
+icon=icons/vector_grid.svg
 # experimental flag
 experimental=False
 
