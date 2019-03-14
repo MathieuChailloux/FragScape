@@ -25,18 +25,16 @@ Install it and a grid icon should appear. Otherwise, it is available in plugins 
 
 # Documentation
 
-Available documentation (only in french for now):
- - [Modelling method description](https://www.umr-tetis.fr/jdownloads/plateformes/Notice_Plugin_FragScape1.0.pdf)
- - [User guide](https://www.umr-tetis.fr/jdownloads/plateformes/MethodePermeabiliteMilieux.pdf)
+Available documentation:
+ - [FragScape User Guide](https://drive.google.com/open?id=1h0deADl_Rv4wEqG1HI4H51VpofmnccjD)
 
-# Sample data
+# Example
 
-A sample data set can be downloaded at TODO.
+Sample data is provided with plugin [here](https://github.com/MathieuChailloux/FragScape/tree/qgis-lib-mc/sample_data/EPCI_Clermontais_2012)
 
-To produce above dispersal map, open configuration file *BousquetOrb.xml* 
-and run steps 2,3,4,5,7. You should obtain such results (legend is manually assigned) :
+![Alt Text](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
 
-GIF
+To reproduce above results, see "Example" section of User Guide.
  
 # Steps
 
