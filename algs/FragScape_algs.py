@@ -100,10 +100,10 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("1 - Prepare land use data")
+        return self.tr("1 - Prepare land cover data")
         
     def shortHelpString(self):
-        return self.tr("TODO")
+        return self.tr("This algorithms prepares land cover data by applying selection (from expression) and dissolving geometries")
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -184,7 +184,7 @@ class PrepareFragmentationAlgorithm(QgsProcessingAlgorithm):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("2.1 - Prepare Fragmentation")
+        return self.tr("2.1 - Prepare fragmentation data")
         
     def shortHelpString(self):
         return self.tr("This algorithm prepares a fragmentation layer by applying clip, selection and buffer")
@@ -294,13 +294,13 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         return self.tr("2.2 - Apply fragmentation")
         
     def shortHelpString(self):
-        return self.tr("This algorithm cuts a land use layer with fragmentation data")
+        return self.tr("This algorithm builds a layer of patches from a land cover layer and fragmentation layers. Overlaying geometries are removed and remaining ones are cast to single geometry type.")
 
     def initAlgorithm(self, config=None):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.LANDUSE,
-                self.tr("Land use layer"),
+                self.tr("Land cover layer"),
                 [QgsProcessing.TypeVectorPolygon]))
         self.addParameter(
             QgsProcessingParameterMultipleLayers(
@@ -493,7 +493,7 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("Effective Mesh Size (Boundary)")
+        return self.tr("Effective mesh size (Boundary)")
         
     def shortHelpString(self):
         return self.tr("Computes effective mesh size from boundary layer")
@@ -728,7 +728,7 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("3 - Effective Mesh Size (Reporting)")
+        return self.tr("3 - Effective mesh size (Reporting)")
         
     def shortHelpString(self):
         return self.tr("Computes effective mesh size and other fragmentation indicators")

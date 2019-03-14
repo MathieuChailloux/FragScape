@@ -264,9 +264,9 @@ class ParamsModel(QAbstractTableModel):
         if self.CRS in dict:
             crs = QgsCoordinateReferenceSystem(dict[self.CRS])
             self.setCrs(crs)
-        #if self.WORKSPACE in dict:
-        #    if os.path.isdir(dict[self.WORKSPACE]):
-        #        self.setWorkspace(dict[self.WORKSPACE])
+        if self.WORKSPACE in dict:
+           if not self.workspace and os.path.isdir(dict[self.WORKSPACE]):
+               self.setWorkspace(dict[self.WORKSPACE])
         # if self.TERRITORY in dict:
             # self.setTerritoryLayer(dict[self.TERRITORY])
         #if self.CLIP in dict:
