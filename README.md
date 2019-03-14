@@ -57,7 +57,6 @@ Each step is detailed in plugin help panel.
 > Chailloux, M. & Amsallem, J. (2018) FragScape : a QGIS plugin to compute effective mesh size
     
 # Links
- - [FragScape homepage](https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/415-biodispersal)
  - [FragScape git repository](https://github.com/MathieuChailloux/FragScape)
  - [IRSTEA](http://www.irstea.fr)
  - [AgroParisTech](http://www2.agroparistech.fr/)
