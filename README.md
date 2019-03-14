@@ -32,8 +32,13 @@ Available documentation:
 
 Sample data is provided with plugin [here](https://github.com/MathieuChailloux/FragScape/tree/qgis-lib-mc/sample_data/EPCI_Clermontais_2012)
 
-![alt text](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
-![alt text](https://lauraeoliver.files.wordpress.com/2015/03/gifex3.gif)
+Results with CUT method :
+
+![GIF1](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
+
+Results with Cross-Boundary Connection method :
+
+![GIF2](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
 
 To reproduce above results, see "Example" section of User Guide.
  
@@ -49,7 +54,7 @@ Each step is detailed in plugin help panel.
 
 # Quotation
 
-> Chailloux, M. & Amsallem, J. (2018) $FragScape$ : a QGIS plugin to compute effective mesh size
+> Chailloux, M. & Amsallem, J. (2018) FragScape : a QGIS plugin to compute effective mesh size
     
 # Links
  - [FragScape homepage](https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/415-biodispersal)
