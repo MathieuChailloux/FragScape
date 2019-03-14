@@ -32,7 +32,7 @@ Available documentation:
 
 Sample data is provided with plugin [here](https://github.com/MathieuChailloux/FragScape/tree/qgis-lib-mc/sample_data/EPCI_Clermontais_2012)
 
-![Alt Text](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
+![alt text](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
 
 To reproduce above results, see "Example" section of User Guide.
  
