@@ -28,11 +28,11 @@ Des données d'exemple sont fournies avec le plugin ([lien](https://github.com/M
 
 Résultats avec la méthode CUT :
 
-CUT_GIF
+![CUT_GIF](/docs/CUT.gif)
 
 Résultats avec la méthode CBC :
 
-CBC_GIF
+![CBC_GIF](/docs/CBC.gif)
 
 Pour reproduire les résultats, cf section "Exemple" de la notice d'utilisation.
  

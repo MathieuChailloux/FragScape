@@ -30,11 +30,11 @@ Sample data is provided with plugin [here](https://github.com/MathieuChailloux/F
 
 Results with CUT method :
 
-CUT_GIF
+![CUT_GIF](/docs/CUT.gif)
 
 Results with Cross-Boundary Connection method :
 
-CBC_GIF
+![CBC_GIF](/docs/CBC.gif)
 
 To reproduce above results, see "Example" section of User Guide.
  
