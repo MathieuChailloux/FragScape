@@ -6,7 +6,7 @@
 *FragScape* is a QGIS 3 plugin.
 
 Its purpose is to compute landscape fragmentation metrics defined by Jaeger (Jaeger
-2000). Among these metrics, effective mesh size has beenwidely used to quantify landscape fragmentation.
+2000). Among these metrics, effective mesh size has been widely used to quantify landscape fragmentation.
 
 *FragScape* defines a 4 steps process from raw data to computed metrics and allow user to save configuration so that results can be reproduced with same context.
 
