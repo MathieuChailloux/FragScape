@@ -10,11 +10,7 @@ Its purpose is to compute landscape fragmentation metrics defined by Jaeger (Jae
 
 *FragScape* defines a 4 steps process from raw data to computed metrics and allow user to save configuration so that results can be reproduced with same context.
 
-[comment]: <> (Below is an example of dispersal map created by *FragScape* :)
-[comment]: <> (![dispEx](/docs/pictures/FragScapeExamplePicture.png))
-
-It has been developped by *Mathieu Chailloux* at [*IRSTEA*](http://www.irstea.fr), 
-on mission for the [*French ecological network resource center*](http://www.trameverteetbleue.fr/) 
+It has been developped by *Mathieu Chailloux* at [*IRSTEA*](http://www.irstea.fr), for the [*French ecological network resource center*](http://www.trameverteetbleue.fr/) 
 (driven by [*French ministry of ecology*](https://www.ecologique-solidaire.gouv.fr/)).
 
 # Installation
