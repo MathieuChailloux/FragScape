@@ -54,7 +54,7 @@ Each step is detailed in plugin help panel.
 
 # Quotation
 
-> Chailloux, M. & Chéry J.P. & Amsallem, J. (2019) FragScape : a QGIS plugin to quantify landscape fragmentation
+> Chailloux, M. & Chéry, J.P. & Amsallem, J. (2019) FragScape : a QGIS plugin to quantify landscape fragmentation
     
 # Links
  - [FragScape git repository](https://github.com/MathieuChailloux/FragScape)
