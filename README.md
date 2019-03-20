@@ -26,7 +26,7 @@ Install it and a grid icon should appear. Otherwise, it is available in plugins 
 # Documentation
 
 Available documentation:
- - [FragScape User Guide](https://drive.google.com/open?id=1h0deADl_Rv4wEqG1HI4H51VpofmnccjD)
+ - [FragScape User Guide](https://drive.google.com/open?id=1VxrRMjfpa1Kdf0ahqw9kWqvzhSLmAYDI)
 
 # Example
 
@@ -34,11 +34,11 @@ Sample data is provided with plugin [here](https://github.com/MathieuChailloux/F
 
 Results with CUT method :
 
-![GIF1](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
+![CUT_GIF](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
 
 Results with Cross-Boundary Connection method :
 
-![GIF2](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
+![CBC_GIF](https://drive.google.com/open?id=1e3Rr3ZzV1qeBwfKQevP-Tj9KtKbI68ZU)
 
 To reproduce above results, see "Example" section of User Guide.
  
@@ -54,7 +54,7 @@ Each step is detailed in plugin help panel.
 
 # Quotation
 
-> Chailloux, M. & Amsallem, J. (2018) FragScape : a QGIS plugin to compute effective mesh size
+> Chailloux, M. & Chéry J.P. & Amsallem, J. (2019) FragScape : a QGIS plugin to quantify landscape fragmentation
     
 # Links
  - [FragScape git repository](https://github.com/MathieuChailloux/FragScape)
