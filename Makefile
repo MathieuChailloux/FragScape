@@ -14,6 +14,12 @@ archive:
 	for d in $(TO_COPY_DIRS); do \
 		cp -r $$d $(ARCHIVE_DIR) ; \
 	done
+	rm -rf $(ARCHIVE_DIR)/sample_data/EPCI_Clermontais_2012/CBC/outputs
+	rm -rf $(ARCHIVE_DIR)/sample_data/EPCI_Clermontais_2012/CBC/tmp
+	rm -rf $(ARCHIVE_DIR)/sample_data/EPCI_Clermontais_2012/CUT/outputs
+	rm -rf $(ARCHIVE_DIR)/sample_data/EPCI_Clermontais_2012/CUT/tmp
+	mkdir $(ARCHIVE_DIR)/docs
+	cp docs/FragScape_UserGuide_en.pdf $(ARCHIVE_DIR)/docs
 	cp -r $(MC_LIB_DIR) $(ARCHIVE_DIR)
 	cp *.py $(ARCHIVE_DIR)
 	cp *.ui $(ARCHIVE_DIR)
