@@ -1,0 +1,194 @@
+%%novalidate
+
+\usepackage{tikz}
+\usepackage{calc}
+\usepackage{booktabs}
+\usepackage{datetime}
+
+
+% colors
+\definecolor{color1}{HTML}{000060}
+%\definecolor{color1}{HTML}{8C260F}
+\definecolor{color2}{HTML}{333333}
+\definecolor{editorPurple}{cmyk}{0.45, 1, 0, 0}
+
+% fonts
+\usepackage{fontspec}
+\defaultfontfeatures{Mapping=tex-text}
+\setmainfont
+[BoldFont=Lato-Bold.ttf,
+ItalicFont=Lato-Italic.ttf,
+BoldItalicFont=Lato-BoldItalic.ttf]
+{Lato-Regular.ttf}
+\newfontfamily\headingfont[ItalicFont=Lato-BlackItalic.ttf]{Lato-Black.ttf}
+%%%
+
+\usepackage{geometry}
+\geometry{a4paper,
+hmargin=20mm,vmargin=20mm,
+head=0ex,foot=3ex}
+
+\linespread{1.1}
+
+\usepackage{caption}
+\DeclareCaptionFormat{upper}{#1#2{#3}\par}
+\captionsetup{labelfont={bf,color=color2},textfont={normalsize,color=color2},format = upper,figurename=FIGURE,tablename=TABLE}
+
+%%% fancy sections
+\usepackage{titlesec}
+%\titleformat{\chapter}{\headingfont\LARGE\bfseries\scshape\color{color1}}{\thechapter}{1em}{}[\titlerule]
+\titleformat{\section}{\color{color1}\headingfont\Large\bfseries\uppercase}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\color{color1}\headingfont\large\bfseries\uppercase}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\color{color1}\headingfont\bfseries}{\thesubsubsection}{1em}{}
+
+\setcounter{secnumdepth}{4}
+\titleformat{\paragraph}{\color{color1}\headingfont\small\bfseries}{\theparagraph}{1em}{}
+%\titlespacing*{\paragraph}
+%{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+%%%
+
+\newdateformat{dateFormat}{%
+\THEDAY/\THEMONTH/\THEYEAR}
+\dateFormat
+
+% head and foot
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\makeatletter
+\rhead{}
+%\rhead{\color{color2}\@date}
+\makeatother
+\newlength{\myheight}
+\lfoot{\today
+% \settoheight{\myheight}{\thepage}
+% \raisebox{-2ex-0.5\myheight}{\includegraphics[height=4ex]{logo}}
+}
+\cfoot{\color{color2}TODO}
+\rfoot{\color{color2}\thepage}
+\renewcommand\headrulewidth{0pt}
+\renewcommand\footrulewidth{0pt}
+
+\fancypagestyle{style1}{
+\fancyhf{}
+\fancyfoot[L]{\color{lightgray} \textit{\today}}
+\fancyfoot[C]{\color{lightgray} \textit{FragScape v1.0 - Notice d'utilisation}}
+\fancyfoot[R]{\color{lightgray} \thepage / \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0pt}
+}
+
+\fancypagestyle{style2}{
+\fancyhf{}
+\fancyhead[C]{
+\vspace{0.3cm}
+\begin{tabular}{cccc}
+\includegraphics[scale=0.07]{pictures/logoIrstea.png}\hspace{1cm}
+&
+\includegraphics[scale=0.2]{pictures/logoAgroParisTech.png}\hspace{1cm}
+&
+\includegraphics[scale=0.25]{pictures/logoTetis.png}\hspace{1cm}
+&
+\includegraphics[scale=0.9]{pictures/logoCRTVB.png}\hspace{1cm}
+&
+\includegraphics[scale=1.0]{pictures/logoMTES.png}
+\end{tabular}
+\renewcommand{\headrulewidth}{0pt}
+}}
+
+% custom titlepage
+\makeatletter
+\newcommand*\DefVar[1]{\@namedef{#1}##1{\global\@namedef{get#1}{##1}}}
+\DefVar{summary}
+%\vspace{4cm}
+\renewcommand{\maketitle}{
+\begin{center}
+\begin{tabular}{ccc}
+\includegraphics[scale=0.07]{pictures/logoIrstea.png}\hspace{1cm}
+&
+\includegraphics[scale=0.2]{pictures/logoAgroParisTech.png}
+&
+\includegraphics[scale=0.25]{pictures/logoTetis.png}
+\end{tabular}
+
+\vspace{1cm}
+
+\begin{tabular}{lr}
+\includegraphics[scale=0.9]{pictures/logoCRTVB.png}\hspace{1cm}
+&
+\includegraphics[scale=1.0]{pictures/logoMTES.png}
+\end{tabular}
+\vspace{2cm}
+
+{\color{color1}\headingfont\bfseries\huge
+FragScape v1.0}
+
+\vspace{1cm}
+
+{\color{color1}\headingfont\bfseries\LARGE
+Notice d'utilisation}
+
+\vspace{1cm}
+
+\today
+
+\vspace{1cm}
+
+{\fontsize{12}{15}\textnormal{
+Mathieu Chailloux (IRSTEA / UMR TETIS) - \textit{mathieu.chailloux@irstea.fr}\\
+Jennifer Amsallem (IRSTEA / UMR TETIS) - \textit{jennifer.amsallem@irstea.fr}\\
+Jean-Pierre Chéry (AgroParisTech / UMR TETIS) - \textit{jean-pierre.chery@teledection.fr}\\
+\bigskip
+}}
+
+
+%\headingfont\bfseries\Large\@author\par
+%\bigskip\medskip
+%\textit{\textnormal{Commanditaire :}}\\
+%Pierre-Olaf Schut (UPEM) - {\fontsize{15}{18}\textnormal{po.schut@u-pem.fr}}
+%{\color{color2}\normalfont\normalsize\textbf{Summary:}\\
+%\getsummary}
+\end{center}
+\clearpage
+}
+\makeatother
+%%%
+
+%%% fancy boxes
+\usepackage{tcolorbox}
+\usepackage{wrapfig}
+\def\fullboxbegin{
+\bigskip
+\begin{tcolorbox}[colback=color1,colframe=color1,coltext=white,arc=0mm,boxrule=0pt]
+}
+\def\fullboxend{\end{tcolorbox}\medskip}
+%
+\def\leftboxbegin{
+\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{tcolorbox}[colback=color1,colframe=color1,coltext=white,arc=0mm,boxrule=0pt]
+}
+\def\leftboxend{
+\end{tcolorbox}
+\end{wrapfigure}
+}
+%
+\def\rightboxbegin{
+\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{tcolorbox}[colback=color1,colframe=color1,coltext=white,arc=0mm,boxrule=0pt]
+}
+\def\rightboxend{
+\end{tcolorbox}
+\end{wrapfigure}
+}
+%
+\newcounter{frames}
+\def\frameboxbegin#1{
+\bigskip
+\refstepcounter{frames}
+\begin{tcolorbox}[colback=white,colframe=color1,arc=0mm,title={{\textbf{Encart \arabic{frames}} : #1}}]
+}
+\def\frameboxend{
+\end{tcolorbox}
+}
+%%%

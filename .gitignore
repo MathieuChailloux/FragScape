@@ -1,6 +1,7 @@
 qgis_lib_mc
 __pycache__/
 algs/__pycache__/
+docs/source/svg-inkscape
 steps/__pycache__/
 sample_data/EPCI_Clermontais_2012/CBC/outputs/
 sample_data/EPCI_Clermontais_2012/CBC/tmp/
