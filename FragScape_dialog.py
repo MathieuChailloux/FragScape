@@ -36,7 +36,7 @@ from qgis.gui import QgsFileWidget
 from qgis.core import QgsApplication, QgsProcessingContext
 
 from .qgis_lib_mc import utils, qgsUtils, feedbacks, config_parsing, log, qgsTreatments
-from .algs.FragScape_algs import FragScapeAlgorithmsProvider
+from .algs.FragScape_algs_provider import FragScapeAlgorithmsProvider
 from .algs.FragScape_global_alg import FragScapeAlgorithm
 from .steps import params, landuse, fragm, reporting
 from . import tabs

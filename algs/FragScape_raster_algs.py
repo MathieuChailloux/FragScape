@@ -22,68 +22,120 @@
  ***************************************************************************/
 """
 
+import math
+import scipy
+import numpy as np
+
+from PyQt5.QtCore import QCoreApplication
 from qgis.core import (QgsProcessing,
-                       QgsProcessingAlgorithm)                       
+                       QgsProcessingAlgorithm,
+                       QgsProcessingParameterRasterLayer,
+                       QgsProcessingParameterNumber,
+                       QgsProcessingOutputNumber)      
+
+from ..qgis_lib_mc import qgsUtils                       
                        
-def tr(self, string):
+def tr(string):
     return QCoreApplication.translate('Processing', string) 
 
-class RasterMeff(QgsProcessingAlgorithm):
+class MeffRaster(QgsProcessingAlgorithm):
 
-    ALG_NAME = "rasterMeff"
+    ALG_NAME = "meffRaster"
+    
     INPUT = "INPUT"
     CLASS = "CLASS"
+    OUTPUT = "OUTPUT"
         
     def createInstance(self):
-        return RasterMeff()
+        return MeffRaster()
         
     def name(self):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("Raster Effective Mesh Size")
+        return tr("Raster Effective Mesh Size")
         
     def shortHelpString(self):
-        return self.tr("Computes effective mesh size on a raster layer")
+        return tr("Computes effective mesh size on a raster layer")
 
-    def initAlgorithm(self, config):
+    def initAlgorithm(self, config=None):
         '''Here we define the inputs and output of the algorithm, along
         with some other properties'''
-        self.addParameter(QgsProcessingParameterRasterLayer(self.INPUT, "Input raster layer", optional=False))
-        self.addParameter(QgsProcessingParameterNumber(self.CLASS, "Choose Landscape Class", type=QgsProcessingParameterNumber.Integer, defaultValue=1))
-        self.addParameter(QgsProcessingParameterRasterDestination(self.OUTPUT_RASTER, "Result output"))  
-        self.addOutput(QgsProcessingParameterRasterDestination(self.OUTPUT_RASTER, "Result output"))
+        self.addParameter(QgsProcessingParameterRasterLayer(
+            self.INPUT, "Input raster layer", optional=False))
+        self.addParameter(QgsProcessingParameterNumber(
+            self.CLASS, "Choose Landscape Class", type=QgsProcessingParameterNumber.Integer, defaultValue=1))
+        self.addOutput(QgsProcessingOutputNumber(
+            self.OUTPUT, "Output effective mesh size"))
         
     def processAlgorithm(self, parameters, context, feedback):
         '''Here is where the processing itself takes place'''
         
         # Retrieve the values of the parameters entered by the user
-        input = 
-        inputFilename = self.parameterAsRasterLayer(parameters, self.LAND, context).source()
-        cl = self.parameterAsInt(parameters, self.LC_CLASS, context)
-        output = self.parameterAsOutputLayer(parameters, self.OUTPUT_RASTER, context)        
+        input = self.parameterAsRasterLayer(parameters, self.INPUT, context)
+        cl = self.parameterAsInt(parameters, self.CLASS, context)
+        output = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)        
                 
         # Processing
-        nodata = lcs.f_returnNoDataValue(str(inputFilename)) # Get Nodata-value
-        classes, array = lcs.f_landcover(str(inputFilename)) # get classes and array
-
-        # Check for nodata value
-        if nodata == None:
-            ln = str(path.basename(inputFilename))
-            raise QgsProcessingException("The layer %s has no valid nodata value (no number)!" % (ln))
-
-        # Needed to see if class in inside raster
+        input_dpr = input.dataProvider()
+        nodata = input_dpr.sourceNoDataValue(1)
+        inputFilename = input.source()
+        x_res = input.rasterUnitsPerPixelX() # Extract The X-Value
+        y_res = input.rasterUnitsPerPixelY() # Extract The Y-Value
+        pix_area = x_res * y_res
+        feedback.pushDebugInfo("Pixel area " + str(x_res) + " x " + str(y_res)
+                                + " = " + str(pix_area))
+        classes, array = qgsUtils.getRasterValsAndArray(str(inputFilename)) # get classes and array
         if cl not in classes:
-            ln = str(path.basename(inputFilename))
-            raise QgsProcessingException("The layer %s has no cells with value %s !" % (ln,cl))
-            
-        # Build 
-        cl_array = numpy.copy(array)
-        cl_array[cl_array!=int(cl)] = 0
-
+            raise QgsProcessingException("Input layer has no cells with value " + str(cl))
+        new_array = np.copy(array)
+        new_array[new_array!=cl] = 0
         struct = scipy.ndimage.generate_binary_structure(2,2)
-        results, numpatches = ndimage.label(cl_array,struct) 
-    
-        # Create the output layer 
-        func.exportRaster(results,inputFilename,output)
-        return {self.OUTPUT_RASTER: output}
+        labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
+        feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
+        #struct = scipy.ndimage.generate_binary_structure(2,2)
+
+        res = []
+        labels = list(range(1,nb_patches+1))
+        feedback.pushDebugInfo("labels = " + str(labels))
+        patches_len = scipy.ndimage.labeled_comprehension(new_array,labeled_array,labels,len,int,0)
+        feedback.pushDebugInfo("patches_len = " + str(patches_len))
+        
+        # sum_per_label = scipy.ndimage.sum(new_array,labeled_array,labels)
+        # sum_per_label = sum_per_label[sum_per_label!=0] # remove zeros
+        
+        sum_ai = 0
+        sum_ai_sq = 0
+        for patch_len in patches_len:
+            ai = patch_len * pix_area
+            sum_ai_sq += math.pow(ai,2)
+            sum_ai += ai
+        feedback.pushDebugInfo("sum_ai = " + str(sum_ai))
+        feedback.pushDebugInfo("sum_ai_sq = " + str(sum_ai_sq))
+        if sum_ai_sq == 0:
+            feedback.reportError("Empty area for patches, please check your selection.")
+        
+        nb_pix = len(array[array != nodata])
+        nb_pix1 = len(array)
+        nb_pix11 = len(array[array != -1])
+        nb_pix111 = array.size
+        nb_pix2 = len(array[array != nodata])
+        nb_pix3 = len(array[array == nodata])
+        nb_pix4 = len(array[array != 0])
+        nb_pix5 = len(array[array == 0])
+        tot_area = nb_pix * pix_area
+        feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
+        feedback.pushDebugInfo("nb_pix11 = " + str(nb_pix11))
+        feedback.pushDebugInfo("nb_pix111 = " + str(nb_pix111))
+        feedback.pushDebugInfo("nb_pix2 = " + str(nb_pix2))
+        feedback.pushDebugInfo("nb_pix3 = " + str(nb_pix3))
+        feedback.pushDebugInfo("nb_pix4 = " + str(nb_pix4))
+        feedback.pushDebugInfo("nb_pix5 = " + str(nb_pix5))
+        feedback.pushDebugInfo("tot_area = " + str(tot_area))
+        #area_sq = math.pow(nb_pix,2)
+        if nb_pix == 0:
+            feedback.reportError("Unexpected error : empty area for input layer")
+        
+        res = float(sum_ai_sq) / float(tot_area)
+        
+        return {self.OUTPUT: res}

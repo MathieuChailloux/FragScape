@@ -25,12 +25,22 @@
 
 from qgis.core import QgsApplication, QgsProcessingProvider
 
-from ..steps.landuse import LanduseAlgorithm
+from .FragScape_algs import (PrepareLanduseAlgorithm,
+                             PrepareFragmentationAlgorithm,
+                             ApplyFragmentationAlgorithm,
+                             EffectiveMeshSizeReportingAlgorithm,
+                             EffectiveMeshSizeGlobalAlgorithm)
+from .FragScape_raster_algs import MeffRaster
 
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [LanduseAlgorithm(),ApplyFragmentationAlgorithm()]
+        self.alglist = [PrepareLanduseAlgorithm(),
+                        PrepareFragmentationAlgorithm(),
+                        ApplyFragmentationAlgorithm(),
+                        EffectiveMeshSizeReportingAlgorithm(),
+                        EffectiveMeshSizeGlobalAlgorithm(),
+                        MeffRaster()]
         for a in self.alglist:
             a.initAlgorithm()
         super().__init__()
