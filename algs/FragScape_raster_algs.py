@@ -90,19 +90,16 @@ class MeffRaster(QgsProcessingAlgorithm):
             raise QgsProcessingException("Input layer has no cells with value " + str(cl))
         new_array = np.copy(array)
         new_array[new_array!=cl] = 0
+        # 8-connexity ? TODO : investigate
         struct = scipy.ndimage.generate_binary_structure(2,2)
         labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
         feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
-        #struct = scipy.ndimage.generate_binary_structure(2,2)
 
         res = []
         labels = list(range(1,nb_patches+1))
         feedback.pushDebugInfo("labels = " + str(labels))
         patches_len = scipy.ndimage.labeled_comprehension(new_array,labeled_array,labels,len,int,0)
         feedback.pushDebugInfo("patches_len = " + str(patches_len))
-        
-        # sum_per_label = scipy.ndimage.sum(new_array,labeled_array,labels)
-        # sum_per_label = sum_per_label[sum_per_label!=0] # remove zeros
         
         sum_ai = 0
         sum_ai_sq = 0
@@ -116,22 +113,7 @@ class MeffRaster(QgsProcessingAlgorithm):
             feedback.reportError("Empty area for patches, please check your selection.")
         
         nb_pix = len(array[array != nodata])
-        nb_pix1 = len(array)
-        nb_pix11 = len(array[array != -1])
-        nb_pix111 = array.size
-        nb_pix2 = len(array[array != nodata])
-        nb_pix3 = len(array[array == nodata])
-        nb_pix4 = len(array[array != 0])
-        nb_pix5 = len(array[array == 0])
         tot_area = nb_pix * pix_area
-        feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
-        feedback.pushDebugInfo("nb_pix11 = " + str(nb_pix11))
-        feedback.pushDebugInfo("nb_pix111 = " + str(nb_pix111))
-        feedback.pushDebugInfo("nb_pix2 = " + str(nb_pix2))
-        feedback.pushDebugInfo("nb_pix3 = " + str(nb_pix3))
-        feedback.pushDebugInfo("nb_pix4 = " + str(nb_pix4))
-        feedback.pushDebugInfo("nb_pix5 = " + str(nb_pix5))
-        feedback.pushDebugInfo("tot_area = " + str(tot_area))
         #area_sq = math.pow(nb_pix,2)
         if nb_pix == 0:
             feedback.reportError("Unexpected error : empty area for input layer")
