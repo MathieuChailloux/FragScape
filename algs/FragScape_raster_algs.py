@@ -28,12 +28,15 @@ import numpy as np
 
 from PyQt5.QtCore import QCoreApplication
 from qgis.core import (QgsProcessing,
+                       QgsProcessingUtils,
+                       QgsProcessingException,
                        QgsProcessingAlgorithm,
                        QgsProcessingParameterRasterLayer,
                        QgsProcessingParameterNumber,
-                       QgsProcessingOutputNumber)      
+                       QgsProcessingOutputNumber,
+                       QgsProcessingParameterFeatureSource)      
 
-from ..qgis_lib_mc import qgsUtils                       
+from ..qgis_lib_mc import qgsUtils, qgsTreatments                    
                        
 def tr(string):
     return QCoreApplication.translate('Processing', string) 
@@ -121,3 +124,81 @@ class MeffRaster(QgsProcessingAlgorithm):
         res = float(sum_ai_sq) / float(tot_area)
         
         return {self.OUTPUT: res}
+        
+        
+class MeffRasterCBC(QgsProcessingAlgorithm):
+
+    ALG_NAME = "meffRasterCBC"
+    
+    INPUT = "INPUT"
+    CLASS = "CLASS"
+    REPORTING_LAYER = "REPORTING_LAYER"
+    OUTPUT = "OUTPUT"
+        
+    def createInstance(self):
+        return MeffRasterCBC()
+        
+    def name(self):
+        return self.ALG_NAME
+        
+    def displayName(self):
+        return tr("Raster Effective Mesh Size (Cross-Boundary C)")
+        
+    def shortHelpString(self):
+        return tr("Computes effective mesh size on a raster layer")
+
+    def initAlgorithm(self, config=None):
+        '''Here we define the inputs and output of the algorithm, along
+        with some other properties'''
+        self.addParameter(QgsProcessingParameterRasterLayer(
+            self.INPUT, "Input raster layer", optional=False))
+        self.addParameter(QgsProcessingParameterNumber(
+            self.CLASS, "Choose Landscape Class", type=QgsProcessingParameterNumber.Integer, defaultValue=1))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.REPORTING_LAYER,
+                description=tr("Reporting layer"),
+                types=[QgsProcessing.TypeVectorPolygon],
+                optional=True))
+        self.addOutput(QgsProcessingOutputNumber(
+            self.OUTPUT, "Output effective mesh size"))
+        
+    def processAlgorithm(self, parameters, context, feedback):
+        '''Here is where the processing itself takes place'''
+        
+        # Retrieve the values of the parameters entered by the user
+        input = self.parameterAsRasterLayer(parameters, self.INPUT, context)
+        cl = self.parameterAsInt(parameters, self.CLASS, context)
+        report_layer = self.parameterAsVectorLayer(parameters,self.REPORTING_LAYER,context)
+        output = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)        
+            
+        # Processing
+        input_dpr = input.dataProvider()
+        nodata = input_dpr.sourceNoDataValue(1)
+        inputFilename = input.source()
+        x_res = input.rasterUnitsPerPixelX() # Extract The X-Value
+        y_res = input.rasterUnitsPerPixelY() # Extract The Y-Value
+        pix_area = x_res * y_res
+        feedback.pushDebugInfo("Pixel area " + str(x_res) + " x " + str(y_res)
+                                + " = " + str(pix_area))
+        classes, array = qgsUtils.getRasterValsAndArray(str(inputFilename)) # get classes and array
+        if cl not in classes:
+            raise QgsProcessingException("Input layer has no cells with value " + str(cl))
+        new_array = np.copy(array)
+        new_array[new_array!=cl] = 0
+        # 8-connexity ? TODO : investigate
+        struct = scipy.ndimage.generate_binary_structure(2,2)
+        labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
+        feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
+            
+        labeled_path = QgsProcessingUtils.generateTempFilename("labeled.tif")
+        clipped_path = QgsProcessingUtils.generateTempFilename("labeled_clipped.tif")
+        qgsUtils.exportRaster(labeled_array,inputFilename,labeled_path)
+        clipped = qgsTreatments.clipRasterFromVector(labeled_path,report_layer,clipped_path,
+            crop_cutline=False, context=context, feedback=feedback)
+            
+        qgsUtils.loadRasterLayer(clipped_path,loadProject=True)
+        res = 0
+        return {self.OUTPUT: res}
+            
+            
