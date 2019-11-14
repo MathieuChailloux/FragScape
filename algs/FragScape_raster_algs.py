@@ -188,7 +188,7 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
         report_layer = self.parameterAsVectorLayer(parameters,self.REPORTING_LAYER,context)
         output = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)        
             
-        # Processing
+        # Preparation
         input_dpr = input.dataProvider()
         nodata = input_dpr.sourceNoDataValue(1)
         inputFilename = input.source()
@@ -202,24 +202,33 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
         if cl not in classes:
             raise QgsProcessingException("Input layer has no cells with value " + str(cl))
         new_array = np.copy(array)
+        # new_array2 = np.copy(array)
+        # new_array3 = np.copy(array)
+        # new_array4 = np.copy(array)
+        # new_array5 = np.copy(array)
+        # new_array6 = np.copy(array)
         feedback.pushDebugInfo("new_array = " + str(new_array))
         new_array[new_array!=cl] = 0
         new_array[array==cl] = 1
         feedback.pushDebugInfo("new_array = " + str(new_array))
+        
+        # Label input layer
         # 8-connexity ? TODO : investigate
         struct = scipy.ndimage.generate_binary_structure(2,2)
         labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
         feedback.pushDebugInfo("labeled_array = " + str(labeled_array))
+        feedback.pushDebugInfo("la type = " + str(labeled_array.dtype))
         feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
         labels = list(range(1,nb_patches+1))
         labels_with_zero = list(range(0,nb_patches+1))
-        feedback.pushDebugInfo("labels = " + str(labels))
-        feedback.pushDebugInfo("labels_with_zero = " + str(labels_with_zero))        
+        #feedback.pushDebugInfo("labels = " + str(labels))
+        #feedback.pushDebugInfo("labels_with_zero = " + str(labels_with_zero))        
         if nb_patches == 0:
             feedback.reportError("No patches found",fatalError=True)
         max_label = labels[-1]
+        # Export 
         
-        # Input clip
+        # Clip input layer
         if math.isnan(nodata):
             out_nodata = -1
             # type = 7 <=> Float32
@@ -228,56 +237,59 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
             out_nodata = nodata
             # type = 0 <=> input data type
             out_type = 0
-        input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped.tif")
-        input_clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
-            input_clipped_path,crop_cutline=False,nodata=out_nodata,
-            data_type=out_type,context=context, feedback=feedback)
-        input_classes, input_array = qgsUtils.getRasterValsAndArray(str(input_clipped_path))
-        feedback.pushDebugInfo("input_array = " + str(input_array))
-        if math.isnan(nodata):
-            nodata = 0
-        feedback.pushDebugInfo("nodata = " + str(out_nodata))
-        nb_pix = len(input_array[input_array != out_nodata])
-        feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
+        out_nodata = nodata
+        out_type = 0
+        # input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped.tif")
+        # input_clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
+            # input_clipped_path,crop_cutline=False,nodata=out_nodata,
+            # data_type=out_type,context=context, feedback=feedback)
+        # input_classes, input_array = qgsUtils.getRasterValsAndArray(str(input_clipped_path))
+        # feedback.pushDebugInfo("input_array = " + str(input_array))
+        # if math.isnan(nodata):
+            # nodata = 0
+        # feedback.pushDebugInfo("nodata = " + str(out_nodata))
+        # nb_pix = len(input_array[input_array != out_nodata])
+        # feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         
-        # Label clip
-        labeled_path = QgsProcessingUtils.generateTempFilename("labeled.tif")
-        clipped_path = QgsProcessingUtils.generateTempFilename("labeled_clipped.tif")
-        if max_label < 256:
-            label_out_type = gdal.GDT_Byte
-        elif max_label < 65536:
-            label_out_type = gdal.GDT_UInt16
-        else:
-            label_out_type = gdal.GDT_UInt32
-        qgsUtils.exportRaster(labeled_array,inputFilename,labeled_path,
-            nodata=0,type=label_out_type)
-        clipped = qgsTreatments.clipRasterFromVector(labeled_path,report_layer,clipped_path,
-            crop_cutline=False,context=context,feedback=feedback)
-        clip_classes, clip_array = qgsUtils.getRasterValsAndArray(str(clipped_path))
-        #clip_classes = labels
-        feedback.pushDebugInfo("clip_classes = " + str(clip_classes))
-        feedback.pushDebugInfo("clip_array = " + str(clip_array))
-        # clip_array.astype(np.uint8)
+        # Export label
+        # labeled_path = QgsProcessingUtils.generateTempFilename("labeled.tif")
+        # if max_label < 256:
+            # label_out_type = gdal.GDT_Byte
+        # elif max_label < 65536:
+            # label_out_type = gdal.GDT_UInt16
+        # else:
+            # label_out_type = gdal.GDT_UInt32
+        # qgsUtils.exportRaster(labeled_array,inputFilename,labeled_path,
+            # nodata=0,type=out_type)
+            
+        # Clip label
+        # clipped_path = QgsProcessingUtils.generateTempFilename("labeled_clipped.tif")
+        # clipped = qgsTreatments.clipRasterFromVector(labeled_path,report_layer,clipped_path,
+            # crop_cutline=False,context=context,feedback=feedback)
+        # clip_classes, clip_array = qgsUtils.getRasterValsAndArray(str(clipped_path))
+        # feedback.pushDebugInfo("clip_classes = " + str(clip_classes))
         # feedback.pushDebugInfo("clip_array = " + str(clip_array))
         
-        # dummy_type= np.dtype('O')
-        # feedback.pushDebugInfo("dtype = " + str(dummy_type))
+        # feedback.pushDebugInfo("na type = " + str(new_array.dtype))
+        # feedback.pushDebugInfo("la type = " + str(labeled_array.dtype))
+        # feedback.pushDebugInfo("ca type = " + str(clip_array.dtype))
         
-        feedback.pushDebugInfo("array size = " + str(array.size))
-        feedback.pushDebugInfo("new_array size = " + str(new_array.size))
-        feedback.pushDebugInfo("labeled_array size = " + str(labeled_array.size))
-        feedback.pushDebugInfo("input_array size = " + str(input_array.size))
-        feedback.pushDebugInfo("clip_array size = " + str(clip_array.size))
+        # feedback.pushDebugInfo("array size = " + str(array.size))
+        # feedback.pushDebugInfo("new_array size = " + str(new_array.size))
+        # feedback.pushDebugInfo("labeled_array size = " + str(labeled_array.size))
+        # feedback.pushDebugInfo("input_array size = " + str(input_array.size))
+        # feedback.pushDebugInfo("clip_array size = " + str(clip_array.size))
+        
+        # Compute patches length
+        
         patches_len = scipy.ndimage.labeled_comprehension(
             new_array,labeled_array,labels_with_zero,len,int,0)
         feedback.pushDebugInfo("patchess_len = " + str(patches_len))
-        
-        feedback.pushDebugInfo("na type = " + str(new_array.dtype))
-        feedback.pushDebugInfo("la type = " + str(labeled_array.dtype))
-        feedback.pushDebugInfo("ca type = " + str(clip_array.dtype))
-        
+              
+        #clip_array = np.copy(new_array)
         patches_len_clipped = scipy.ndimage.labeled_comprehension(
-            new_array,clip_array,labels_with_zero,len,int,0)
+            new_array,labeled_array,labels_with_zero,len,int,0)
+        #del clip_array
         feedback.pushDebugInfo("patches_len_clipped = " + str(patches_len_clipped))
         
         # if 0 in clip_classes:
@@ -291,7 +303,7 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
         #feedback.pushDebugInfo("labels = " + str(labels))
         for cpt, lbl in enumerate(labels):
             lbl_val = int(lbl)
-            feedback.pushDebugInfo("lbl_val = " + str(lbl_val))
+            # feedback.pushDebugInfo("lbl_val = " + str(lbl_val))
             patch_len = patches_len[lbl_val]
             cbc_len = patches_len_clipped[cpt + 1]
             if patch_len != cbc_len:
@@ -305,7 +317,7 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
             sum_ai_sq += ai * ai_cbc
         feedback.pushDebugInfo("sum_ai_sq = " + str(sum_ai_sq))
             
-        #nb_pix = len(clip_array[clip_array != nodata])
+        nb_pix = len(new_array[new_array != nodata])
         #nb_pix = array.size - nb_nodata
         tot_area = nb_pix * pix_area
         feedback.pushDebugInfo("tot_area = " + str(tot_area))
@@ -317,6 +329,6 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
             
         #qgsUtils.loadRasterLayer(clipped_path,loadProject=True)
         #res = 0
-        return {self.OUTPUT : res, self.OUTPUT_PATH : clipped_path}
+        return {self.OUTPUT : res, self.OUTPUT_PATH : None}
             
             
