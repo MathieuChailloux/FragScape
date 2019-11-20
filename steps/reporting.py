@@ -62,10 +62,10 @@ class ReportingModel(abstract_model.DictModel):
         #super().__init__(self,self.fields)
                 
     def getInputLayer(self):
-        return self.fsModel.fragmModel.getFinalLayer()
-        # if not self.input_layer:
-            # self.input_layer = self.fsModel.fragmModel.getFinalLayer()
-        # return self.input_layer
+        #return self.fsModel.fragmModel.getFinalLayer()
+        if not self.input_layer:
+            self.input_layer = self.fsModel.fragmModel.getFinalLayer()
+        return self.input_layer
                 
     def setOutLayer(self,layer_path):
         self.out_layer = layer_path
@@ -260,7 +260,7 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsSelection.setLayer(layer)
         self.unloadResults()
         #self.dlg.resultsSelection.setLayer(loaded_layer)
-        #self.model.input_layer = path
+        self.model.input_layer = qgsUtils.pathOfLayer(layer)
         
     def setSelectExpr(self,expr):
         self.model.select_expr = expr

@@ -52,11 +52,12 @@ class FragScapeAboutDialog(QtWidgets.QDialog,Ui_FragScapeAbout):
         super(FragScapeAboutDialog,self).__init__(parent)
         self.setupUi(self)
 
-# FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    # os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
 
 
-class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
+#class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
+class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
         super(FragScapeDialog, self).__init__(parent)
@@ -125,8 +126,9 @@ class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
             msg = separator + "\n" + errmsg + "\n" + separator
             #msg = '\n'.join(sections)
             utils.debug(str(msg))
-            final_msg = tbinfo + "\n" + msg
-            utils.error_msg(final_msg,prefix="Unexpected error")
+            #final_msg = tbinfo + "\n" + msg
+            utils.warn("Traceback : " + tbinfo)
+            utils.error_msg(msg,prefix="Unexpected error")
         self.mTabWidget.setCurrentWidget(self.logTab)
         #feedbacks.progressConnector.clear()
         

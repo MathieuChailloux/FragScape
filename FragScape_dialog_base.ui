@@ -417,12 +417,12 @@
                      <string/>
                     </property>
                     <property name="checked">
-                     <bool>true</bool>
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QgsFileWidget" name="workspace">
+                   <widget class="QgsFileWidget" name="workspace" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -473,7 +473,7 @@
                    </widget>
                   </item>
                   <item row="3" column="1">
-                   <widget class="QgsProjectionSelectionWidget" name="paramsCrs">
+                   <widget class="QgsProjectionSelectionWidget" name="paramsCrs" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -744,7 +744,7 @@
                    </widget>
                   </item>
                   <item row="3" column="1" colspan="2">
-                   <widget class="QgsFileWidget" name="landuseClipLayer">
+                   <widget class="QgsFileWidget" name="landuseClipLayer" native="true">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -954,7 +954,7 @@
                           <height>21</height>
                          </size>
                         </property>
-                        <property name="allowEmptyFieldName">
+                        <property name="allowEmptyFieldName" stdset="0">
                          <bool>true</bool>
                         </property>
                        </widget>
@@ -1216,7 +1216,7 @@
                        </widget>
                       </item>
                       <item row="0" column="1">
-                       <widget class="QgsFieldExpressionWidget" name="landuseSelectExpr"/>
+                       <widget class="QgsFieldExpressionWidget" name="landuseSelectExpr" native="true"/>
                       </item>
                      </layout>
                     </widget>
@@ -1419,7 +1419,7 @@
                    </widget>
                   </item>
                   <item row="3" column="1" colspan="2">
-                   <widget class="QgsFileWidget" name="fragmClipLayer">
+                   <widget class="QgsFileWidget" name="fragmClipLayer" native="true">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -1536,7 +1536,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="fragmExpr">
+                   <widget class="QgsFieldExpressionWidget" name="fragmExpr" native="true">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -1568,7 +1568,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="fragmBuffer">
+                   <widget class="QgsFieldExpressionWidget" name="fragmBuffer" native="true">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -1912,7 +1912,7 @@
                   <item row="0" column="1">
                    <widget class="QgsMapLayerComboBox" name="resultsInputLayer">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1932,11 +1932,14 @@
                       <height>21</height>
                      </size>
                     </property>
+                    <property name="editable">
+                     <bool>false</bool>
+                    </property>
                     <property name="currentIndex">
                      <number>-1</number>
                     </property>
-                    <property name="allowEmptyLayer">
-                     <bool>true</bool>
+                    <property name="allowEmptyLayer" stdset="0">
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
@@ -1967,7 +1970,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="resultsSelection">
+                   <widget class="QgsFieldExpressionWidget" name="resultsSelection" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -2014,7 +2017,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QgsFileWidget" name="resultsReportingLayer">
+                   <widget class="QgsFileWidget" name="resultsReportingLayer" native="true">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -2107,7 +2110,7 @@
                    </widget>
                   </item>
                   <item row="4" column="1">
-                   <widget class="QgsFileWidget" name="resultsOutLayer">
+                   <widget class="QgsFileWidget" name="resultsOutLayer" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -2132,10 +2135,10 @@
                     <property name="accessibleDescription">
                      <string/>
                     </property>
-                    <property name="dialogTitle">
+                    <property name="dialogTitle" stdset="0">
                      <string/>
                     </property>
-                    <property name="defaultRoot">
+                    <property name="defaultRoot" stdset="0">
                      <string/>
                     </property>
                    </widget>

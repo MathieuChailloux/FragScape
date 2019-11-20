@@ -134,7 +134,7 @@ class ParamsModel(QAbstractTableModel):
         self.tmpDir = None
         #self.dataClipFlag = True
         self.projectFile = ""
-        self.save_tmp = True
+        self.save_tmp = False
         self.crs = defaultCrs
         self.fields = [self.WORKSPACE,self.PROJECT,self.CRS]
         QAbstractTableModel.__init__(self)

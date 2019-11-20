@@ -398,6 +398,11 @@ class ReportingIntersection(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("reporting = " + str(reporting))
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
+        if not qgsUtils.isMultipartLayer(source):
+            sg_path = params.mkTmpLayerPath('singleGeom.gpkg')
+            qgsTreatments.multiToSingleGeom(source,sg_path,context,feedback)
+            source = qgsUtils.loadVectorLayer(sg_path)
+        # Output fields
         patch_id_field = QgsField("patch_id", QVariant.Int)
         report_id_field = QgsField("report_id", QVariant.Int)
         area_field = QgsField("area", QVariant.Double)
@@ -781,6 +786,10 @@ class EffectiveMeshSizeReportingAlgorithm(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("source = " + str(source))
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+        if not qgsUtils.isMultipartLayer(source):
+            sg_path = params.mkTmpLayerPath('singleGeom.gpkg')
+            qgsTreatments.multiToSingleGeom(source,sg_path,context,feedback)
+            source = qgsUtils.loadVectorLayer(sg_path)
         select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
         feedback.pushDebugInfo("reporting = " + str(reporting))
