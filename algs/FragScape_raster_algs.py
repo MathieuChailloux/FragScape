@@ -110,6 +110,7 @@ class MeffRaster(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("new_array = " + str(new_array))
         # 8-connexity ? TODO : investigate
         struct = scipy.ndimage.generate_binary_structure(2,2)
+        #struct = scipy.ndimage.generate_binary_structure(2,1)
         labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
         feedback.pushDebugInfo("labeled_array = " + str(labeled_array))
         feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
@@ -136,7 +137,9 @@ class MeffRaster(QgsProcessingAlgorithm):
             feedback.reportError("Empty area for patches, please check your selection.")
         
         nb_pix = len(array[array != nodata])
+        feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         tot_area = nb_pix * pix_area
+        feedback.pushDebugInfo("tot_area = " + str(tot_area))
         #area_sq = math.pow(nb_pix,2)
         if nb_pix == 0:
             feedback.reportError("Unexpected error : empty area for input layer")
@@ -314,6 +317,7 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
         
         #nb_pix = len(array[array != nodata])
         tot_area = nb_pix * pix_area
+        feedback.pushDebugInfo("tot_area = " + str(tot_area))
         #area_sq = math.pow(nb_pix,2)
         if nb_pix == 0:
             feedback.reportError("Unexpected error : empty area for input layer")
