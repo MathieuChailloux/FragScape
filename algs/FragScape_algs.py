@@ -140,8 +140,8 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
         feedback.pushDebugInfo("input ok")
         clip_layer = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        select_layer = params.mkTmpLayerPath("select.gpkg")
-        feedback.pushDebugInfo("select_layer = " + str(select_layer))
+        # select_layer = params.mkTmpLayerPath("select.gpkg")
+        # feedback.pushDebugInfo("select_layer = " + str(select_layer))
         if clip_layer is None:
             clipped = input
         else:
@@ -335,8 +335,9 @@ class ApplyFragmentationAlgorithm(QgsProcessingAlgorithm):
         if fragm_layer is None:
             raise QgsProcessingException("Fragmentation layers merge failed")
         # Apply difference
+        diff_path = params.mkTmpLayerPath("diff.gpkg")
         diff_layer = qgsTreatments.applyDifference(
-            landuse,fragm_layer,'memory:',
+            landuse,fragm_layer,diff_path,
             context=context,feedback=feedback)
         if fragm_layer is None:
             raise QgsProcessingException("Difference landuse/fragmentation failed")

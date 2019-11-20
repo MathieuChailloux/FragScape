@@ -171,7 +171,7 @@ class LanduseModel(abstract_model.DictModel):
             utils.internal_error("Unexpected selection mode : " + str(self.select_mode))
         return expr
                 
-    def applyItemsWithContext(self,context,feedback):
+    def applyItemsWithContext(self,context,feedback,indexes):
         feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
