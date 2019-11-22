@@ -172,7 +172,7 @@ class LanduseModel(abstract_model.DictModel):
         return expr
                 
     def applyItemsWithContext(self,context,feedback,indexes):
-        feedbacks.progressFeedback.beginSection("Landuse classification")
+        #feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
         self.checkFieldSelected()
@@ -196,7 +196,7 @@ class LanduseModel(abstract_model.DictModel):
             "FragScape","prepareLanduse",parameters,
             context,feedback)
         qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
-        feedbacks.progressFeedback.endSection()
+        #feedbacks.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:

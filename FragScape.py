@@ -67,7 +67,8 @@ class FragScape:
                 QCoreApplication.installTranslator(self.translator)
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = FragScapeDialog()
+        self.dlgVect = FragScapeDialog()
+        self.dlgRast = FragScapeRasterDialog()
 
         # Declare instance attributes
         self.actions = []
@@ -164,6 +165,10 @@ class FragScape:
         self.actions.append(action)
 
         return action
+        
+    def initProcessing(self):
+        self.provider = FragScapeAlgorithmsProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
@@ -173,12 +178,22 @@ class FragScape:
         self.add_action(
             icon_path,
             text=self.tr(u'FragScape'),
-            callback=self.run,
+            callback=self.runVectorDialog,
             parent=self.iface.mainWindow())
             
-        self.dlg.initTabs()
-        self.dlg.initGui()
-        self.dlg.connectComponents()
+        self.add_action(
+            icon_path,
+            text=self.tr(u'FragScape'),
+            callback=self.runRasterDialog,
+            parent=self.iface.mainWindow())
+            
+        self.dlgVect.initTabs()
+        self.dlgVect.initGui()
+        self.dlgVect.connectComponents()
+        
+        self.dlgRast.initTabs()
+        self.dlgRast.initGui()
+        self.dlgRast.connectComponents()
 
 
     def unload(self):
@@ -191,24 +206,32 @@ class FragScape:
         # Exceptions hook 
         utils.print_func = print
         sys.excepthook = qgis_excepthook
-        if self.dlg:
-            self.dlg.initializeGlobals()
+        if self.dlgVect:
+            self.dlgVect.initializeGlobals()
+        if self.dlgRast:
+            self.dlgRast.initializeGlobals()
         # remove the toolbar
         del self.toolbar
+        QgsApplication.processingRegistry().removeProvider(self.provider)
 
+    def runVectorDialog(self):
+        self.runDialogGeneric(sel.dlgVect)
 
-    def run(self):
+    def runRasterDialog(self):
+        self.runDialogGeneric(sel.dlgRast)
+
+    def runDialogGeneric(self,dlg):
         """Run method that performs all the real work"""
-        self.dlg = FragScapeDialog()
-        self.dlg.initTabs()
-        self.dlg.initLog()
-        self.dlg.initGui()
-        self.dlg.connectComponents()
+        dlg = FragScapeDialog()
+        dlg.initTabs()
+        dlg.initLog()
+        dlg.initGui()
+        dlg.connectComponents()
         # show the dialog
-        self.dlg.show()
+        dlg.show()
         #qgsTreatments.initGdalCommands()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        result = dlg.exec_()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and

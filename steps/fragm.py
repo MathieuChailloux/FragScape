@@ -166,7 +166,7 @@ class FragmModel(abstract_model.DictModel):
         
     def applyItemsWithContext(self,context,feedback,indexes=None):
         fragmMsg = "Application of fragmentation data to landuse"
-        feedbacks.progressFeedback.beginSection(fragmMsg)
+        #feedbacks.progressFeedback.beginSection(fragmMsg)
         #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         #clip_layer = self.clip_layer if self.dataClipFlag else None
         prepared_layers = []
@@ -216,7 +216,7 @@ class FragmModel(abstract_model.DictModel):
             "FragScape","applyFragm",parameters,
             context=context,feedback=feedback)
         qgsUtils.loadVectorLayer(res_path,loadProject=True)
-        feedbacks.progressFeedback.endSection()
+        #feedbacks.progressFeedback.endSection()
         return res
             
     def fromXMLRoot(self,root):

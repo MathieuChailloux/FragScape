@@ -88,7 +88,7 @@ class ReportingModel(abstract_model.DictModel):
                 
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
-        feedbacks.progressFeedback.beginSection(reportingMsg)
+        #feedbacks.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
         #if self.select_expr:
         if False:
@@ -143,7 +143,7 @@ class ReportingModel(abstract_model.DictModel):
             # global_meff = f[FragScape_algs.EffectiveMeshSizeAlgorithm.MESH_SIZE]
         #global_meff = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT_GLOBAL_MEFF]
         #out_path = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
-        feedbacks.progressFeedback.endSection()
+        #feedbacks.progressFeedback.endSection()
         return (res1,res2)
                 
     def toXML(self,indent=" "):
