@@ -68,7 +68,7 @@ class FragScape:
 
         # Create the dialog (after translation) and keep reference
         self.dlgVect = FragScapeDialog()
-        self.dlgRast = FragScapeRasterDialog()
+        # self.dlgRast = FragScapeRasterDialog()
 
         # Declare instance attributes
         self.actions = []
@@ -181,19 +181,19 @@ class FragScape:
             callback=self.runVectorDialog,
             parent=self.iface.mainWindow())
             
-        self.add_action(
-            icon_path,
-            text=self.tr(u'FragScape'),
-            callback=self.runRasterDialog,
-            parent=self.iface.mainWindow())
+        # self.add_action(
+            # icon_path,
+            # text=self.tr(u'FragScape'),
+            # callback=self.runRasterDialog,
+            # parent=self.iface.mainWindow())
             
         self.dlgVect.initTabs()
         self.dlgVect.initGui()
         self.dlgVect.connectComponents()
         
-        self.dlgRast.initTabs()
-        self.dlgRast.initGui()
-        self.dlgRast.connectComponents()
+        # self.dlgRast.initTabs()
+        # self.dlgRast.initGui()
+        # self.dlgRast.connectComponents()
 
 
     def unload(self):
@@ -208,17 +208,17 @@ class FragScape:
         sys.excepthook = qgis_excepthook
         if self.dlgVect:
             self.dlgVect.initializeGlobals()
-        if self.dlgRast:
-            self.dlgRast.initializeGlobals()
+        # if self.dlgRast:
+            # self.dlgRast.initializeGlobals()
         # remove the toolbar
         del self.toolbar
         QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def runVectorDialog(self):
-        self.runDialogGeneric(sel.dlgVect)
+        self.runDialogGeneric(self.dlgVect)
 
     def runRasterDialog(self):
-        self.runDialogGeneric(sel.dlgRast)
+        self.runDialogGeneric(self.dlgRast)
 
     def runDialogGeneric(self,dlg):
         """Run method that performs all the real work"""
@@ -231,6 +231,7 @@ class FragScape:
         dlg.show()
         #qgsTreatments.initGdalCommands()
         # Run the dialog event loop
+        print ("PRELAUNCH")
         result = dlg.exec_()
         # See if OK was pressed
         if result:

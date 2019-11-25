@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BioDispersalDialogBase</class>
- <widget class="QDialog" name="BioDispersalDialogBase">
+ <class>FragScapeRasterDialogBase</class>
+ <widget class="QDialog" name="FragScapeRasterDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>BioDispersal</string>
+   <string>FragScape</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_22">
    <item row="0" column="0" colspan="2">
@@ -109,14 +109,14 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Save BioDispersal project as</string>
+              <string>Save FragScape project as</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/BioDispersal/icons/mActionFileSaveAs.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileSaveAs.svg</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/mActionFileSaveAs.svg</normaloff>:/plugins/FragScape/icons/mActionFileSaveAs.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -132,8 +132,8 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/BioDispersal/icons/iconHelpConsole.svg</normaloff>:/plugins/BioDispersal/icons/iconHelpConsole.svg</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/iconHelpConsole.svg</normaloff>:/plugins/FragScape/icons/iconHelpConsole.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -162,14 +162,14 @@
               </size>
              </property>
              <property name="toolTip">
-              <string>Open BioDispersal project</string>
+              <string>Open FragScape project</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/BioDispersal/icons/mActionFileOpen.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileOpen.svg</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -185,8 +185,8 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/BioDispersal/icons/enFlag.svg</normaloff>:/plugins/BioDispersal/icons/enFlag.svg</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/enFlag.svg</normaloff>:/plugins/FragScape/icons/enFlag.svg</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -208,14 +208,14 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Save BioDispersal project</string>
+              <string>Save FragScape project</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/BioDispersal/icons/mActionFileSave.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileSave.svg</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</iconset>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -228,8 +228,8 @@
               <string>...</string>
              </property>
              <property name="icon">
-              <iconset resource="../BioDispersal/resources.qrc">
-               <normaloff>:/plugins/BioDispersal/icons/frFlag.svg</normaloff>:/plugins/BioDispersal/icons/frFlag.svg</iconset>
+              <iconset resource="../resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/frFlag.svg</normaloff>:/plugins/FragScape/icons/frFlag.svg</iconset>
              </property>
              <property name="checkable">
               <bool>true</bool>
@@ -300,7 +300,7 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome in FragScape !&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href=&quot;https://github.com/MathieuChailloux/BioDispersal/blob/master/docs/drafts/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MathieuChailloux/BioDispersal/blob/master/docs/drafts/README.md&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;Video tutorials: &lt;a href=&quot;https://www.youtube.com/playlist?list=PL0Wd1JAi6QuHdwALwwJqj5TcfNYvjRbcs&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PL0Wd1JAi6QuHdwALwwJqj5TcfNYvjRbcs&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/BioDispersal/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/BioDispersal/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome in FragScape !&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href=&quot;https://github.com/MathieuChailloux/BioDispersal/blob/master/docs/drafts/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MathieuChailloux/BioDispersal/blob/master/docs/drafts/README.md&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;Video tutorials: &lt;a href=&quot;https://www.youtube.com/playlist?list=PL0Wd1JAi6QuHdwALwwJqj5TcfNYvjRbcs&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PL0Wd1JAi6QuHdwALwwJqj5TcfNYvjRbcs&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="wordWrap">
                      <bool>true</bool>
@@ -926,8 +926,8 @@
                         <string>Save selection</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
-                         <normaloff>:/plugins/BioDispersal/icons/mActionFileSave.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileSave.svg</iconset>
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1023,8 +1023,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
-                         <normaloff>:/plugins/BioDispersal/icons/up-arrow.png</normaloff>:/plugins/BioDispersal/icons/up-arrow.png</iconset>
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/up-arrow.png</normaloff>:/plugins/FragScape/icons/up-arrow.png</iconset>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -1052,8 +1052,8 @@
                         <string/>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
-                         <normaloff>:/plugins/BioDispersal/icons/down-arrow.png</normaloff>:/plugins/BioDispersal/icons/down-arrow.png</iconset>
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/down-arrow.png</normaloff>:/plugins/FragScape/icons/down-arrow.png</iconset>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -1103,8 +1103,8 @@
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset resource="../BioDispersal/resources.qrc">
-                      <normaloff>:/plugins/BioDispersal/icons/mActionDeleteSelected.svg</normaloff>:/plugins/BioDispersal/icons/mActionDeleteSelected.svg</iconset>
+                     <iconset resource="../resources.qrc">
+                      <normaloff>:/plugins/FragScape/icons/mActionDeleteSelected.svg</normaloff>:/plugins/FragScape/icons/mActionDeleteSelected.svg</iconset>
                     </property>
                     <property name="autoRaise">
                      <bool>true</bool>
@@ -1284,8 +1284,8 @@
                         <string>Launch and merge selections</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
-                         <normaloff>:/plugins/BioDispersal/icons/play.svg</normaloff>:/plugins/BioDispersal/icons/play.svg</iconset>
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/play.svg</normaloff>:/plugins/FragScape/icons/play.svg</iconset>
                        </property>
                       </widget>
                      </item>
@@ -1513,8 +1513,8 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="../BioDispersal/resources.qrc">
-                       <normaloff>:/plugins/BioDispersal/icons/mActionRefresh.svg</normaloff>:/plugins/BioDispersal/icons/mActionRefresh.svg</iconset>
+                      <iconset resource="../resources.qrc">
+                       <normaloff>:/plugins/FragScape/icons/mActionRefresh.svg</normaloff>:/plugins/FragScape/icons/mActionRefresh.svg</iconset>
                      </property>
                      <property name="autoRaise">
                       <bool>true</bool>
@@ -1542,8 +1542,8 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="../BioDispersal/resources.qrc">
-                       <normaloff>:/plugins/BioDispersal/icons/mActionFileOpen.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileOpen.svg</iconset>
+                      <iconset resource="../resources.qrc">
+                       <normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</normaloff>:/plugins/FragScape/icons/mActionFileOpen.svg</iconset>
                      </property>
                      <property name="autoRaise">
                       <bool>true</bool>
@@ -1571,8 +1571,8 @@
                       <string/>
                      </property>
                      <property name="icon">
-                      <iconset resource="../BioDispersal/resources.qrc">
-                       <normaloff>:/plugins/BioDispersal/icons/mActionFileSaveAs.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileSaveAs.svg</iconset>
+                      <iconset resource="../resources.qrc">
+                       <normaloff>:/plugins/FragScape/icons/mActionFileSaveAs.svg</normaloff>:/plugins/FragScape/icons/mActionFileSaveAs.svg</iconset>
                      </property>
                      <property name="autoRaise">
                       <bool>true</bool>
@@ -1766,8 +1766,8 @@
                         <string>Launch selections</string>
                        </property>
                        <property name="icon">
-                        <iconset resource="../BioDispersal/resources.qrc">
-                         <normaloff>:/plugins/BioDispersal/icons/play.svg</normaloff>:/plugins/BioDispersal/icons/play.svg</iconset>
+                        <iconset resource="../resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/play.svg</normaloff>:/plugins/FragScape/icons/play.svg</iconset>
                        </property>
                       </widget>
                      </item>
@@ -2142,7 +2142,7 @@
                   <string>Compute metrics</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="resources.qrc">
+                  <iconset resource="../resources.qrc">
                    <normaloff>:/plugins/FragScape/icons/play.svg</normaloff>:/plugins/FragScape/icons/play.svg</iconset>
                  </property>
                 </widget>
@@ -2272,8 +2272,8 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../BioDispersal/resources.qrc">
-                     <normaloff>:/plugins/BioDispersal/icons/debug_icon/mActionAnnotation.svg</normaloff>:/plugins/BioDispersal/icons/debug_icon/mActionAnnotation.svg</iconset>
+                    <iconset resource="../resources.qrc">
+                     <normaloff>:/plugins/FragScape/icons/debug_icon/mActionAnnotation.svg</normaloff>:/plugins/FragScape/icons/debug_icon/mActionAnnotation.svg</iconset>
                    </property>
                    <property name="checkable">
                     <bool>true</bool>
@@ -2292,8 +2292,8 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../BioDispersal/resources.qrc">
-                     <normaloff>:/plugins/BioDispersal/icons/mActionFileSave.svg</normaloff>:/plugins/BioDispersal/icons/mActionFileSave.svg</iconset>
+                    <iconset resource="../resources.qrc">
+                     <normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</normaloff>:/plugins/FragScape/icons/mActionFileSave.svg</iconset>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -2309,8 +2309,8 @@
                     <string>...</string>
                    </property>
                    <property name="icon">
-                    <iconset resource="../BioDispersal/resources.qrc">
-                     <normaloff>:/plugins/BioDispersal/icons/iconClearConsole.svg</normaloff>:/plugins/BioDispersal/icons/iconClearConsole.svg</iconset>
+                    <iconset resource="../resources.qrc">
+                     <normaloff>:/plugins/FragScape/icons/iconClearConsole.svg</normaloff>:/plugins/FragScape/icons/iconClearConsole.svg</iconset>
                    </property>
                    <property name="autoRaise">
                     <bool>true</bool>
@@ -2439,7 +2439,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../BioDispersal/resources.qrc">:/plugins/BioDispersal/icons/logoIrstea.png</pixmap>
+         <pixmap resource="../resources.qrc">:/plugins/FragScape/icons/logoIrstea.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -2464,7 +2464,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../BioDispersal/resources.qrc">:/plugins/BioDispersal/icons/logoTetis.png</pixmap>
+         <pixmap resource="../resources.qrc">:/plugins/FragScape/icons/logoTetis.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -2511,9 +2511,6 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../BioDispersal/resources.qrc"/>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
