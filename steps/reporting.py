@@ -41,6 +41,7 @@ class ReportingModel(abstract_model.DictModel):
     SELECT_EXPR = "select_expr"
     REPORTING = "reporting_layer"
     METHOD = "method"
+    INCLUDE_CBC = "include_cbc"
     UNIT = "unit"
     OUTPUT = "output"
     
@@ -53,23 +54,21 @@ class ReportingModel(abstract_model.DictModel):
         self.input_layer = None
         self.select_expr = None
         self.reporting_layer = None
-        self.method = self.CUT_METHOD
+        # self.method = self.CUT_METHOD
+        self.includeCBC = False
         self.unit = 0
         self.out_layer = None
         self.init_fields = []
         self.fields = self.init_fields
         super().__init__(self,self.fields)
-        #super().__init__(self,self.fields)
                 
     def getInputLayer(self):
-        #return self.fsModel.fragmModel.getFinalLayer()
         if not self.input_layer:
             self.input_layer = self.fsModel.fragmModel.getFinalLayer()
         return self.input_layer
                 
     def setOutLayer(self,layer_path):
         self.out_layer = layer_path
-        #self.out_layer = self.fsModel.normalizePath(layer_path)
         
     def getOutLayer(self):
         if self.out_layer:
@@ -103,17 +102,17 @@ class ReportingModel(abstract_model.DictModel):
         global_results_path = params.mkTmpLayerPath("reportingResultsGlobal.gpkg")
         qgsUtils.removeVectorLayer(results_path)
         qgsUtils.removeVectorLayer(global_results_path)
-        if self.method == self.CUT_METHOD:
-            cut_mode = True
-        elif self.method == self.CBC_METHOD:
-            cut_mode = False
-        else:
-            utils.internal_error("Unexpected method : " + str(self.method))
+        # if self.method == self.CUT_METHOD:
+            # cut_mode = True
+        # elif self.method == self.CBC_METHOD:
+            # cut_mode = False
+        # else:
+            # utils.internal_error("Unexpected method : " + str(self.method))
         parameters1 = { FragScape_algs.EffectiveMeshSizeReportingAlgorithm.INPUT : selected,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.SELECT_EXPR : self.select_expr,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.REPORTING : self.reporting_layer,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.CRS : crs,
-                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.CUT_MODE : cut_mode,
+                       FragScape_algs.EffectiveMeshSizeReportingAlgorithm.INCLUDE_CBC : self.includeCBC,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.UNIT : self.unit,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.OUTPUT : results_path }
         res1 = qgsTreatments.applyProcessingAlg(
@@ -127,7 +126,7 @@ class ReportingModel(abstract_model.DictModel):
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.SELECT_EXPR : self.select_expr,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.BOUNDARY : self.reporting_layer,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.CRS : crs,
-                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.CUT_MODE : cut_mode,
+                       FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.INCLUDE_CBC : self.includeCBC,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.UNIT : self.unit,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.OUTPUT : global_results_path }
         res2 = qgsTreatments.applyProcessingAlg(
@@ -156,8 +155,9 @@ class ReportingModel(abstract_model.DictModel):
             # pass
         if self.select_expr:
             modelParams[self.SELECT_EXPR] = self.select_expr
-        if self.method >= 0:
-            modelParams[self.METHOD] = self.method
+        # if self.method >= 0:
+            # modelParams[self.METHOD] = self.method
+        modelParams[self.INCLUDE_CBC] = self.includeCBC
         if self.unit:
             modelParams[self.UNIT] = self.unit
         if self.reporting_layer:
@@ -174,7 +174,10 @@ class ReportingModel(abstract_model.DictModel):
         if self.REPORTING in attribs:
             self.reporting_layer = self.fsModel.getOrigPath(attribs[self.REPORTING])
         if self.METHOD in attribs:
-            self.method = int(attribs[self.METHOD])
+            method = int(attribs[self.METHOD])
+            self.includeCBC = (method > 0)
+        if self.INCLUDE_CBC in attribs:
+            self.includeCBC = bool(attribs[self.INCLUDE_CBC])
         if self.UNIT in attribs:
             self.unit = int(attribs[self.UNIT])
         if self.OUTPUT in attribs:
@@ -212,7 +215,8 @@ class ReportingConnector(abstract_model.AbstractConnector):
         self.dlg.resultsInputLayer.layerChanged.connect(self.setInputLayer)
         self.dlg.resultsSelection.fieldChanged.connect(self.setSelectExpr)
         self.dlg.resultsReportingLayer.fileChanged.connect(self.setReportingLayer)
-        self.dlg.resultsCutMode.currentIndexChanged.connect(self.setMethod)
+        # self.dlg.resultsCutMode.currentIndexChanged.connect(self.setMethod)
+        self.dlg.resultsCBC.stateChanged.connect(self.setIncludeCBC)
         self.dlg.resultsUnit.currentIndexChanged.connect(self.setUnit)
         self.dlg.resultsOutLayer.fileChanged.connect(self.model.setOutLayer)
         self.dlg.resultsRun.clicked.connect(self.runReporting)
@@ -244,13 +248,17 @@ class ReportingConnector(abstract_model.AbstractConnector):
         # self.dlg.reportingLayerCombo.setLayer(layer)
         # self.model.reporting_layer = qgsUtils.pathOfLayer(layer)
     
-    def setMethod(self,idx):
-        if idx == 0:
-            self.model.method = ReportingModel.CUT_METHOD
-        elif idx == 1:
-            self.model.method = ReportingModel.CBC_METHOD
-        else:
-            utils.internal_error("Unexpected index for reporting method : " + str(idx))
+    # def setMethod(self,idx):
+        # if idx == 0:
+            # self.model.method = ReportingModel.CUT_METHOD
+        # elif idx == 1:
+            # self.model.method = ReportingModel.CBC_METHOD
+        # else:
+            # utils.internal_error("Unexpected index for reporting method : " + str(idx))
+            
+    def setIncludeCBC(self,state):
+        boolVal = state > 0
+        self.includeCBC = state
             
     def setUnit(self,idx):
         self.model.unit = idx
@@ -286,8 +294,8 @@ class ReportingConnector(abstract_model.AbstractConnector):
         if self.model.reporting_layer:
             #qgsUtils.loadVectorLayer(self.model.reporting_layer,loadProject=True)
             self.dlg.resultsReportingLayer.setFilePath(self.model.reporting_layer)
-        if self.model.method:
-            self.dlg.resultsCutMode.setCurrentIndex(int(self.model.method))
+        if self.model.includeCBC:
+            self.dlg.resultsCBC.setChecked(True)
         if self.model.unit:
             self.dlg.resultsUnit.setCurrentIndex(int(self.model.unit))
         if self.model.out_layer:

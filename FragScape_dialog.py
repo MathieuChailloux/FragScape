@@ -85,12 +85,8 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         self.paramsConnector = params.ParamsConnector(self,self.fsModel.paramsModel)
         params.params = self.paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self,self.fsModel.landuseModel)
-        #landuse.landuseModel = self.landuseConnector.model
         self.fragmConnector = fragm.FragmConnector(self,self.fsModel.fragmModel)
-        #fragm.fragmModel = self.fragmConnector.model
         self.reportingConnector = reporting.ReportingConnector(self,self.fsModel.reportingModel)
-        # progressConnector = feedbacks.ProgressConnector(self)
-        # feedbacks.progressConnector = progressConnector
         tabConnector = tabs.TabConnector(self)
         self.connectors = {"Params" : self.paramsConnector,
                            "Log" : logConnector,
@@ -110,7 +106,7 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     # Exception hook, i.e. function called when exception raised.
     # Displays traceback and error message in log tab.
     # Ignores CustomException : exception raised from FragScape and already displayed.
-    def bioDispHook(self,excType, excValue, tracebackobj):
+    def exceptionHook(self,excType, excValue, tracebackobj):
         utils.debug("bioDispHook")
         if excType == utils.CustomException:
             utils.debug("Ignoring custom exception : " + str(excValue))
@@ -137,10 +133,6 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     def connectComponents(self):
         for k, tab in self.connectors.items():
             tab.connectComponents()
-        utils.debug("progressFeedback cc = " + str(feedbacks.progressFeedback))
-        utils.debug("progressFeedback cc type = " + str(type(feedbacks.progressFeedback)))
-        utils.debug("progressFeedback cc type = " + str(feedbacks.progressFeedback.__class__))
-        utils.debug("progressFeedback cc type = " + str(feedbacks.progressFeedback is None))
         # Main tab connectors
         self.saveProjectAs.clicked.connect(self.saveModelAsAction)
         self.saveProject.clicked.connect(self.saveModel)
@@ -148,11 +140,8 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         self.langEn.clicked.connect(self.switchLangEn)
         self.langFr.clicked.connect(self.switchLangFr)
         self.aboutButton.clicked.connect(self.openHelpDialog)
-        #progressFeedback = feedbacks.ProgressFeedback(self)
         feedbacks.progressFeedback.connectComponents()
-        #feedbacks.progressFeedback = progressFeedback
-        #qgsTreatments.setProgressFeedback(progressFeedback)
-        sys.excepthook = self.bioDispHook
+        sys.excepthook = self.exceptionHook
         
     # Initialize or re-initialize global variables.
     def initializeGlobals(self):
@@ -209,11 +198,6 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         
         # Return XML string describing project
     def toXML(self):
-        # xmlStr = "<FragScapeConfig>\n"
-        # for parser in self.parsers:
-            # xmlStr += parser.toXML() + "\n"
-        # xmlStr += "</FragScapeConfig>\n"
-        # utils.debug("Final xml : \n" + xmlStr)
         xmlStr = self.fsModel.toXML()
         return xmlStr
 
@@ -221,7 +205,6 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     def saveModelAs(self,fname):
         self.recomputeParsers()
         xmlStr = self.fsModel.toXML()
-        #params.params.projectFile = fname
         self.fsModel.paramsModel.projectFile = fname
         utils.writeFile(fname,xmlStr)
         utils.info("FragScape model saved into file '" + fname + "'")
@@ -233,7 +216,6 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         
     # Save project to projectFile if existing
     def saveModel(self):
-        #fname = params.params.projectFile
         fname = self.fsModel.paramsModel.projectFile
         utils.checkFileExists(fname,"Project ")
         self.saveModelAs(fname)
@@ -243,11 +225,7 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         utils.debug("loadModel " + str(fname))
         utils.checkFileExists(fname)
         config_parsing.setConfigParsers(self.parsers)
-        #params.params.projectFile = fname
-        #xml_tree = ET.parse(fname)
-        #xml_root = xml_tree.getroot()
         self.fsModel.paramsModel.projectFile = fname
-        #self.fsModel.fromXMLRoot(xml_root)
         config_parsing.parseConfig(fname)
         utils.info("FragScape model loaded from file '" + fname + "'")
         

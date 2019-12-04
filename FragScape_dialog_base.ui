@@ -422,7 +422,7 @@
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QgsFileWidget" name="workspace" native="true">
+                   <widget class="QgsFileWidget" name="workspace">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -473,7 +473,7 @@
                    </widget>
                   </item>
                   <item row="3" column="1">
-                   <widget class="QgsProjectionSelectionWidget" name="paramsCrs" native="true">
+                   <widget class="QgsProjectionSelectionWidget" name="paramsCrs">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -744,7 +744,7 @@
                    </widget>
                   </item>
                   <item row="3" column="1" colspan="2">
-                   <widget class="QgsFileWidget" name="landuseClipLayer" native="true">
+                   <widget class="QgsFileWidget" name="landuseClipLayer">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -954,7 +954,7 @@
                           <height>21</height>
                          </size>
                         </property>
-                        <property name="allowEmptyFieldName" stdset="0">
+                        <property name="allowEmptyFieldName">
                          <bool>true</bool>
                         </property>
                        </widget>
@@ -1216,7 +1216,7 @@
                        </widget>
                       </item>
                       <item row="0" column="1">
-                       <widget class="QgsFieldExpressionWidget" name="landuseSelectExpr" native="true"/>
+                       <widget class="QgsFieldExpressionWidget" name="landuseSelectExpr"/>
                       </item>
                      </layout>
                     </widget>
@@ -1419,7 +1419,7 @@
                    </widget>
                   </item>
                   <item row="3" column="1" colspan="2">
-                   <widget class="QgsFileWidget" name="fragmClipLayer" native="true">
+                   <widget class="QgsFileWidget" name="fragmClipLayer">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -1536,7 +1536,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="fragmExpr" native="true">
+                   <widget class="QgsFieldExpressionWidget" name="fragmExpr">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -1568,7 +1568,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="fragmBuffer" native="true">
+                   <widget class="QgsFieldExpressionWidget" name="fragmBuffer">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -1938,7 +1938,7 @@
                     <property name="currentIndex">
                      <number>-1</number>
                     </property>
-                    <property name="allowEmptyLayer" stdset="0">
+                    <property name="allowEmptyLayer">
                      <bool>false</bool>
                     </property>
                    </widget>
@@ -1970,7 +1970,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QgsFieldExpressionWidget" name="resultsSelection" native="true">
+                   <widget class="QgsFieldExpressionWidget" name="resultsSelection">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                       <horstretch>0</horstretch>
@@ -2017,7 +2017,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QgsFileWidget" name="resultsReportingLayer" native="true">
+                   <widget class="QgsFileWidget" name="resultsReportingLayer">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -2053,97 +2053,18 @@
                      </font>
                     </property>
                     <property name="text">
-                     <string>Cut method</string>
+                     <string>Include CBC metrics</string>
                     </property>
                    </widget>
                   </item>
                   <item row="3" column="1">
-                   <widget class="QComboBox" name="resultsCutMode">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>21</height>
-                     </size>
+                   <widget class="QCheckBox" name="resultsCBC">
+                    <property name="text">
+                     <string/>
                     </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <item>
-                     <property name="text">
-                      <string>CUT (Cutting-Out)</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>CBC (Cross-Boundary Connection)</string>
-                     </property>
-                    </item>
                    </widget>
                   </item>
                   <item row="4" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_11">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>80</width>
-                      <height>16</height>
-                     </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <weight>50</weight>
-                      <italic>true</italic>
-                      <bold>false</bold>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Output layer [opt.]</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QgsFileWidget" name="resultsOutLayer" native="true">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <property name="accessibleName">
-                     <string/>
-                    </property>
-                    <property name="accessibleDescription">
-                     <string/>
-                    </property>
-                    <property name="dialogTitle" stdset="0">
-                     <string/>
-                    </property>
-                    <property name="defaultRoot" stdset="0">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0">
                    <widget class="QLabel" name="selectionLayerLabel_18">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -2168,7 +2089,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="5" column="1">
+                  <item row="4" column="1">
                    <widget class="QComboBox" name="resultsUnit">
                     <property name="minimumSize">
                      <size>
@@ -2202,6 +2123,66 @@
                       <string>km² (square kilometers)</string>
                      </property>
                     </item>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_11">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>80</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <weight>50</weight>
+                      <italic>true</italic>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Output layer [opt.]</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QgsFileWidget" name="resultsOutLayer">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="accessibleName">
+                     <string/>
+                    </property>
+                    <property name="accessibleDescription">
+                     <string/>
+                    </property>
+                    <property name="dialogTitle">
+                     <string/>
+                    </property>
+                    <property name="defaultRoot">
+                     <string/>
+                    </property>
                    </widget>
                   </item>
                  </layout>
