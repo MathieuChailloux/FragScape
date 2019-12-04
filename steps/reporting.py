@@ -87,7 +87,7 @@ class ReportingModel(abstract_model.DictModel):
                 
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
-        #feedbacks.progressFeedback.beginSection(reportingMsg)
+        feedbacks.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
         #if self.select_expr:
         if False:
@@ -134,15 +134,7 @@ class ReportingModel(abstract_model.DictModel):
             FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.ALG_NAME,
             parameters2,
             context=context,feedback=feedback,onlyOutput=False)
-        # global_layer = qgsUtils.loadVectorLayer(global_results_path)
-        # if global_layer.featureCount() != 1:
-            # utils.internal_error("Unexpected number of features for global reporting layer "
-                                  # + str(global_results_path) + " : " + str(global_layer.featureCount()))
-        # for f in global_layer.dataProvider().getFeatures():
-            # global_meff = f[FragScape_algs.EffectiveMeshSizeAlgorithm.MESH_SIZE]
-        #global_meff = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT_GLOBAL_MEFF]
-        #out_path = res[FragScape_algs.EffectiveMeshSizeAlgorithm.OUTPUT]
-        #feedbacks.progressFeedback.endSection()
+        feedbacks.progressFeedback.endSection()
         return (res1,res2)
                 
     def toXML(self,indent=" "):

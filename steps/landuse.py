@@ -172,17 +172,14 @@ class LanduseModel(abstract_model.DictModel):
         return expr
                 
     def applyItemsWithContext(self,context,feedback,indexes):
-        #feedbacks.progressFeedback.beginSection("Landuse classification")
+        feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
         self.checkFieldSelected()
-        #in_layer = qgsUtils.pathOfLayer(self.landuseLayer)
-        #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         clip_layer = self.clip_layer if self.dataClipFlag else None
         utils.debug("clip_layer1 = " + str(self.clip_layer))
         utils.debug("dataflag = " + str(self.dataClipFlag))
         utils.debug("clip_layer = " + str(clip_layer))
-        #clip_layer = self.fsModel.paramsModel.getTerritoryLayer()
         expr = self.getSelectionExpr()
         #if not expr:
         #    utils.user_error("No expression selected : TODO select everything")
@@ -196,7 +193,7 @@ class LanduseModel(abstract_model.DictModel):
             "FragScape","prepareLanduse",parameters,
             context,feedback)
         qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
-        #feedbacks.progressFeedback.endSection()
+        feedbacks.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
