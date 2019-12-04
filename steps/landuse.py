@@ -181,8 +181,8 @@ class LanduseModel(abstract_model.DictModel):
         utils.debug("dataflag = " + str(self.dataClipFlag))
         utils.debug("clip_layer = " + str(clip_layer))
         expr = self.getSelectionExpr()
-        #if not expr:
-        #    utils.user_error("No expression selected : TODO select everything")
+        # if not expr:
+           # utils.user_error("No expression selected : TODO select everything")
         dissolveLayer = self.getDissolveLayer()
         qgsUtils.removeVectorLayer(dissolveLayer)
         parameters = { self.ALG_INPUT : self.landuseLayer,
@@ -284,6 +284,10 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseOpenTable.clicked.connect(self.importFields)
         self.dlg.landuseSaveTable.clicked.connect(self.saveFields)
         #self.dlg.landuseSelectionMode.activated.connect(self.switchSelectionMode)
+        # self.dlg.landuseRun.clicked.connect(self.runModel)
+        
+    # def runModel(self):
+        # self.model.applyItemsWithContext(None,None,[])
         
     def switchDataClipFlag(self,state):
         utils.debug("switchDataClipFlag")

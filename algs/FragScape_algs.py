@@ -152,10 +152,10 @@ class PrepareLanduseAlgorithm(QgsProcessingAlgorithm):
             #clipped = clipped_path
         selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
         qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
-        #selected = qgsUtils.loadVectorLayer(selected_path)
-        #selected = qgsTreatments.extractByExpression(
-        #    clipped,expr,'memory:',
-        #    context=context,feedback=feedback)
+        # selected = qgsUtils.loadVectorLayer(selected_path)
+        # selected = qgsTreatments.extractByExpression(
+           # clipped,expr,'memory:',
+           # context=context,feedback=feedback)
         feedback.pushDebugInfo("selected = " + str(selected_path))
         output = parameters[self.OUTPUT]
         dissolved = qgsTreatments.dissolveLayer(selected_path,output,context=context,feedback=feedback)
