@@ -49,7 +49,15 @@ from ..qgis_lib_mc import qgsUtils, qgsTreatments
 def tr(string):
     return QCoreApplication.translate('Processing', string) 
 
-class MeffRaster(QgsProcessingAlgorithm):
+class FragScapeRasterAlgorithm(QgsProcessingAlgorithm):
+    
+    def group(self):
+        return "Raster"
+    
+    def groupId(self):
+        return "fsRast"
+
+class MeffRaster(FragScapeRasterAlgorithm):
 
     ALG_NAME = "meffRaster"
     
@@ -149,7 +157,7 @@ class MeffRaster(QgsProcessingAlgorithm):
         return {self.OUTPUT: res}
 
         
-class MeffRasterCBC(QgsProcessingAlgorithm):
+class MeffRasterCBC(FragScapeRasterAlgorithm):
 
     ALG_NAME = "meffRasterCBC"
     
@@ -329,7 +337,7 @@ class MeffRasterCBC(QgsProcessingAlgorithm):
         
         return {self.OUTPUT: res}
         
-class MeffRasterTmp(QgsProcessingAlgorithm):
+class MeffRasterTmp(FragScapeRasterAlgorithm):
 
     ALG_NAME = "meffRasterTmp"
     

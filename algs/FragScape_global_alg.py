@@ -35,10 +35,11 @@ from qgis.core import (QgsProcessingProvider,
 import processing
 import xml.etree.ElementTree as ET
 
+from .FragScape_algs import FragScapeVectorAlgorithm
 from ..qgis_lib_mc import utils, qgsUtils, feedbacks
 from ..FragScape_model import FragScapeModel
 
-class FragScapeAlgorithm(QgsProcessingAlgorithm):
+class FragScapeAlgorithm(FragScapeVectorAlgorithm):
 
     # Algorithm parameters
     INPUT_CONFIG = "INPUT"
