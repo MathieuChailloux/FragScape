@@ -22,7 +22,9 @@
  ***************************************************************************/
 """
 
+import os
 
+from PyQt5.QtGui import QIcon
 from qgis.core import QgsApplication, QgsProcessingProvider
 
 from .FragScape_algs import (PrepareLanduseAlgorithm,
@@ -57,6 +59,12 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
         
     def longName(self):
         return self.name()
+        
+    def icon(self):
+        icon_path = os.path.join(os.path.dirname(__file__), "..", "icons", "vector_grid.png")
+        #icon_path = ':/plugins/FragScape/icons/vector_grid.svg'
+        print("icon_path = " + str(icon_path))
+        return QIcon(icon_path)
         
     def loadAlgorithms(self):
         for a in self.alglist:
