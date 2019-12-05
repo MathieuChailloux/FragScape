@@ -31,7 +31,7 @@ from PyQt5.QtCore import QVariant
 from processing import QgsProcessingUtils
 
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
-from ..algs import FragScape_algs
+from ..algs import FragScape_algs, FragScape_algs_provider
 from . import params, fragm
 
 class ReportingModel(abstract_model.DictModel):
@@ -115,8 +115,7 @@ class ReportingModel(abstract_model.DictModel):
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.INCLUDE_CBC : self.includeCBC,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.UNIT : self.unit,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.OUTPUT : results_path }
-        res1 = qgsTreatments.applyProcessingAlg(
-            FragScape_algs.FragScapeAlgorithmsProvider.NAME,
+        res1 = qgsTreatments.applyProcessingAlg('FragScape',
             FragScape_algs.EffectiveMeshSizeReportingAlgorithm.ALG_NAME,
             parameters1,context=context,feedback=feedback,onlyOutput=False)
         #qgsUtils.loadVectorLayer(results_path,loadProject=True)
@@ -129,8 +128,7 @@ class ReportingModel(abstract_model.DictModel):
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.INCLUDE_CBC : self.includeCBC,
                        FragScape_algs.EffectiveMeshSizeReportingAlgorithm.UNIT : self.unit,
                        FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.OUTPUT : global_results_path }
-        res2 = qgsTreatments.applyProcessingAlg(
-            FragScape_algs.FragScapeAlgorithmsProvider.NAME,
+        res2 = qgsTreatments.applyProcessingAlg('FragScape',
             FragScape_algs.EffectiveMeshSizeGlobalAlgorithm.ALG_NAME,
             parameters2,
             context=context,feedback=feedback,onlyOutput=False)
