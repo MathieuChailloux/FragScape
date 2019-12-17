@@ -328,7 +328,7 @@ class ApplyFragmentationAlgorithm(FragScapeVectorAlgorithm):
         return {self.OUTPUT : singleGeomLayer}
         
                 
-class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
+class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
 
     ALG_NAME = "effectiveMeshSizeGlobal"
 
@@ -373,10 +373,10 @@ class EffectiveMeshSizeGlobalAlgorithm(QgsProcessingAlgorithm):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("Effective mesh size (Boundary)")
+        return self.tr("3.1 - Effective mesh size (Global)")
         
     def shortHelpString(self):
-        return self.tr("Computes effective mesh size from boundary layer")
+        return self.tr("Computes effective mesh size from patch layer and boundary of reporting layer (features are dissolved if needed)")
 
     def initAlgorithm(self, config=None):
         self.unit_options = [
@@ -626,10 +626,10 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm):
         return self.ALG_NAME
         
     def displayName(self):
-        return self.tr("3 - Effective mesh size (Reporting)")
+        return self.tr("3.2 - Effective mesh size (Reporting)")
         
     def shortHelpString(self):
-        return self.tr("Computes effective mesh size and other fragmentation indicators")
+        return self.tr("Computes effective mesh size from patch layer for each feature of reporting layer.")
 
     def initAlgorithm(self, config=None):
         self.unit_options = [
