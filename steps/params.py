@@ -132,8 +132,8 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         super().__init__()
         self.mode = self.VECTOR_MODE
         self.save_tmp = False
-        self.fields = [self.WORKSPACE,self.EXTENT_LAYER,self.MODE,
-            self.RESOLUTION,self.PROJECT,self.CRS]
+        self.fields = [self.WORKSPACE,self.EXTENT_LAYER,
+            self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]
     
     def setWorkspace(self,path):
         norm_path = super().setWorkspace(path)
@@ -149,6 +149,14 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
             self.save_tmp = True
         else:
             utils.internal_error("Unexpected state for save_tmp checkbox : " + str(state))
+        self.layoutChanged.emit()
+        
+    def setMode(self,mode):
+        try:
+            self.mode = int(mode)
+        except ValueError:
+            utils.user_error("Unexpected mode : " + str(mode))
+        self.layoutChanged.emit()
         
     def mkOutputFile(self,name):
         self.checkWorkspaceInit()
@@ -156,12 +164,9 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         return new_path
        
     def fromXMLDict(self,dict):
-        super().fromXMLDict()
+        super().fromXMLDict(dict)
         if self.MODE in dict:
-            try:
-                self.switchMode(int(dict[self.MODE]))
-            except ValueError:
-                utils.user_error("Unexpected mode : " + str(dict[self.MODE]))
+            self.setMode(dict[self.MODE])
         
     def toXML(self,indent=""):
         xmlStr = indent + "<" + self.parser_name
@@ -391,7 +396,6 @@ class ParamsConnector:
         
     def switchMode(self,mode):
         utils.debug("switchDataClipFlag " + str(mode))
-        self.model.mode = mode
         vector_widgets = self.dlg.getVectorWidgets()
         raster_widgets = self.dlg.getRasterWidgets()
         if mode == self.model.VECTOR_MODE:
@@ -406,6 +410,7 @@ class ParamsConnector:
                 w.setEnabled(True)
         else:
             utils.internal_error("Unexpected mode : " + str(mode))
+        self.model.setMode(mode)
         # self.dlg.landuseConnector.switchSelectionMode(0)
         self.dlg.landuseSelectionMode.setCurrentIndex(0)
         
