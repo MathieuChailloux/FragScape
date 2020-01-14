@@ -58,6 +58,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 
 #class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
 class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
+
     def __init__(self, parent=None):
         """Constructor."""
         super(FragScapeDialog, self).__init__(parent)
@@ -102,6 +103,15 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         self.switchLangEn()
         for k, tab in self.connectors.items():
             tab.initGui()
+        
+    def getVectorWidgets(self):
+        widgets = [self.landuseSelectionMode,
+            self.landuseSelectField,
+            self.landuseDescrField]
+        return widgets
+    def getRasterWidgets(self):
+        widgets = [self.rasterResolution]
+        return widgets
         
     # Exception hook, i.e. function called when exception raised.
     # Displays traceback and error message in log tab.

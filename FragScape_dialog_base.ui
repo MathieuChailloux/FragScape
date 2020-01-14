@@ -301,8 +301,8 @@
               <attribute name="title">
                <string>1 - Parameters</string>
               </attribute>
-              <layout class="QGridLayout" name="gridLayout_14">
-               <item row="0" column="0" colspan="2">
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
                 <widget class="QFrame" name="frame_2">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -342,7 +342,7 @@
                  </layout>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item>
                 <widget class="QLabel" name="paramlabel">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -362,7 +362,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0" colspan="2">
+               <item>
                 <widget class="QFrame" name="paramsFrame">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -373,7 +373,7 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>70</height>
+                   <height>174</height>
                   </size>
                  </property>
                  <property name="frameShape">
@@ -393,31 +393,6 @@
                     </property>
                     <property name="text">
                      <string>Workspace</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QCheckBox" name="saveTmpResultsFlag">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <property name="layoutDirection">
-                     <enum>Qt::LeftToRight</enum>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="checked">
-                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
@@ -446,8 +421,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="boundsLayer_3">
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="workspaceLabel_2">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -455,11 +430,116 @@
                      </sizepolicy>
                     </property>
                     <property name="text">
-                     <string>Save intermediate layers</string>
+                     <string>Mode</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="paramsMode">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Vector</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Raster</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_46">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Resolution</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QgsDoubleSpinBox" name="rasterResolution">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>77</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximum">
+                     <double>999999.000000000000000</double>
+                    </property>
+                    <property name="clearValue">
+                     <bool>false</bool>
                     </property>
                    </widget>
                   </item>
                   <item row="3" column="0">
+                   <widget class="QLabel" name="label_45">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Extent layer</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QgsFileWidget" name="extentLayer">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
                    <widget class="QLabel" name="label_47">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -472,7 +552,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
+                  <item row="4" column="1">
                    <widget class="QgsProjectionSelectionWidget" name="paramsCrs">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -494,10 +574,48 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="boundsLayer_3">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Save intermediate layers</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QCheckBox" name="saveTmpResultsFlag">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="layoutDirection">
+                     <enum>Qt::LeftToRight</enum>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </widget>
                </item>
-               <item row="3" column="0" colspan="2">
+               <item>
                 <widget class="QTableView" name="paramsView">
                  <property name="enabled">
                   <bool>true</bool>
@@ -511,13 +629,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>120</height>
+                   <height>150</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>120</height>
+                   <height>150</height>
                   </size>
                  </property>
                  <property name="editTriggers">
@@ -537,7 +655,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
+               <item>
                 <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1051,6 +1169,9 @@
                          <enum>QFrame::Raised</enum>
                         </property>
                         <layout class="QHBoxLayout" name="horizontalLayout">
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
                          <item>
                           <widget class="QToolButton" name="landuseOpenTable">
                            <property name="toolTip">
@@ -1128,6 +1249,12 @@
                              <horstretch>0</horstretch>
                              <verstretch>0</verstretch>
                             </sizepolicy>
+                           </property>
+                           <property name="minimumSize">
+                            <size>
+                             <width>0</width>
+                             <height>21</height>
+                            </size>
                            </property>
                            <property name="layoutDirection">
                             <enum>Qt::LeftToRight</enum>
@@ -1536,8 +1663,13 @@
                       <height>13</height>
                      </size>
                     </property>
+                    <property name="font">
+                     <font>
+                      <italic>true</italic>
+                     </font>
+                    </property>
                     <property name="text">
-                     <string>Buffer</string>
+                     <string>Buffer [opt.]</string>
                     </property>
                    </widget>
                   </item>
@@ -1614,7 +1746,7 @@
                   <item row="4" column="1">
                    <widget class="QCheckBox" name="fragmCheckbox">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="text">
                      <string/>
@@ -2610,6 +2742,11 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QgsDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>qgsdoublespinbox.h</header>
+  </customwidget>
   <customwidget>
    <class>QgsFieldComboBox</class>
    <extends>QComboBox</extends>

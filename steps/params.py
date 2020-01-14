@@ -23,7 +23,7 @@
 """
 
 import os.path
-import pathlib
+# import pathlib
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle, QgsProject, QgsCoordinateTransform, QgsProcessingUtils
 from qgis.gui import QgsFileWidget
@@ -118,13 +118,72 @@ def mkTmpLayerPath(layer_name):
         path = QgsProcessingUtils.generateTempFilename(layer_name)
     return path
         
+class ParamsModel(abstract_model.NormalizingParamsModel):
+
+    MODE = "mode"
+    SAVE_TMP = "saveTmpFiles"
+    
+    VECTOR_MODE = 0
+    RASTER_MODE = 1
+    
+    def __init__(self,fsModel):
+        self.parser_name = "Params"
+        self.fsModel = fsModel
+        super().__init__()
+        self.mode = self.VECTOR_MODE
+        self.save_tmp = False
+        self.fields = [self.WORKSPACE,self.EXTENT_LAYER,self.MODE,
+            self.RESOLUTION,self.PROJECT,self.CRS]
+    
+    def setWorkspace(self,path):
+        norm_path = super().setWorkspace(path)
+        self.outputDir = utils.createSubdir(norm_path,"outputs")
+        utils.info("Outputs directory set to '" + str(norm_path))
+        self.tmpDir = utils.createSubdir(norm_path,"tmp")
+        utils.info("Temporary directory set to '" + str(self.tmpDir))
+        
+    def setSaveTmp(self,state):
+        if state == 0:
+            self.save_tmp = False
+        elif state == 2:
+            self.save_tmp = True
+        else:
+            utils.internal_error("Unexpected state for save_tmp checkbox : " + str(state))
+        
+    def mkOutputFile(self,name):
+        self.checkWorkspaceInit()
+        new_path = utils.joinPath(self.outputDir,name)
+        return new_path
+       
+    def fromXMLDict(self,dict):
+        super().fromXMLDict()
+        if self.MODE in dict:
+            try:
+                self.switchMode(int(dict[self.MODE]))
+            except ValueError:
+                utils.user_error("Unexpected mode : " + str(dict[self.MODE]))
+        
+    def toXML(self,indent=""):
+        xmlStr = indent + "<" + self.parser_name
+        xmlStr += super().getXMLStr()
+        xmlStr += " " + self.MODE + "=\"" + str(self.mode) + "\""
+        xmlStr += "/>"
+        return xmlStr
+        
+    
 #class ParamsModel(abstract_model.AbstractGroupModel):
-class ParamsModel(QAbstractTableModel):
+class ParamsModelOld(QAbstractTableModel):
 
     WORKSPACE = "workspace"
     PROJECT = "projectFile"
+    EXTENT_LAYER = "extentLayer"
+    MODE = "mode"
+    RESOLUTION = "resolution"
     SAVE_TMP = "saveTmpFiles"
     CRS = "crs"
+    
+    VECTOR_MODE = 0
+    RASTER_MODE = 1
 
     def __init__(self,fsModel):
         self.parser_name = "Params"
@@ -133,17 +192,26 @@ class ParamsModel(QAbstractTableModel):
         self.outputDir = None
         self.tmpDir = None
         #self.dataClipFlag = True
+        self.extentLayer = None
+        self.mode = self.VECTOR_MODE
+        self.resolution = 0.0
         self.projectFile = ""
         self.save_tmp = False
         self.crs = defaultCrs
-        self.fields = [self.WORKSPACE,self.PROJECT,self.CRS]
+        self.fields = [self.WORKSPACE,self.EXTENT_LAYER,self.MODE,
+            self.RESOLUTION,self.PROJECT,self.CRS]
         QAbstractTableModel.__init__(self)
         
-    # def setDataClipFalg(self,val):
-        # self.dataClipFlag = val
+    def setExtentLayer(self,path):
+        path = self.normalizePath(path)
+        utils.info("Setting extent layer to " + str(path))
+        self.extentLayer = path
+        self.layoutChanged.emit()
         
-    # def switchDataClipFlag(self):
-        # self.dataClipFlag = not self.dataClipFlag
+    def setResolution(self,resolution):
+        utils.info("Setting resolution to " + str(resolution))
+        self.resolution = resolution
+        self.layoutChanged.emit()
         
     def setSaveTmp(self,state):
         if state == 0:
@@ -264,6 +332,16 @@ class ParamsModel(QAbstractTableModel):
         if self.CRS in dict:
             crs = QgsCoordinateReferenceSystem(dict[self.CRS])
             self.setCrs(crs)
+        if self.MODE in dict:
+            try:
+                self.switchMode(int(dict[self.MODE]))
+            except ValueError:
+                utils.user_error("Unexpected mode : " + str(dict[self.MODE]))
+        if self.RESOLUTION in dict:
+            try:
+                self.setResolution(float(dict[self.RESOLUTION]))
+            except ValueError:
+                utils.user_error("Unexpected resolution : " + str(dict[self.RESOLUTION]))
         if self.WORKSPACE in dict:
            if not self.workspace and os.path.isdir(dict[self.WORKSPACE]):
                self.setWorkspace(dict[self.WORKSPACE])
@@ -279,6 +357,8 @@ class ParamsModel(QAbstractTableModel):
         xmlStr = indent + "<" + self.parser_name
         if self.workspace:
             xmlStr += " " + self.WORKSPACE + "=\"" + str(self.workspace) + "\""
+        xmlStr += " " + self.MODE + "=\"" + str(self.mode) + "\""
+        xmlStr += " " + self.RESOLUTION + "=\"" + str(self.resolution) + "\""
         xmlStr += " " + self.CRS + "=\"" + self.getCrsStr() + "\""
         #xmlStr += " " + self.CLIP + "=\"" + str(self.dataClipFlag) + "\""
         xmlStr += "/>"
@@ -295,11 +375,12 @@ class ParamsConnector:
         
     def initGui(self):
         self.dlg.paramsView.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.dlg.paramsCrs.setCrs(defaultCrs)
+        self.dlg.paramsCrs.setCrs(self.model.DEFAULT_CRS)
         
     def connectComponents(self):
         self.dlg.paramsView.setModel(self.model)
         #self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
+        self.dlg.paramsMode.currentIndexChanged.connect(self.switchMode)
         self.dlg.workspace.setStorageMode(QgsFileWidget.GetDirectory)
         self.dlg.workspace.fileChanged.connect(self.model.setWorkspace)
         self.dlg.saveTmpResultsFlag.stateChanged.connect(self.model.setSaveTmp)
@@ -307,6 +388,26 @@ class ParamsConnector:
         header = self.dlg.paramsView.horizontalHeader()     
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.model.layoutChanged.emit()
+        
+    def switchMode(self,mode):
+        utils.debug("switchDataClipFlag " + str(mode))
+        self.model.mode = mode
+        vector_widgets = self.dlg.getVectorWidgets()
+        raster_widgets = self.dlg.getRasterWidgets()
+        if mode == self.model.VECTOR_MODE:
+            for w in vector_widgets:
+                w.setEnabled(True)
+            for w in raster_widgets:
+                w.setEnabled(False)
+        elif mode == self.model.RASTER_MODE:
+            for w in vector_widgets:
+                w.setEnabled(False)
+            for w in raster_widgets:
+                w.setEnabled(True)
+        else:
+            utils.internal_error("Unexpected mode : " + str(mode))
+        # self.dlg.landuseConnector.switchSelectionMode(0)
+        self.dlg.landuseSelectionMode.setCurrentIndex(0)
         
     def updateUI(self):
         self.dlg.workspace.setFilePath(self.model.workspace)
