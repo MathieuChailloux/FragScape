@@ -255,10 +255,10 @@ class ReportingConnector(abstract_model.AbstractConnector):
     
     def setInputLayer(self,layer):
         utils.debug("setInputLayer to " + str(layer))
-        self.dlg.resultsSelection.setLayer(layer)
         self.unloadResults()
-        #self.dlg.resultsSelection.setLayer(loaded_layer)
-        self.model.input_layer = qgsUtils.pathOfLayer(layer)
+        if layer:
+            self.dlg.resultsSelection.setLayer(layer)
+            self.model.input_layer = qgsUtils.pathOfLayer(layer)
         
     def setSelectExpr(self,expr):
         self.model.select_expr = expr

@@ -22,7 +22,14 @@
  ***************************************************************************/
 """
 
-from qgis.core import QgsMapLayerProxyModel, QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException, QgsProcessingParameterFeatureSource, QgsProcessingParameterExpression, QgsProcessingParameterFeatureSink, QgsFieldProxyModel
+from qgis.core import (QgsMapLayerProxyModel,
+                        QgsProcessing,
+                        QgsProcessingAlgorithm,
+                        QgsProcessingException,
+                        QgsProcessingParameterFeatureSource,
+                        QgsProcessingParameterExpression,
+                        QgsProcessingParameterFeatureSink,
+                        QgsFieldProxyModel)
 # from PyQt5 import QtGui, QtCore, QtWidgets
 # from PyQt5.QtCore import QCoreApplication
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
@@ -96,18 +103,21 @@ class LanduseModel(abstract_model.DictModel):
         return LanduseFieldItem(v,d,i)
         
     def changeLayer(self,path):
-        if not utils.pathEquals(path,self.landuseLayer):
-            utils.debug("path = " + str(path))
-            utils.debug("old path = " + str(self.landuseLayer))
-            self.landuseLayer = path
-            if self.select_field:
-                loaded_layer = qgsUtils.loadLayer(path)
-                if self.select_field not in loaded_layer.fields().names():
-                    self.setSelectField(None)
-            if self.descr_field:
-                if self.descr_field not in loaded_layer.fields().names():
-                    self.setDescrField(None)
-            self.setSelectExpr("")
+        self.landuseLayer = path
+        self.select_field = None
+        self.descr_field = None
+        # if not utils.pathEquals(path,self.landuseLayer):
+            # utils.debug("path = " + str(path))
+            # utils.debug("old path = " + str(self.landuseLayer))
+            # self.landuseLayer = path
+            # if self.select_field:
+                # loaded_layer = qgsUtils.loadLayer(path)
+                # if self.select_field not in loaded_layer.fields().names():
+                    # self.setSelectField(None)
+            # if self.descr_field:
+                # if self.descr_field not in loaded_layer.fields().names():
+                    # self.setDescrField(None)
+            # self.setSelectExpr("")
             
     def setDataClipFlag(self,flag):
         self.dataClipFlag = flag
@@ -142,10 +152,34 @@ class LanduseModel(abstract_model.DictModel):
             
     def getDissolveLayer(self):
         return self.fsModel.mkOutputFile("landuseSelectionDissolve.gpkg")
+            
+    def getOutputRaster(self):
+        return self.fsModel.mkOutputFile("landuseSelection.tif")
         
     # def switchDataClipFlag(self,state):
         # utils.debug("switchDataClipFlag")
         # self.dataClipFlag = not self.dataClipFlag
+        
+    def getSelectedValues(self):
+        vals = [i.dict[LanduseFieldItem.VALUE_FIELD] for i in self.items if i.dict[LanduseFieldItem.TO_SELECT_FIELD]]
+        return vals
+            
+    def mkRasterFormula(self,feedback):
+        values = self.getSelectedValues()
+        loaded_layer = qgsUtils.loadVectorLayer(self.landuseLayer)
+        input_vals = qgsTreatments.getRasterUniqueVals(loaded_layer,feedback)
+        feedback.pushDebugInfo("values = " + str(values))
+        feedback.pushDebugInfo("input_vals = " + str(input_vals))
+        input_vals_str = [str(v) for v in input_vals]
+        existing_vals = [v for v in values if v in input_vals_str]
+        if not existing_vals:
+            utils.user_error("No existing values selected for landuse layer")
+        form = "logical_or(A==" + str(existing_vals[0])
+        for v in existing_vals[1:]:
+            form += ", A==" + str(v)
+        # form += ") * A"
+        form += ")"
+        return form
 
     def mkSelectionExpr(self):
         expr = ""
@@ -171,15 +205,9 @@ class LanduseModel(abstract_model.DictModel):
             utils.internal_error("Unexpected selection mode : " + str(self.select_mode))
         return expr
                 
-    def applyItemsWithContext(self,context,feedback,indexes):
-        feedbacks.progressFeedback.beginSection("Landuse classification")
-        self.fsModel.checkWorkspaceInit()
-        self.checkLayerSelected()
+    def applyVector(self,context,feedback):
         self.checkFieldSelected()
         clip_layer = self.clip_layer if self.dataClipFlag else None
-        utils.debug("clip_layer1 = " + str(self.clip_layer))
-        utils.debug("dataflag = " + str(self.dataClipFlag))
-        utils.debug("clip_layer = " + str(clip_layer))
         expr = self.getSelectionExpr()
         # if not expr:
            # utils.user_error("No expression selected : TODO select everything")
@@ -193,6 +221,30 @@ class LanduseModel(abstract_model.DictModel):
             "FragScape","prepareLanduse",parameters,
             context,feedback)
         qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
+        return res
+       
+    def applyRaster(self,context,feedback):
+        input = self.landuseLayer
+        formula = self.mkRasterFormula(feedback)
+        output = self.getOutputRaster()
+        qgsUtils.removeRaster(output)
+        res = qgsTreatments.applyRasterCalc(input,output,formula,context=context,feedback=feedback)
+        qgsUtils.loadRasterLayer(output,loadProject=True)
+        return res
+                
+    def applyItemsWithContext(self,context,feedback,indexes):
+        feedbacks.progressFeedback.beginSection("Landuse classification")
+        self.fsModel.checkWorkspaceInit()
+        self.checkLayerSelected()
+        clip_layer = self.clip_layer if self.dataClipFlag else None
+        utils.debug("clip_layer1 = " + str(self.clip_layer))
+        utils.debug("dataflag = " + str(self.dataClipFlag))
+        utils.debug("clip_layer = " + str(clip_layer))
+        # Vector or raster
+        if self.fsModel.paramsModel.modeIsVector():
+            res = self.applyVector(context,feedback)
+        else:
+            res = self.applyRaster(context,feedback)
         feedbacks.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
@@ -301,8 +353,8 @@ class LanduseConnector(abstract_model.AbstractConnector):
         
     def setLayerUI(self,layer):
         utils.debug("setlayerUI")
-        if layer:
-            #self.dlg.landuseInputLayerCombo.setLayer(layer)
+        # if layer:
+        if True:
             self.dlg.landuseSelectField.setLayer(layer)
             self.dlg.landuseDescrField.setLayer(layer)
             self.dlg.landuseSelectExpr.setLayer(layer)
@@ -313,7 +365,9 @@ class LanduseConnector(abstract_model.AbstractConnector):
             utils.debug("setLayer " + str(layer.type))
             layer_path = qgsUtils.pathOfLayer(layer)
             self.model.changeLayer(layer_path)
-            self.setLayerUI(layer)
+        else:
+            self.model.changeLayer(None)
+        self.setLayerUI(layer)
   
     # def loadLayer(self,path):
         # utils.debug("loadLayer")
@@ -321,11 +375,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
         # self.setLayer(loaded_layer)
         # self.dlg.landuseInputLayerCombo.setLayer(loaded_layer)
         
-    def loadFields(self,fieldname):
-        utils.debug("loadField")
-        curr_layer = self.dlg.landuseInputLayerCombo.currentLayer()
-        if not curr_layer:
-            utils.internal_error("No layer selected in landuse tab")
+    def loadVectorFields(self,layer,fieldname):
         if not self.model.select_field:
             utils.user_error("No selection field selected")
         new_items = []
@@ -343,6 +393,23 @@ class LanduseConnector(abstract_model.AbstractConnector):
                 new_item.dict[LanduseFieldItem.TO_SELECT_FIELD] = old_item.dict[LanduseFieldItem.TO_SELECT_FIELD]
                 if keepDescr:
                    new_item.dict[LanduseFieldItem.DESCR_FIELD] = old_item.dict[LanduseFieldItem.DESCR_FIELD]
+        return new_items
+        
+    def loadRasterFields(self,layer):
+        feedback = feedbacks.progressFeedback
+        vals = qgsTreatments.getRasterUniqueVals(layer,feedback)
+        new_items = [LanduseFieldItem(v) for v in vals]
+        return new_items
+        
+    def loadFields(self,fieldname):
+        utils.debug("loadField")
+        curr_layer = self.dlg.landuseInputLayerCombo.currentLayer()
+        if not curr_layer:
+            utils.user_error("No layer selected in landuse tab")
+        if self.model.fsModel.modeIsVector():
+            new_items = self.loadVectorFields(curr_layer)
+        else:
+            new_items = self.loadRasterFields(curr_layer)
         self.model.items = new_items
         self.model.layoutChanged.emit()
         

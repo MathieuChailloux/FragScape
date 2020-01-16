@@ -25,7 +25,12 @@
 import os.path
 # import pathlib
 
-from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle, QgsProject, QgsCoordinateTransform, QgsProcessingUtils
+from qgis.core import (QgsCoordinateReferenceSystem,
+                        QgsRectangle,
+                        QgsProject,
+                        QgsCoordinateTransform,
+                        QgsProcessingUtils,
+                        QgsMapLayerProxyModel)
 from qgis.gui import QgsFileWidget
 from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt
 from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QHeaderView
@@ -157,6 +162,9 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         except ValueError:
             utils.user_error("Unexpected mode : " + str(mode))
         self.layoutChanged.emit()
+        
+    def modeIsVector(self):
+        return (self.mode == self.VECTOR_MODE)
         
     def mkOutputFile(self,name):
         self.checkWorkspaceInit()
@@ -398,16 +406,27 @@ class ParamsConnector:
         utils.debug("switchDataClipFlag " + str(mode))
         vector_widgets = self.dlg.getVectorWidgets()
         raster_widgets = self.dlg.getRasterWidgets()
+        layer_combos = [ self.dlg.resultsInputLayer]
+        layer_combo_dlg = [self.dlg.landuseConnector.layerComboDlg,
+            self.dlg.fragmConnector.layerComboDlg ]
         if mode == self.model.VECTOR_MODE:
             for w in vector_widgets:
                 w.setEnabled(True)
             for w in raster_widgets:
                 w.setEnabled(False)
+            for lc in layer_combos:
+                lc.setFilters(QgsMapLayerProxyModel.VectorLayer)
+            for lcd in layer_combo_dlg:
+                lcd.setVectorMode()
         elif mode == self.model.RASTER_MODE:
             for w in vector_widgets:
                 w.setEnabled(False)
             for w in raster_widgets:
                 w.setEnabled(True)
+            for lc in layer_combos:
+                lc.setFilters(QgsMapLayerProxyModel.RasterLayer)
+            for lcd in layer_combo_dlg:
+                lcd.setRasterMode()
         else:
             utils.internal_error("Unexpected mode : " + str(mode))
         self.model.setMode(mode)

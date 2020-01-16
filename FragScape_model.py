@@ -39,6 +39,9 @@ class FragScapeModel:
         
     def checkWorkspaceInit(self):
         self.paramsModel.checkWorkspaceInit()
+        
+    def modeIsVector(self): 
+        return self.paramsModel.modeIsVector()
             
     # Returns relative path w.r.t. workspace directory.
     # File separator is set to common slash '/'.
