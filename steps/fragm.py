@@ -41,8 +41,19 @@ class FragmItem(abstract_model.DictItem):
 
     NAME_FIELD = "NAME"
 
+    PREPARE_INPUT = FragScape_algs.PrepareFragmentationAlgorithm.INPUT
+    PREPARE_SELECT_EXPR = FragScape_algs.PrepareFragmentationAlgorithm.SELECT_EXPR
+    PREPARE_BUFFER = FragScape_algs.PrepareFragmentationAlgorithm.BUFFER
+    PREPARE_NAME = NAME_FIELD
+    PREPARE_FRAGM = "isFragm"
+    PREPARE_OUTPUT = FragScape_algs.PrepareFragmentationAlgorithm.OUTPUT
+
+    FIELDS = [PREPARE_INPUT,PREPARE_SELECT_EXPR,PREPARE_BUFFER,PREPARE_NAME,PREPARE_FRAGM]
+
+    NAME_FIELD = "NAME"
+
     def __init__(self,dict):
-        super().__init__(dict,fields=FragmModel.FIELDS)
+        super().__init__(dict,fields=self.FIELDS)
         self.selectionLayer = None
         self.bufferLayer = None
         
@@ -55,6 +66,11 @@ class FragmItem(abstract_model.DictItem):
     def getOutputLayer(self):
         name = self.dict[self.NAME_FIELD]
         self.outputLayer = params.mkTmpLayerPath(name + ".gpkg")
+        return self.outputLayer
+        
+    def getOutputRLayer(self):
+        name = self.dict[self.NAME_FIELD]
+        self.outputLayer = params.mkTmpLayerPath(name + ".tif")
         return self.outputLayer
         
     def getSelectionLayer(self):
@@ -70,6 +86,32 @@ class FragmItem(abstract_model.DictItem):
             self.bufferLayer = params.mkTmpLayerPath(name + "_buf.gpkg")
             #self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
         return self.bufferLayer
+        
+    def prepareVector(self,context,feedback):
+        in_layer_path = item.dict[self.PREPARE_INPUT]
+        in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
+        clip_layer_path = item.dict[self.PREPARE_CLIP_LAYER]
+        if clip_layer_path:
+            clip_layer_abs_path = self.fsModel.getOrigPath(clip_layer_path)
+        else:
+            clip_layer_abs_path = None
+        select_expr = item.dict[self.PREPARE_SELECT_EXPR]
+        buffer_expr = item.dict[self.PREPARE_BUFFER]
+        utils.debug("select_expr : " + str(select_expr))
+        utils.debug("buffer_expr : " + str(buffer_expr))
+        outPath = item.getOutputLayer()
+        name = item.dict[self.PREPARE_NAME]
+        parameters = { self.PREPARE_INPUT : in_layer_abs_path,
+                       self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
+                       self.PREPARE_SELECT_EXPR : select_expr,
+                       self.PREPARE_BUFFER : buffer_expr,
+                       self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
+                       self.PREPARE_OUTPUT : outPath }
+        prepared = qgsTreatments.applyProcessingAlg(
+            "FragScape","prepareFragm",parameters,
+            context=context,feedback=step_feedback)
+            
+
         
     # def instantiateSelectionLayer(self):
         # out_path = self.getSelectionLayer()
@@ -113,66 +155,115 @@ class FragmModel(abstract_model.DictModel):
                 dict[self.PREPARE_CLIP_LAYER] = None
             return FragmItem(dict)
         
-    def getFragmLayer(self):
-        return params.mkTmpLayerPath("fragm.gpkg")
+    # def getFragmLayer(self):
+        # return params.mkTmpLayerPath("fragm.gpkg")
         
-    def getBuffersMergedLayer(self):
-        return params.mkTmpLayerPath("fragmBuffersMerged.shp")
+    # def getBuffersMergedLayer(self):
+        # return params.mkTmpLayerPath("fragmBuffersMerged.shp")
         
-    def getLanduseFragmLayer(self):
-        return params.mkTmpLayerPath("landuseFragm.gpkg")
+    # def getLanduseFragmLayer(self):
+        # return params.mkTmpLayerPath("landuseFragm.gpkg")
         
-    def getFinalLayer(self):
+    def getSingleGeomLayer(self):
         return self.fsModel.mkOutputFile("landuseFragmSingleGeom.gpkg")
         
+    def getMergedLayer(self):
+        return self.fsModel.mkOutputFile("landuseFragm.tif")
+        
+    def getFinalLayer(self):
+        if self.fsModel.modeIsVector():
+            return self.getSingleGeomLayer()
+        else:
+            return self.getMergedLayer()
+            
+    def prepareItem(self,item,context,feedback):
+        input_rel = item.dict[self.PREPARE_INPUT]
+        input = self.fsModel.getOrigPath(input_rel)
+        input_layer, input_type = qgsUtils.loadLayerGetType(input)
+        input_vector = input_type == 'Vector'
+        select_expr = item.dict[self.PREPARE_SELECT_EXPR]
+        buffer_expr = item.dict[self.PREPARE_BUFFER]
+        name = item.dict[self.PREPARE_NAME]
+        is_fragm = item.dict[self.PREPARE_FRAGM]
+        burn_val = (1 if is_fragm else 0)
+        vector_mode = self.fsModel.modeIsVector()
+        outPath = item.getOutputLayer()
+        outRPath = item.getOutputRLayer()
+        extent = self.fsModel.paramsModel.getExtentRectangle()
+        resolution = self.fsModel.paramsModel.getResolution()
+        # Processing
+        clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,context=context,feedback=feedback)
+        if input_vector:
+            clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,
+                context=context,feedback=feedback)
+            parameters = { self.PREPARE_INPUT : clipped,
+                           self.PREPARE_SELECT_EXPR : select_expr,
+                           self.PREPARE_BUFFER : buffer_expr,
+                           self.PREPARE_NAME : name,
+                           self.PREPARE_OUTPUT : outPath }
+            res = qgsTreatments.applyProcessingAlg(
+                "FragScape","prepareFragm",parameters,
+                context=context,feedback=step_feedback)
+            if not vector_mode:
+                res = qgsTreatments.applyRasterization(prepared,outRPath,
+                    extent,resolution,brun_val=burn_val,all_touch=True,
+                    context=context,feedback=feedback)
+        elif vector_mode:
+            utils.internal_error("Not implemented yet : Raster to Vector")
+        else:
+            normalized_path = QgsProcessingUtils.generateTempFilename(name + '_normalized.tif')
+            normalized = self.fsModel.paramsModel.normalizeRaster(input,
+                out_path=normalized_path,context=context,feedback=feedback)
+            res = qgsTreatments.applyRasterCalc(normalized,outRPath,str(burn_val),
+                out_type=0,context=context,feedback=feedback)
+        return res
+            
     def applyItemsWithContext(self,context,feedback,indexes=None):
         fragmMsg = "Application of fragmentation data to landuse"
         feedbacks.progressFeedback.beginSection(fragmMsg)
         prepared_layers = []
-        res_path = self.getFinalLayer()
+        res_path = self.getSingleGeomLayer()
         qgsUtils.removeVectorLayer(res_path)
         nb_items = len(self.items)
         curr_step = 1
         step_feedback = feedbacks.ProgressMultiStepFeedback(nb_items,feedback)
         for item in self.items:
-            in_layer_path = item.dict[self.PREPARE_INPUT]
-            in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
-            clip_layer_path = item.dict[self.PREPARE_CLIP_LAYER]
-            if clip_layer_path:
-                clip_layer_abs_path = self.fsModel.getOrigPath(clip_layer_path)
-            else:
-                clip_layer_abs_path = None
-            select_expr = item.dict[self.PREPARE_SELECT_EXPR]
-            buffer_expr = item.dict[self.PREPARE_BUFFER]
-            utils.debug("select_expr : " + str(select_expr))
-            utils.debug("buffer_expr : " + str(buffer_expr))
-            outPath = item.getOutputLayer()
-            name = item.dict[self.PREPARE_NAME]
-            parameters = { self.PREPARE_INPUT : in_layer_abs_path,
-                           self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
-                           self.PREPARE_SELECT_EXPR : select_expr,
-                           self.PREPARE_BUFFER : buffer_expr,
-                           self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
-                           self.PREPARE_OUTPUT : outPath }
-            prepared = qgsTreatments.applyProcessingAlg(
-                "FragScape","prepareFragm",parameters,
-                context=context,feedback=step_feedback)
+            prepared = self.prepareItem(item,context,step_feedback)
             curr_step += 1
             step_feedback.setCurrentStep(curr_step)
-            #qgsUtils.loadVectorLayer(prepared,loadProject=True)
             prepared_layers.append(prepared)
-        landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
-        crs = self.fsModel.paramsModel.crs
-        parameters = { self.APPLY_LANDUSE : landuseLayer,
-                       self.APPLY_FRAGMENTATION : prepared_layers,
-                       self.APPLY_CRS : crs,
-                       self.APPLY_OUTPUT : res_path }
-        res = qgsTreatments.applyProcessingAlg(
-            "FragScape","applyFragm",parameters,
-            context=context,feedback=feedback)
-        qgsUtils.loadVectorLayer(res_path,loadProject=True)
-        feedbacks.progressFeedback.endSection()
+        feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
+        # MERGE
+        vector_mode = self.fsModel.modeIsVector()
+        if vector_mode:
+            landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
+            crs = self.fsModel.paramsModel.crs
+            parameters = { self.APPLY_LANDUSE : landuseLayer,
+                           self.APPLY_FRAGMENTATION : prepared_layers,
+                           self.APPLY_CRS : crs,
+                           self.APPLY_OUTPUT : res_path }
+            res = qgsTreatments.applyProcessingAlg(
+                "FragScape","applyFragm",parameters,
+                context=context,feedback=feedback)
+            res_path = self.getSingleGeomLayer()
+            qgsUtils.loadVectorLayer(res_path,loadProject=True)
+        else:
+            landuseLayer = self.fsModel.landuseModel.getOutputRaster()
+            prepared_layers.insert(0,landuseLayer)
+            res_path = self.getMergedLayer()
+            res = qgsTreatments.applyMergeRaster(prepared_layers,res_path,
+                nodata_val=255,out_type=0,context=context,feedback=feedback)
+            qgsUtils.loadRasterLayer(res_path,loadProject=True)
         return res
+            
+            
+            
+        # if self.fsModel.modeIsVector():
+            # res = self.applyVector(context,feedback)
+        # else:
+            # res = self.applyRaster(context,feedback)
+        # feedbacks.progressFeedback.endSection()
+        # return res
             
     def fromXMLRoot(self,root):
         utils.debug("fromXML")
@@ -209,13 +300,15 @@ class FragmConnector(abstract_model.AbstractConnector):
                                                        self.dlg.fragmInputLayer)
         self.dlg.fragmClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
         self.dlg.fragmClipLayer.fileChanged.connect(self.setDataClipLayer)
+        self.dlg.selectionUp.clicked.connect(self.upgradeItem)
+        self.dlg.selectionDown.clicked.connect(self.downgradeItem)
         
     def applyItems(self):
         self.dlg.resultsInputLayer.setLayer(None)
         self.dlg.resultsSelection.setLayer(None)
         super().applyItems()
         res_path = self.model.getFinalLayer()
-        res_layer = qgsUtils.loadVectorLayer(res_path)
+        res_layer = qgsUtils.loadLayer(res_path)
         self.dlg.resultsInputLayer.setLayer(res_layer)
         
     def setInLayerFromCombo(self,layer):

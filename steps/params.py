@@ -435,6 +435,7 @@ class ParamsConnector:
         
     def updateUI(self):
         self.dlg.workspace.setFilePath(self.model.workspace)
+        self.dlg.paramsMode.setCurrentIndex(self.model.mode)
         # checkState = 2 if self.model.dataClipFlag else 0
         # self.dlg.dataClipFlag.setCheckState(checkState)
         self.dlg.paramsCrs.setCrs(self.model.crs)

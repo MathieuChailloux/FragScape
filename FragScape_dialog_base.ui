@@ -99,6 +99,59 @@
            </size>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
+           <item row="0" column="3">
+            <widget class="QToolButton" name="aboutButton">
+             <property name="toolTip">
+              <string>About</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/iconHelpConsole.svg</normaloff>:/plugins/FragScape/icons/iconHelpConsole.svg</iconset>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>790</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="5">
+            <widget class="QToolButton" name="langEn">
+             <property name="toolTip">
+              <string>English</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="resources.qrc">
+               <normaloff>:/plugins/FragScape/icons/enFlag.svg</normaloff>:/plugins/FragScape/icons/enFlag.svg</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QToolButton" name="openProject">
              <property name="sizePolicy">
@@ -186,59 +239,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
-            <widget class="QToolButton" name="aboutButton">
-             <property name="toolTip">
-              <string>About</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/plugins/FragScape/icons/iconHelpConsole.svg</normaloff>:/plugins/FragScape/icons/iconHelpConsole.svg</iconset>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="4">
-            <spacer name="horizontalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>790</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="5">
-            <widget class="QToolButton" name="langEn">
-             <property name="toolTip">
-              <string>English</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="resources.qrc">
-               <normaloff>:/plugins/FragScape/icons/enFlag.svg</normaloff>:/plugins/FragScape/icons/enFlag.svg</iconset>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="6">
             <widget class="QToolButton" name="langFr">
              <property name="toolTip">
@@ -265,7 +265,7 @@
            <item row="1" column="0" colspan="7">
             <widget class="QTabWidget" name="mTabWidget">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>2</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -310,10 +310,16 @@
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>153</height>
+                  </size>
+                 </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>254</height>
+                   <height>173</height>
                   </size>
                  </property>
                  <property name="frameShape">
@@ -330,6 +336,18 @@
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>153</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>153</height>
+                     </size>
                     </property>
                     <property name="text">
                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 1.0 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory from vector input data (land cover, elements of fragmentation) in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification&lt;br/&gt;3) Fragmentation elements integration&lt;br/&gt;4) Fragmentation metrics computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -663,7 +681,7 @@
                  <property name="sizeHint" stdset="0">
                   <size>
                    <width>20</width>
-                   <height>151</height>
+                   <height>16</height>
                   </size>
                  </property>
                 </spacer>
@@ -1362,7 +1380,7 @@
              </widget>
              <widget class="QWidget" name="tab">
               <attribute name="title">
-               <string>3 - Fragmentation</string>
+               <string>3 - More data</string>
               </attribute>
               <layout class="QGridLayout" name="gridLayout_16">
                <item row="0" column="0">
@@ -1381,7 +1399,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Fragmentation data</string>
+                  <string>More data</string>
                  </property>
                 </widget>
                </item>
@@ -1790,10 +1808,7 @@
                   <enum>QFrame::Raised</enum>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_2">
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <item row="0" column="1">
+                  <item row="0" column="2">
                    <widget class="QFrame" name="frame_12">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -1858,7 +1873,89 @@
                     </layout>
                    </widget>
                   </item>
-                  <item row="1" column="0" colspan="2">
+                  <item row="1" column="0">
+                   <widget class="QFrame" name="selectArrowsFrame">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>50</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_5">
+                     <item>
+                      <widget class="QToolButton" name="selectionUp">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>25</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Upgrade selection</string>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/up-arrow.png</normaloff>:/plugins/FragScape/icons/up-arrow.png</iconset>
+                       </property>
+                       <property name="autoRaise">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QToolButton" name="selectionDown">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>25</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Downgrade selection</string>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                       <property name="icon">
+                        <iconset resource="resources.qrc">
+                         <normaloff>:/plugins/FragScape/icons/down-arrow.png</normaloff>:/plugins/FragScape/icons/down-arrow.png</iconset>
+                       </property>
+                       <property name="autoRaise">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="1" column="1" colspan="2">
                    <widget class="QTableView" name="fragmView">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -1883,7 +1980,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="0">
+                  <item row="2" column="1">
                    <widget class="QToolButton" name="fragmRemove">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1906,7 +2003,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
+                  <item row="2" column="2">
                    <widget class="QFrame" name="frame_9">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

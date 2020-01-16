@@ -228,7 +228,8 @@ class LanduseModel(abstract_model.DictModel):
         formula = self.mkRasterFormula(feedback)
         output = self.getOutputRaster()
         qgsUtils.removeRaster(output)
-        res = qgsTreatments.applyRasterCalc(input,output,formula,context=context,feedback=feedback)
+        res = qgsTreatments.applyRasterCalc(input,output,formula,
+            nodata_val=255,out_type=0,context=context,feedback=feedback)
         qgsUtils.loadRasterLayer(output,loadProject=True)
         return res
                 
@@ -251,21 +252,22 @@ class LanduseModel(abstract_model.DictModel):
         if not self.landuseLayer:
             utils.warn("No layer selected")
             return ""
-        if not self.select_field:
-            utils.warn("No field selected")
-            return ""
-        #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.landuseLayer))
         layerRelPath = self.fsModel.normalizePath(self.landuseLayer)
-        attribs_dict = { self.INPUT_FIELD : layerRelPath,
-                         self.SELECT_MODE_FIELD : self.select_mode }
-        if self.dataClipFlag and self.clip_layer:
-            attribs_dict[self.CLIP_LAYER] = self.fsModel.normalizePath(self.clip_layer)
-        if self.select_field:
-            attribs_dict[self.SELECT_FIELD_FIELD] = self.select_field
-        if self.descr_field:
-            attribs_dict[self.SELECT_DESCR_FIELD] = self.descr_field
-        if self.select_mode == self.SELECT_EXPR_MODE:
-            attribs_dict[self.SELECT_EXPR_FIELD] = self.select_expr
+        attribs_dict = { self.INPUT_FIELD : layerRelPath }
+        if self.fsModel.modeIsVector():
+            if not self.select_field:
+                utils.warn("No field selected")
+                return ""
+            #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.landuseLayer))
+            attribs_dict[self.SELECT_MODE_FIELD] : self.select_mode
+            if self.dataClipFlag and self.clip_layer:
+                attribs_dict[self.CLIP_LAYER] = self.fsModel.normalizePath(self.clip_layer)
+            if self.select_field:
+                attribs_dict[self.SELECT_FIELD_FIELD] = self.select_field
+            if self.descr_field:
+                attribs_dict[self.SELECT_DESCR_FIELD] = self.descr_field
+            if self.select_mode == self.SELECT_EXPR_MODE:
+                attribs_dict[self.SELECT_EXPR_FIELD] = self.select_expr
         xmlStr = super().toXML(indent,attribs_dict)
         return xmlStr
         
@@ -439,7 +441,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
         
     def updateUI(self):
         if self.model.landuseLayer:
-            loaded_layer = qgsUtils.loadVectorLayer(self.model.landuseLayer,loadProject=True)
+            loaded_layer = qgsUtils.loadLayer(self.model.landuseLayer,loadProject=True)
             self.dlg.landuseInputLayerCombo.setLayer(loaded_layer)
         utils.debug("clipflag1" + str(self.model.dataClipFlag))
         if self.model.dataClipFlag:

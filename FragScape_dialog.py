@@ -110,8 +110,9 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     def getVectorWidgets(self):
         widgets = [self.landuseSelectionMode,
             self.landuseSelectField,
-            self.landuseDescrField,
-            self.fragmExpr]
+            self.landuseDescrField]
+            # self.fragmExpr,
+            # self.fragmBuffer]
         return widgets
     def getRasterWidgets(self):
         widgets = [self.rasterResolution]
