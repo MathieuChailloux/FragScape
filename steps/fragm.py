@@ -49,6 +49,8 @@ class FragmItem(abstract_model.DictItem):
 
 
     def __init__(self,dict):
+        if self.FRAGM not in dict:
+            dict[self.FRAGM] = True
         super().__init__(dict,fields=self.FIELDS)
         self.selectionLayer = None
         self.bufferLayer = None
@@ -139,10 +141,12 @@ class FragmModel(abstract_model.DictModel):
         
     def mkItemFromDict(self,dict):
         if "in_layer" in dict:
-            new_dict = { self.PREPARE_INPUT : dict["in_layer"],
-                         self.PREPARE_SELECT_EXPR : dict["expr"],
-                         self.PREPARE_BUFFER : dict["buffer"],
-                         self.PREPARE_NAME : dict["name"] }
+            new_dict = { FragmItem.INPUT : dict["in_layer"],
+                         FragmItem.SELECT_EXPR : dict["expr"],
+                         FragmItem.BUFFER : dict["buffer"],
+                         FragmItem.NAME : dict["name"],
+                         FragmItem.FRAGM : True
+                         }
             return FragmItem(new_dict)
         else:
             return FragmItem(dict)
@@ -169,8 +173,11 @@ class FragmModel(abstract_model.DictModel):
             return self.getMergedLayer()
             
     def prepareItem(self,item,context,feedback):
+        self.fsModel.checkWorkspaceInit()
         input_rel = item.dict[FragmItem.INPUT]
+        feedback.pushDebugInfo("input_rel = " + str(input_rel))
         input = self.fsModel.getOrigPath(input_rel)
+        feedback.pushDebugInfo("input = " + str(input))
         input_layer, input_type = qgsUtils.loadLayerGetType(input)
         input_vector = input_type == 'Vector'
         select_expr = item.dict[FragmItem.SELECT_EXPR]
@@ -180,29 +187,37 @@ class FragmModel(abstract_model.DictModel):
         burn_val = (1 if is_fragm else 0)
         vector_mode = self.fsModel.modeIsVector()
         outPath = item.getOutputLayer()
+        feedback.pushDebugInfo("outPath = " + str(outPath))
         outRPath = item.getOutputRLayer()
-        extent = self.fsModel.paramsModel.getExtentRectangle()
-        resolution = self.fsModel.paramsModel.getResolution()
+        feedback.pushDebugInfo("outRPath = " + str(outRPath))
         # Processing
-        clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,context=context,feedback=feedback)
+        # clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,context=context,feedback=feedback)
         if input_vector:
             clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,
-                context=context,feedback=feedback)
+            context=context,feedback=feedback)
+            feedback.pushDebugInfo("clipped = " + str(clipped))
             parameters = { self.PREPARE_INPUT : clipped,
                            self.PREPARE_SELECT_EXPR : select_expr,
                            self.PREPARE_BUFFER : buffer_expr,
                            self.PREPARE_NAME : name,
                            self.PREPARE_OUTPUT : outPath }
-            res = qgsTreatments.applyProcessingAlg(
+            prepared = qgsTreatments.applyProcessingAlg(
                 "FragScape","prepareFragm",parameters,
-                context=context,feedback=step_feedback)
-            if not vector_mode:
+                context=context,feedback=feedback)
+            if vector_mode:
+                res = prepared
+            else:
+                self.fsModel.checkResolutionInit()
+                self.fsModel.checkExtentInit()
+                crs, extent, resolution = self.fsModel.getRasterParams()
                 res = qgsTreatments.applyRasterization(prepared,outRPath,
-                    extent,resolution,brun_val=burn_val,all_touch=True,
-                    context=context,feedback=feedback)
+                    extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
+                    all_touch=True,context=context,feedback=feedback)
         elif vector_mode:
             utils.internal_error("Not implemented yet : Raster to Vector")
         else:
+            self.fsModel.checkResolutionInit()
+            self.fsModel.checkExtentInit()
             normalized_path = QgsProcessingUtils.generateTempFilename(name + '_normalized.tif')
             normalized = self.fsModel.paramsModel.normalizeRaster(input,
                 out_path=normalized_path,context=context,feedback=feedback)
@@ -215,11 +230,13 @@ class FragmModel(abstract_model.DictModel):
         feedbacks.progressFeedback.beginSection(fragmMsg)
         prepared_layers = []
         res_path = self.getSingleGeomLayer()
+        feedback.pushDebugInfo("res_path = " + str(res_path))
         qgsUtils.removeVectorLayer(res_path)
         nb_items = len(self.items)
         curr_step = 1
         step_feedback = feedbacks.ProgressMultiStepFeedback(nb_items,feedback)
         for item in self.items:
+            feedback.pushDebugInfo("item = " + str(item))
             prepared = self.prepareItem(item,context,step_feedback)
             curr_step += 1
             step_feedback.setCurrentStep(curr_step)
@@ -244,7 +261,8 @@ class FragmModel(abstract_model.DictModel):
             prepared_layers.insert(0,landuseLayer)
             res_path = self.getMergedLayer()
             res = qgsTreatments.applyMergeRaster(prepared_layers,res_path,
-                nodata_val=255,out_type=0,context=context,feedback=feedback)
+                nodata_val=255,out_type=0,nodata_input=255,
+                context=context,feedback=feedback)
             qgsUtils.loadRasterLayer(res_path,loadProject=True)
         return res
             
@@ -257,14 +275,14 @@ class FragmModel(abstract_model.DictModel):
         # feedbacks.progressFeedback.endSection()
         # return res
             
-    def fromXMLRoot(self,root):
-        utils.debug("fromXML")
-        for item in root:
-            utils.debug(str(item))
-            dict = item.attrib
-            fragmItem = self.mkItemFromDict(dict)
-            self.addItem(fragmItem)
-        self.layoutChanged.emit()
+    # def fromXMLRoot(self,root):
+        # utils.debug("fromXML")
+        # for item in root:
+            # utils.debug(str(item))
+            # dict = item.attrib
+            # fragmItem = self.mkItemFromDict(dict)
+            # self.addItem(fragmItem)
+        # self.layoutChanged.emit()
             
         
         

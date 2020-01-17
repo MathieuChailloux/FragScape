@@ -222,7 +222,7 @@ class PrepareFragmentationAlgorithm(FragScapeVectorAlgorithm):
         #buffer_expr = ""
         feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
         if buffer_expr == "" and input.geometryType() != QgsWkbTypes.PolygonGeometry:
-           raise QgsProcessingException("Empty buffer with non-polygon layer")
+           feedback.reportError("Empty buffer with non-polygon layer")
         output = parameters[self.OUTPUT]
         if clip is None:
             clipped = input

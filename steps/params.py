@@ -138,7 +138,15 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         self.mode = self.VECTOR_MODE
         self.save_tmp = False
         self.fields = [self.WORKSPACE,self.EXTENT_LAYER,
-            self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]
+            self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]# def checkInit():
+
+    # Checks that all parameters are initialized
+    def checkInit(self,check_res=True):
+        self.checkWorkspaceInit()
+        self.checkExtentInit()
+        if check_res:
+            self.checkResolutionInit()
+        self.checkCrsInit()
     
     def setWorkspace(self,path):
         norm_path = super().setWorkspace(path)
@@ -392,12 +400,14 @@ class ParamsConnector:
         
     def connectComponents(self):
         self.dlg.paramsView.setModel(self.model)
-        #self.dlg.dataClipFlag.stateChanged.connect(self.model.switchDataClipFlag)
         self.dlg.paramsMode.currentIndexChanged.connect(self.switchMode)
+        self.dlg.rasterResolution.valueChanged.connect(self.model.setResolution)
+        self.dlg.extentLayer.fileChanged.connect(self.model.setExtentLayer)
         self.dlg.workspace.setStorageMode(QgsFileWidget.GetDirectory)
         self.dlg.workspace.fileChanged.connect(self.model.setWorkspace)
-        self.dlg.saveTmpResultsFlag.stateChanged.connect(self.model.setSaveTmp)
         self.dlg.paramsCrs.crsChanged.connect(self.model.setCrs)
+        self.dlg.saveTmpResultsFlag.stateChanged.connect(self.model.setSaveTmp)
+        # header
         header = self.dlg.paramsView.horizontalHeader()     
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.model.layoutChanged.emit()

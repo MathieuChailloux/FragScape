@@ -40,6 +40,18 @@ class FragScapeModel:
     def checkWorkspaceInit(self):
         self.paramsModel.checkWorkspaceInit()
         
+    def checkResolutionInit(self):
+        self.paramsModel.checkResolutionInit()
+        
+    def checkExtentInit(self):
+        self.paramsModel.checkExtentInit()
+        
+    def checkInit(self,check_res=True):
+        self.paramsModel.checkInit(check_res)
+        
+    def getRasterParams(self):
+        return self.paramsModel.getRasterParams()
+        
     def modeIsVector(self): 
         return self.paramsModel.modeIsVector()
             
