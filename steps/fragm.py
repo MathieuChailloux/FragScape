@@ -39,18 +39,14 @@ fragmModel = None
 
 class FragmItem(abstract_model.DictItem):
 
-    NAME_FIELD = "NAME"
+    INPUT = FragScape_algs.PrepareFragmentationAlgorithm.INPUT
+    SELECT_EXPR = FragScape_algs.PrepareFragmentationAlgorithm.SELECT_EXPR
+    BUFFER = FragScape_algs.PrepareFragmentationAlgorithm.BUFFER
+    NAME = "NAME"
+    FRAGM = "FRAGM"
 
-    PREPARE_INPUT = FragScape_algs.PrepareFragmentationAlgorithm.INPUT
-    PREPARE_SELECT_EXPR = FragScape_algs.PrepareFragmentationAlgorithm.SELECT_EXPR
-    PREPARE_BUFFER = FragScape_algs.PrepareFragmentationAlgorithm.BUFFER
-    PREPARE_NAME = NAME_FIELD
-    PREPARE_FRAGM = "isFragm"
-    PREPARE_OUTPUT = FragScape_algs.PrepareFragmentationAlgorithm.OUTPUT
+    FIELDS = [INPUT,SELECT_EXPR,BUFFER,NAME,FRAGM]
 
-    FIELDS = [PREPARE_INPUT,PREPARE_SELECT_EXPR,PREPARE_BUFFER,PREPARE_NAME,PREPARE_FRAGM]
-
-    NAME_FIELD = "NAME"
 
     def __init__(self,dict):
         super().__init__(dict,fields=self.FIELDS)
@@ -61,55 +57,55 @@ class FragmItem(abstract_model.DictItem):
         pass
         
     def equals(self,other):
-        return (self.dict[self.NAME_FIELD] == other.dict[self.NAME_FIELD])
+        return (self.dict[self.NAME] == other.dict[self.NAME])
         
     def getOutputLayer(self):
-        name = self.dict[self.NAME_FIELD]
+        name = self.dict[self.NAME]
         self.outputLayer = params.mkTmpLayerPath(name + ".gpkg")
         return self.outputLayer
         
     def getOutputRLayer(self):
-        name = self.dict[self.NAME_FIELD]
+        name = self.dict[self.NAME]
         self.outputLayer = params.mkTmpLayerPath(name + ".tif")
         return self.outputLayer
         
     def getSelectionLayer(self):
         if not self.selectionLayer:
-            name = self.dict[self.NAME_FIELD]
+            name = self.dict[self.NAME]
             self.selectionLayer = params.mkTmpLayerPath(name + ".gpkg")
             #self.selectionLayer = QgsProcessingUtils.generateTempFilename(name + ".gpkg")
         return self.selectionLayer
        
     def getBufferLayer(self):
         if not self.bufferLayer:
-            name = self.dict[self.NAME_FIELD]
+            name = self.dict[self.NAME]
             self.bufferLayer = params.mkTmpLayerPath(name + "_buf.gpkg")
             #self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
         return self.bufferLayer
         
-    def prepareVector(self,context,feedback):
-        in_layer_path = item.dict[self.PREPARE_INPUT]
-        in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
-        clip_layer_path = item.dict[self.PREPARE_CLIP_LAYER]
-        if clip_layer_path:
-            clip_layer_abs_path = self.fsModel.getOrigPath(clip_layer_path)
-        else:
-            clip_layer_abs_path = None
-        select_expr = item.dict[self.PREPARE_SELECT_EXPR]
-        buffer_expr = item.dict[self.PREPARE_BUFFER]
-        utils.debug("select_expr : " + str(select_expr))
-        utils.debug("buffer_expr : " + str(buffer_expr))
-        outPath = item.getOutputLayer()
-        name = item.dict[self.PREPARE_NAME]
-        parameters = { self.PREPARE_INPUT : in_layer_abs_path,
-                       self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
-                       self.PREPARE_SELECT_EXPR : select_expr,
-                       self.PREPARE_BUFFER : buffer_expr,
-                       self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
-                       self.PREPARE_OUTPUT : outPath }
-        prepared = qgsTreatments.applyProcessingAlg(
-            "FragScape","prepareFragm",parameters,
-            context=context,feedback=step_feedback)
+    # def prepareVector(self,context,feedback):
+        # in_layer_path = item.dict[self.INPUT]
+        # in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
+        # clip_layer_path = item.dict[self.CLIP_LAYER]
+        # if clip_layer_path:
+            # clip_layer_abs_path = self.fsModel.getOrigPath(clip_layer_path)
+        # else:
+            # clip_layer_abs_path = None
+        # select_expr = item.dict[self.SELECT_EXPR]
+        # buffer_expr = item.dict[self.PREPARE_BUFFER]
+        # utils.debug("select_expr : " + str(select_expr))
+        # utils.debug("buffer_expr : " + str(buffer_expr))
+        # outPath = item.getOutputLayer()
+        # name = item.dict[self.PREPARE_NAME]
+        # parameters = { self.PREPARE_INPUT : in_layer_abs_path,
+                       # self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
+                       # self.PREPARE_SELECT_EXPR : select_expr,
+                       # self.PREPARE_BUFFER : buffer_expr,
+                       # self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
+                       # self.PREPARE_OUTPUT : outPath }
+        # prepared = qgsTreatments.applyProcessingAlg(
+            # "FragScape","prepareFragm",parameters,
+            # context=context,feedback=step_feedback)
             
 
         
@@ -123,14 +119,13 @@ class FragmItem(abstract_model.DictItem):
         
 class FragmModel(abstract_model.DictModel):
 
-    PREPARE_INPUT = FragScape_algs.PrepareFragmentationAlgorithm.INPUT
-    PREPARE_CLIP_LAYER = FragScape_algs.PrepareFragmentationAlgorithm.CLIP_LAYER
-    PREPARE_SELECT_EXPR = FragScape_algs.PrepareFragmentationAlgorithm.SELECT_EXPR
-    PREPARE_BUFFER = FragScape_algs.PrepareFragmentationAlgorithm.BUFFER
-    PREPARE_NAME = FragmItem.NAME_FIELD
+    PREPARE_INPUT = FragmItem.INPUT
+    PREPARE_SELECT_EXPR = FragmItem.SELECT_EXPR
+    PREPARE_BUFFER = FragmItem.BUFFER
+    PREPARE_NAME = FragmItem.NAME
     PREPARE_OUTPUT = FragScape_algs.PrepareFragmentationAlgorithm.OUTPUT
     
-    FIELDS = [PREPARE_INPUT,PREPARE_CLIP_LAYER,PREPARE_SELECT_EXPR,PREPARE_BUFFER,PREPARE_NAME]
+    FIELDS = FragmItem.FIELDS
     
     APPLY_LANDUSE = FragScape_algs.ApplyFragmentationAlgorithm.LANDUSE
     APPLY_FRAGMENTATION = FragScape_algs.ApplyFragmentationAlgorithm.FRAGMENTATION
@@ -145,14 +140,11 @@ class FragmModel(abstract_model.DictModel):
     def mkItemFromDict(self,dict):
         if "in_layer" in dict:
             new_dict = { self.PREPARE_INPUT : dict["in_layer"],
-                         self.PREPARE_CLIP_LAYER : None,
                          self.PREPARE_SELECT_EXPR : dict["expr"],
                          self.PREPARE_BUFFER : dict["buffer"],
                          self.PREPARE_NAME : dict["name"] }
             return FragmItem(new_dict)
         else:
-            if (self.PREPARE_CLIP_LAYER not in dict) or (dict[self.PREPARE_CLIP_LAYER] == "None"):
-                dict[self.PREPARE_CLIP_LAYER] = None
             return FragmItem(dict)
         
     # def getFragmLayer(self):
@@ -177,14 +169,14 @@ class FragmModel(abstract_model.DictModel):
             return self.getMergedLayer()
             
     def prepareItem(self,item,context,feedback):
-        input_rel = item.dict[self.PREPARE_INPUT]
+        input_rel = item.dict[FragmItem.INPUT]
         input = self.fsModel.getOrigPath(input_rel)
         input_layer, input_type = qgsUtils.loadLayerGetType(input)
         input_vector = input_type == 'Vector'
-        select_expr = item.dict[self.PREPARE_SELECT_EXPR]
-        buffer_expr = item.dict[self.PREPARE_BUFFER]
-        name = item.dict[self.PREPARE_NAME]
-        is_fragm = item.dict[self.PREPARE_FRAGM]
+        select_expr = item.dict[FragmItem.SELECT_EXPR]
+        buffer_expr = item.dict[FragmItem.BUFFER]
+        name = item.dict[FragmItem.NAME]
+        is_fragm = item.dict[FragmItem.FRAGM]
         burn_val = (1 if is_fragm else 0)
         vector_mode = self.fsModel.modeIsVector()
         outPath = item.getOutputLayer()
@@ -282,7 +274,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.parser_name = "FragmConnector"
         self.dlg = dlg
         self.onlySelection = False
-        self.dataClipFlag = False
+        self.fragmFlag = True
         self.clip_layer = None
         super().__init__(fragmModel,self.dlg.fragmView,
                         self.dlg.fragmAdd,self.dlg.fragmRemove,
@@ -298,8 +290,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.layerComboDlg = qgsUtils.LayerComboDialog(self.dlg,
                                                        self.dlg.fragmInputLayerCombo,
                                                        self.dlg.fragmInputLayer)
-        self.dlg.fragmClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
-        self.dlg.fragmClipLayer.fileChanged.connect(self.setDataClipLayer)
+        self.dlg.fragmCheckbox.stateChanged.connect(self.switchFragmFlag)
         self.dlg.selectionUp.clicked.connect(self.upgradeItem)
         self.dlg.selectionDown.clicked.connect(self.downgradeItem)
         
@@ -315,13 +306,9 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.dlg.fragmExpr.setLayer(layer)
         self.dlg.fragmBuffer.setLayer(layer)
     
-    def switchDataClipFlag(self,state):
-        utils.debug("switchDataClipFlag")
-        self.dataClipFlag = not self.dataClipFlag
-        self.dlg.fragmClipLayer.setEnabled(self.dataClipFlag)
-        
-    def setDataClipLayer(self,layer_path):
-        self.clip_layer = self.model.fsModel.normalizePath(layer_path)
+    def switchFragmFlag(self,state):
+        utils.debug("switchFragmFlag")
+        self.fragmFlag = not self.fragmFlag
     
     # def setInLayer(self,path):
         # utils.debug("setInLayer " + str(path))
@@ -334,21 +321,19 @@ class FragmConnector(abstract_model.AbstractConnector):
         if not in_layer:
             utils.user_error("No layer selected")
         in_layer_path = self.model.fsModel.normalizePath(qgsUtils.pathOfLayer(in_layer))
-        clip_layer = self.clip_layer if self.dataClipFlag else None
-        utils.debug("clip_flag = " + str(self.dataClipFlag))
-        utils.debug("clip_layer = " + str(clip_layer))
         expr = self.dlg.fragmExpr.expression()
         buffer = self.dlg.fragmBuffer.expression()
         #if not buffer:
         #    utils.user_error("Empty buffer")
         name = self.dlg.fragmName.text()
+        is_fragm = self.fragmFlag
         if not name:
             utils.user_error("Empty name")
-        dict = { FragmModel.PREPARE_INPUT : in_layer_path,
-                 FragmModel.PREPARE_CLIP_LAYER : clip_layer,
-                 FragmModel.PREPARE_SELECT_EXPR : expr,
-                 FragmModel.PREPARE_BUFFER : buffer,
-                 FragmModel.PREPARE_NAME : name }
+        dict = { FragmItem.INPUT : in_layer_path,
+                 FragmItem.SELECT_EXPR : expr,
+                 FragmItem.BUFFER : buffer,
+                 FragmItem.NAME : name,
+                 FragmItem.FRAGM : is_fragm}
         item = FragmItem(dict)
         return item
         

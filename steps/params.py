@@ -407,8 +407,7 @@ class ParamsConnector:
         vector_widgets = self.dlg.getVectorWidgets()
         raster_widgets = self.dlg.getRasterWidgets()
         layer_combos = [ self.dlg.resultsInputLayer]
-        layer_combo_dlg = [self.dlg.landuseConnector.layerComboDlg,
-            self.dlg.fragmConnector.layerComboDlg ]
+        layer_combo_dlg = [self.dlg.landuseConnector.layerComboDlg ]
         if mode == self.model.VECTOR_MODE:
             for w in vector_widgets:
                 w.setEnabled(True)
