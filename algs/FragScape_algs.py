@@ -327,7 +327,130 @@ class ApplyFragmentationAlgorithm(FragScapeVectorAlgorithm):
             raise QgsProcessingException("Multi to single part failed")
         return {self.OUTPUT : singleGeomLayer}
         
-                
+ 
+class MeffAlgUtils:
+
+    NB_DIGITS = 5
+    
+    INPUT = "INPUT"
+    OVERLAY = "OVERLAY"
+    CRS = "CRS"
+    INCLUDE_CBC = "INCLUDE_CBC"
+    UNIT = "UNIT"
+    OUTPUT = "OUTPUT"
+    
+    UNIT_DIVISOR = [1, 100, 10000, 1000000]
+
+    # Output layer fields
+    ID = "fid"
+    NB_PATCHES = "nb_patches"
+    REPORT_AREA = "report_area"
+    INTERSECTING_AREA = "intersecting_area"
+    # Main measures
+    MESH_SIZE = "effective_mesh_size"
+    CBC_MESH_SIZE = "CBC_effective_mesh_size"
+    DIVI = "landscape_division"
+    SPLITTING_INDEX = "splitting_index"
+    # Auxiliary measures
+    COHERENCE = "coherence"
+    SPLITTING_DENSITY = "splitting_density"
+    NET_PRODUCT = "net_product"
+    CBC_NET_PRODUCT = "CBC_net_product"
+    
+    UNIT_DIVISOR = [1, 100, 10000, 1000000]
+    
+    def getUnitOptions(self):
+        return [self.tr("m² (square meters)"),
+            self.tr("dm² (square decimeters / ares)"),
+            self.tr("hm² (square hectometers / hectares)"),
+            self.tr("km² (square kilometers)")]
+            
+    def mkReportFields(self,include_cbc=False):
+        report_id_field = QgsField(self.ID, QVariant.Int)
+        mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
+        nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
+        report_area_field = QgsField(self.REPORT_AREA, QVariant.Double)
+        intersecting_area_field = QgsField(self.INTERSECTING_AREA, QVariant.Double)
+        div_field = QgsField(self.DIVI, QVariant.Double)
+        split_index_field = QgsField(self.SPLITTING_INDEX, QVariant.Double)
+        coherence_field = QgsField(self.COHERENCE, QVariant.Double)
+        split_density_field = QgsField(self.SPLITTING_DENSITY, QVariant.Double)
+        net_product_field = QgsField(self.NET_PRODUCT, QVariant.Double)
+        if include_cbc:
+            cbc_mesh_size_field = QgsField(self.CBC_MESH_SIZE, QVariant.Double)
+            cbc_net_product_field = QgsField(self.CBC_NET_PRODUCT, QVariant.Double)
+        output_fields = QgsFields()
+        output_fields.append(report_id_field)
+        output_fields.append(mesh_size_field)
+        if include_cbc:
+            output_fields.append(cbc_mesh_size_field)
+        output_fields.append(nb_patches_field)
+        output_fields.append(report_area_field)
+        output_fields.append(intersecting_area_field)
+        output_fields.append(mesh_size_field)
+        output_fields.append(div_field)
+        output_fields.append(split_index_field)
+        output_fields.append(coherence_field)
+        output_fields.append(split_density_field)
+        output_fields.append(net_product_field)
+        if include_cbc:
+            output_fields.append(cbc_net_product_field)
+        feedback.pushDebugInfo("fields =  " + str(output_fields.names()))
+        return output_fields
+        
+    def mkReportSink(self,parameters,context,wkbType,crs=None):
+        output_fields = self.mkReportFields()
+        if not crs:
+            crs = params.defaultCrs
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            output_fields,
+            wkbType,
+            crs)
+        if sink is None:
+            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        return (sink, dest_id)
+        
+        
+    def initResFeat(self,report_layer):
+        if not report_layer or report_layer.featureCount() == 0:
+            raise QgsProcessingException("Invalide reporting layer")
+        output_fields = self.mkReportFields()
+        res_feat = QgsFeature(output_fields)
+        report_feat = report_layer.getFeatures()[0]
+        res_feat.setGeometry(report_feat.geometry)
+        res_feat[self.ID] = report_feat.id()
+        
+    def mkResFeat(self,nb_patches,sum_ai,sum_ai_sq,report_area):
+        if not self.report_layer or self.report_layer.featureCount() == 0:
+            raise QgsProcessingException("Invalide reporting layer")
+        output_fields = self.mkReportFields()
+        res_feat = QgsFeature(output_fields)
+        report_feat = self.report_layer.getFeatures()[0]
+        res_feat.setGeometry(report_feat.geometry)
+        res_feat[self.ID] = report_feat.id()
+        res_feat[self.NB_PATCHES] = nb_patches
+        # Metrics
+        report_area_sq = report_area * report_area
+        res_feat[self.NET_PRODUCT] = round(sum_ai_sq,NB_DIGITS)
+        res_feat[self.INTERSECTING_AREA] = sum_ai
+        res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
+        res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai if sum_ai > 0 else 0
+        res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS)
+        res_feat[self.SPLITTING_INDEX] = report_area_sq / sum_ai_sq if sum_ai_sq > 0 else 0
+        res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
+        return res_feat
+        #res = float(sum_ai_sq) / float(tot_area)
+        
+    
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
+        
+    def name(self):
+        return self.ALG_NAME
+ 
 class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
 
     ALG_NAME = "effectiveMeshSizeGlobal"
@@ -345,23 +468,7 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
     UNIT_DIVISOR = [1, 100, 10000, 1000000]
     
     OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
-    
-    # Output layer fields
-    ID = "fid"
-    NB_PATCHES = "nb_patches"
-    REPORT_AREA = "report_area"
-    INTERSECTING_AREA = "intersecting_area"
-    # Main measures
-    MESH_SIZE = "effective_mesh_size"
-    CBC_MESH_SIZE = "CBC_effective_mesh_size"
-    DIVI = "landscape_division"
-    SPLITTING_INDEX = "splitting_index"
-    # Auxiliary measures
-    COHERENCE = "coherence"
-    SPLITTING_DENSITY = "splitting_density"
-    NET_PRODUCT = "net_product"
-    CBC_NET_PRODUCT = "CBC_net_product"
-    
+      
     
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)

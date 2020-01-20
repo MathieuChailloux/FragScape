@@ -264,6 +264,7 @@ class FragmModel(abstract_model.DictModel):
                 nodata_val=255,out_type=0,nodata_input=255,
                 context=context,feedback=feedback)
             qgsUtils.loadRasterLayer(res_path,loadProject=True)
+        feedbacks.progressFeedback.endSection()
         return res
             
             
