@@ -162,18 +162,39 @@ class FragmModel(abstract_model.DictModel):
         
     def getSingleGeomLayer(self):
         return self.fsModel.mkOutputFile("landuseFragmSingleGeom.gpkg")
+    def getSingleGeomLayerTmp(self):
+        return QgsProcessingUtils.generateTempFilename("landuseFragmSingleGeom_tmp.gpkg")
         
     def getMergedLayer(self):
         return self.fsModel.mkOutputFile("landuseFragm.tif")
+    def getmergeLayerTmp(self):
+        return QgsProcessingUtils.generateTempFilename("landuseFragm_tmp.tif")
         
-    def getFinalLayer(self):
+    # def getFinalLayer(self):
+        # if self.fsModel.modeIsVector():
+            # return self.getSingleGeomLayer()
+        # else:
+            # return self.getMergedLayer()
+            
+    def getFinalLayers(self):
+        extentLayer = self.fsModel.paramsModel.getExtentLayer()
         if self.fsModel.modeIsVector():
-            return self.getSingleGeomLayer()
+            final_path = self.getSingleGeomLayer()
+            if extentLayer:
+                tmp_path = self.getSingleGeomLayerTmp()
+            else:
+                tmp_path = final_path
         else:
-            return self.getMergedLayer()
+            final_path = self.getMergedLayer()
+            if extentLayer:
+                tmp_path = self.getmergeLayerTmp()
+            else:
+                tmp_path = final_path
+        return (tmp_path, final_path)
             
     def prepareItem(self,item,context,feedback):
         self.fsModel.checkWorkspaceInit()
+        # self.fsModel.checkExtentInit()
         input_rel = item.dict[FragmItem.INPUT]
         feedback.pushDebugInfo("input_rel = " + str(input_rel))
         input = self.fsModel.getOrigPath(input_rel)
@@ -192,10 +213,10 @@ class FragmModel(abstract_model.DictModel):
         feedback.pushDebugInfo("outRPath = " + str(outRPath))
         # Processing
         # clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,context=context,feedback=feedback)
+        clipped = self.fsModel.paramsModel.clipByExtent(input,
+            name=name,context=context,feedback=feedback)
+        feedback.pushDebugInfo("clipped = " + str(clipped))
         if input_vector:
-            clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,
-            context=context,feedback=feedback)
-            feedback.pushDebugInfo("clipped = " + str(clipped))
             parameters = { self.PREPARE_INPUT : clipped,
                            self.PREPARE_SELECT_EXPR : select_expr,
                            self.PREPARE_BUFFER : buffer_expr,
@@ -217,11 +238,10 @@ class FragmModel(abstract_model.DictModel):
             utils.internal_error("Not implemented yet : Raster to Vector")
         else:
             self.fsModel.checkResolutionInit()
-            self.fsModel.checkExtentInit()
-            normalized_path = QgsProcessingUtils.generateTempFilename(name + '_normalized.tif')
-            normalized = self.fsModel.paramsModel.normalizeRaster(input,
-                out_path=normalized_path,context=context,feedback=feedback)
-            res = qgsTreatments.applyRasterCalc(normalized,outRPath,str(burn_val),
+            # normalized_path = QgsProcessingUtils.generateTempFilename(name + '_normalized.tif')
+            # normalized = self.fsModel.paramsModel.normalizeRaster(input,
+                # out_path=normalized_path,context=context,feedback=feedback)
+            res = qgsTreatments.applyRasterCalc(clipped,outRPath,str(burn_val),
                 out_type=0,context=context,feedback=feedback)
         return res
             
@@ -229,9 +249,6 @@ class FragmModel(abstract_model.DictModel):
         fragmMsg = "Application of fragmentation data to landuse"
         feedbacks.progressFeedback.beginSection(fragmMsg)
         prepared_layers = []
-        res_path = self.getSingleGeomLayer()
-        feedback.pushDebugInfo("res_path = " + str(res_path))
-        qgsUtils.removeVectorLayer(res_path)
         nb_items = len(self.items)
         curr_step = 1
         step_feedback = feedbacks.ProgressMultiStepFeedback(nb_items,feedback)
@@ -243,27 +260,34 @@ class FragmModel(abstract_model.DictModel):
             prepared_layers.append(prepared)
         feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
         # MERGE
+        tmp_path, res_path = self.getFinalLayers()
+        feedback.pushDebugInfo("res_path = " + str(res_path))
+        # qgsUtils.removeVectorLayer(res_path)
         vector_mode = self.fsModel.modeIsVector()
         if vector_mode:
+            qgsUtils.removeVectorLayer(res_path)
             landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
             crs = self.fsModel.paramsModel.crs
             parameters = { self.APPLY_LANDUSE : landuseLayer,
                            self.APPLY_FRAGMENTATION : prepared_layers,
                            self.APPLY_CRS : crs,
-                           self.APPLY_OUTPUT : res_path }
+                           self.APPLY_OUTPUT : tmp_path }
             res = qgsTreatments.applyProcessingAlg(
                 "FragScape","applyFragm",parameters,
                 context=context,feedback=feedback)
-            res_path = self.getSingleGeomLayer()
-            qgsUtils.loadVectorLayer(res_path,loadProject=True)
+            # qgsUtils.loadVectorLayer(tmp_path,loadProject=True)
         else:
+            qgsUtils.removeRaster(res_path)
             landuseLayer = self.fsModel.landuseModel.getOutputRaster()
             prepared_layers.insert(0,landuseLayer)
-            res_path = self.getMergedLayer()
-            res = qgsTreatments.applyMergeRaster(prepared_layers,res_path,
+            res = qgsTreatments.applyMergeRaster(prepared_layers,tmp_path,
                 nodata_val=255,out_type=0,nodata_input=255,
                 context=context,feedback=feedback)
-            qgsUtils.loadRasterLayer(res_path,loadProject=True)
+            # qgsUtils.loadRasterLayer(tmp_path,loadProject=True)
+        # TODO CLIP
+        res = self.fsModel.paramsModel.clipByExtent(tmp_path,
+            out_path=res_path,context=context,feedback=feedback)
+        qgsUtils.loadLayer(res,loadProject=True)
         feedbacks.progressFeedback.endSection()
         return res
             
@@ -315,9 +339,9 @@ class FragmConnector(abstract_model.AbstractConnector):
         
     def applyItems(self):
         self.dlg.resultsInputLayer.setLayer(None)
-        self.dlg.resultsSelection.setLayer(None)
+        # self.dlg.resultsSelection.setLayer(None)
         super().applyItems()
-        res_path = self.model.getFinalLayer()
+        tmp_path, res_path = self.model.getFinalLayers()
         res_layer = qgsUtils.loadLayer(res_path)
         self.dlg.resultsInputLayer.setLayer(res_layer)
         

@@ -42,6 +42,8 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterNumber,
                        QgsProcessingOutputNumber,
                        QgsProcessingOutputRasterLayer,
+                       QgsFields,
+                       QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource)      
 
 from ..qgis_lib_mc import qgsUtils, qgsTreatments
@@ -50,13 +52,16 @@ from .FragScape_algs import MeffAlgUtils
 def tr(string):
     return QCoreApplication.translate('Processing', string) 
 
-class FragScapeRasterAlgorithm(QgsProcessingAlgorithm, MeffAlgUtils):
+class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
     
-    INPUT = "INPUT"
-    CLASS = "CLASS"
-    REPORTING_LAYER = "REPORTING_LAYER"
-    OUTPUT = "OUTPUT"
-    OUTPUT_VAL = "OUTPUT_VALUE"
+    # INPUT = "INPUT"
+    # CLASS = "CLASS"
+    # REPORTING_LAYER = "REPORTING_LAYER"
+    # OUTPUT = "OUTPUT"
+    # OUTPUT_VAL = "OUTPUT_VALUE"
+    
+    def __init__(self):
+        QgsProcessingAlgorithm.__init__(self)
     
     def group(self):
         return "Raster"
@@ -75,22 +80,45 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm, MeffAlgUtils):
             defaultValue=1))
         self.addParameter(
             QgsProcessingParameterFeatureSource(
-                self.REPORTING_LAYER,
+                self.REPORTING,
                 description=tr("Clip layer (boundary)"),
                 types=[QgsProcessing.TypeVectorPolygon],
                 optional=report_opt))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer"))),
         self.addOutput(QgsProcessingOutputNumber(
             self.OUTPUT_VAL, "Output layer"))
+            
+    
+    # def mkReportSink(self,parameters,context,wkbType,crs=None):
+        # output_fields = self.mkReportFields()
+        # if not crs:
+            # crs = self.DEFAULT_CRS
+        # (sink, dest_id) = self.parameterAsSink(
+            # parameters,
+            # self.OUTPUT,
+            # context,
+            # output_fields,
+            # wkbType,
+            # crs)
+        # if sink is None:
+            # raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # return (sink, dest_id)
             
     def prepareInputs(self,parameters,context,feedback):
         input = self.parameterAsRasterLayer(parameters, self.INPUT, context)
         cl = self.parameterAsInt(parameters, self.CLASS, context)
-        report_layer = self.parameterAsVectorLayer(parameters,self.REPORTING_LAYER,context)
-        if report_layer:
-            self.sink = self.mkReportSink(parameters,context,report_layer.wkbType())
-        elif not self.report_opt:
+        report_layer = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
+        # if report_layer:
+            # self.sink = self.mkReportSink(parameters,context,report_layer.wkbType())
+            #self.sink = None
+        if not self.report_opt:
             raise QgsProcessingException("No reporting layer given")
         self.report_layer = report_layer
+        # output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        output = parameters[self.OUTPUT]
         # Input properties
         input_dpr = input.dataProvider()
         nodata = input_dpr.sourceNoDataValue(1)
@@ -109,12 +137,12 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm, MeffAlgUtils):
                 data_type=0,context=context, feedback=feedback)
         else:
             clipped = inputFilename   
-        # input = self.prepareInputs(parameters,context)
+        # input = self.prepareInputs(parameters,context,feedback)
         self.nodata = nodata
         self.cl = cl
-        self.pix_area = pix_are
+        self.pix_area = pix_area
         self.input_clipped = clipped
-        return (input, output)
+        return (input, None)
         
     def labelAndPatchLen(self,input,feedback):
         classes, array = qgsUtils.getRasterValsAndArray(input)
@@ -136,7 +164,7 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm, MeffAlgUtils):
         patches_len = scipy.ndimage.labeled_comprehension(new_array,
             labeled_array,labels,len,int,0)
         feedback.pushDebugInfo("patches_len = " + str(patches_len))
-        nb_pix = len(array[array != nodata])
+        nb_pix = len(array[array != self.nodata])
         feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         return (labeled_array, nb_patches, patches_len, nb_pix)
         
@@ -175,7 +203,7 @@ class MeffRasterReportAlgorithm(FragScapeRasterAlgorithm):
             self.OUTPUT_VAL, "Output effective mesh size"))
         
     def processAlgorithm(self, parameters, context, feedback):
-        (input, output) = self.prepareInputs(parameters,context)    
+        (input, output) = self.prepareInputs(parameters,context,feedback)
         output_layer = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)
         nb_feats = self.report_layer.featureCount()
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
@@ -195,7 +223,7 @@ class MeffRasterReportAlgorithm(FragScapeRasterAlgorithm):
                 + str(report_feat.id()) + ".gpkg")
             parameters = { self.INPUT : input,
                 self.CLASS : self.cl,
-                self.REPORTING_LAYER : select_path,
+                self.REPORTING : select_path,
                 self.OUTPUT : report_computed_path }
             qgsTreatments.applyProcessingAlg('FragScape',self.alg_name,
                 parameters, context,multi_feedback)
@@ -204,7 +232,7 @@ class MeffRasterReportAlgorithm(FragScapeRasterAlgorithm):
         return {self.OUTPUT: output}
         
 
-class MeffRaster(FragScapeRasterAlgorithm, MeffAlgUtils):
+class MeffRaster(FragScapeRasterAlgorithm):
 
     ALG_NAME = "meffRaster"
             
@@ -222,7 +250,7 @@ class MeffRaster(FragScapeRasterAlgorithm, MeffAlgUtils):
         
     def processAlgorithm(self, parameters, context, feedback):
         # Retrieve the values of the parameters entered by the user
-        self.prepareInputs(parameters,context)    
+        self.prepareInputs(parameters,context,feedback)
                 
         # Input properties
         # input_dpr = input.dataProvider()
@@ -271,16 +299,16 @@ class MeffRaster(FragScapeRasterAlgorithm, MeffAlgUtils):
         sum_ai = 0
         sum_ai_sq = 0
         for patch_len in patches_len:
-            ai = patch_len * pix_area
+            ai = patch_len * self.pix_area
             sum_ai += ai
             sum_ai_sq += math.pow(ai,2)
         feedback.pushDebugInfo("sum_ai = " + str(sum_ai))
         feedback.pushDebugInfo("sum_ai_sq = " + str(sum_ai_sq))
         if sum_ai_sq == 0:
             feedback.reportError("Empty area for patches, please check your selection.")
-        nb_pix = len(array[array != nodata])
-        feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
-        report_area = nb_pix * pix_area
+        # nb_pix = len(array[array != nodata])
+        # feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
+        report_area = nb_pix * self.pix_area
         feedback.pushDebugInfo("report_area = " + str(report_area))
         # report_area_sq = report_area * report_area
         # area_sq = math.pow(nb_pix,2)
@@ -295,15 +323,30 @@ class MeffRaster(FragScapeRasterAlgorithm, MeffAlgUtils):
         # res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
         # res = float(sum_ai_sq) / float(tot_area)
         
-        res_feat = self.mkResFeat(nb_patches,sum_ai,sum_ai_sq,report_area)
-        res_val = res_feat[self.MESH_SIZE]
         if self.report_layer:
-            sink, dest_id = self.sink
+            res_feat = self.mkResFeat(nb_patches,sum_ai,sum_ai_sq,report_area)
+            res_val = res_feat[self.MESH_SIZE]
+            report_fields = self.mkReportFields()
+            wkb_type = self.report_layer.wkbType()
+            report_crs = self.report_layer.sourceCrs()
+            feedback.pushDebugInfo("wkb_type = " + str(wkb_type))
+            feedback.pushDebugInfo("report_crs = " + str(report_crs))
+            sink, dest_id = self.parameterAsSink(
+                parameters,
+                self.OUTPUT,
+                context,
+                report_fields,
+                # QgsFields(),
+                self.report_layer.wkbType(),
+                report_crs)
+            # assert(False)
             sink.addFeature(res_feat)
-            res = dest_id
+            res_layer = dest_id
+            res_val = res_feat[self.MESH_SIZE]
         else:
-            res = None
-        return {self.OUTPUT : res, self.OUTPUT_VAL : res}
+            res_layer = None
+            res_val = round(sum_ai_sq / report_area, self.NB_DIGITS)
+        return {self.OUTPUT : res_layer, self.OUTPUT_VAL : res_val}
 
 class MeffRasterReport(MeffRasterReportAlgorithm):
 
@@ -350,7 +393,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         
     def processAlgorithm(self, parameters, context, feedback):        
         # Retrieve the values of the parameters entered by the user
-        input, output = self.prepareInputs(parameters,context)
+        input, output = self.prepareInputs(parameters,context,feedback)
                 
         # Processing
         input_dpr = input.dataProvider()

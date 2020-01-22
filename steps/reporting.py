@@ -33,6 +33,7 @@ from processing import QgsProcessingUtils
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
 from ..algs import FragScape_algs_provider
 from ..algs.FragScape_algs import (
+    MeffAlgUtils,
     EffectiveMeshSizeGlobalAlgorithm as MeffGlobalV,
     EffectiveMeshSizeReportingAlgorithm as MeffReportV )
 from ..algs.FragScape_raster_algs import (
@@ -103,7 +104,7 @@ class ReportingModel(abstract_model.DictModel):
         qgsUtils.removeVectorLayer(global_results_path)
         if self.fsModel.modeIsVector():
             parameters1 = { MeffReportV.INPUT : selected,
-                           MeffReportV.SELECT_EXPR : self.select_expr,
+                           # MeffReportV.SELECT_EXPR : self.select_expr,
                            MeffReportV.REPORTING : self.reporting_layer,
                            MeffReportV.CRS : crs,
                            MeffReportV.INCLUDE_CBC : self.includeCBC,
@@ -113,7 +114,7 @@ class ReportingModel(abstract_model.DictModel):
                 MeffReportV.ALG_NAME,parameters1,
                 context=context,feedback=feedback,onlyOutput=False)
             parameters2 = { MeffGlobalV.INPUT : selected,
-                           MeffGlobalV.SELECT_EXPR : self.select_expr,
+                           # MeffGlobalV.SELECT_EXPR : self.select_expr,
                            MeffGlobalV.BOUNDARY : self.reporting_layer,
                            MeffGlobalV.CRS : crs,
                            MeffGlobalV.INCLUDE_CBC : self.includeCBC,
@@ -122,13 +123,19 @@ class ReportingModel(abstract_model.DictModel):
             res2 = qgsTreatments.applyProcessingAlg('FragScape',
                 MeffGlobalV.ALG_NAME,parameters2,
                 context=context,feedback=feedback,onlyOutput=False)
+            res_layer = res1[MeffReportV.OUTPUT]
+            res_val = res2[MeffReportV.OUTPUT_VAL]
         else:
-            assert(False)
+            parameters = { MeffR.INPUT : selected,
+                MeffR.CLASS : 1,
+                MeffR.REPORTING : self.reporting_layer,
+                MeffR.OUTPUT : global_results_path }
+            res1 = qgsTreatments.applyProcessingAlg('FragScape',
+                MeffR.ALG_NAME,parameters,context=context,feedback=feedback,onlyOutput=False)
+            res_layer = res1[MeffR.OUTPUT]
+            res_val = res1[MeffR.OUTPUT_VAL]
         feedbacks.progressFeedback.endSection()
-        return (res1,res2)
-        
-    def runReportingRaster(self,context,feedback):
-        pass
+        return (res_layer,res_val)
                 
     def toXML(self,indent=" "):
         # if not self.reporting_layer:
@@ -138,8 +145,8 @@ class ReportingModel(abstract_model.DictModel):
         modelParams = {}
         # if self.input_layer:
             # pass
-        if self.select_expr:
-            modelParams[self.SELECT_EXPR] = self.select_expr
+        # if self.select_expr:
+            # modelParams[self.SELECT_EXPR] = self.select_expr
         # if self.method >= 0:
             # modelParams[self.METHOD] = self.method
         modelParams[self.INCLUDE_CBC] = self.includeCBC
@@ -154,8 +161,8 @@ class ReportingModel(abstract_model.DictModel):
         return xmlStr
         
     def fromXMLAttribs(self,attribs):
-        if self.SELECT_EXPR in attribs:
-            self.select_expr = attribs[self.SELECT_EXPR]
+        # if self.SELECT_EXPR in attribs:
+            # self.select_expr = attribs[self.SELECT_EXPR]
         if self.REPORTING in attribs:
             self.reporting_layer = self.fsModel.getOrigPath(attribs[self.REPORTING])
         if self.METHOD in attribs:
@@ -209,23 +216,26 @@ class ReportingConnector:
         self.dlg.resultsRun.clicked.connect(self.runReporting)
         
     def runReporting(self):
-        (res1, res2) = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
-        out_path = res1[MeffGlobalV.OUTPUT]
-        out_global_meff = res2[MeffGlobalV.OUTPUT_GLOBAL_MEFF]
+        (res_layer, res_val) = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
+        utils.debug("res_layer = " + str(res_layer))
+        utils.debug("res_val = " + str(res_val))
+        # out_path = res1[MeffAlgUtils.OUTPUT]
+        # out_global_meff = res2[MeffAlgUtils.OUTPUT_VAL]
         # UI update
-        self.dlg.resultsGlobalRes.setText(str(out_global_meff))
-        self.loaded_layer = qgsUtils.loadVectorLayer(out_path,loadProject=True)
-        self.layer_cache = QgsVectorLayerCache(self.loaded_layer,24)
-        self.attribute_model = QgsAttributeTableModel(self.layer_cache)
-        self.attribute_model.loadLayer()
+        self.dlg.resultsGlobalRes.setText(str(res_val))
+        if res_layer:
+            self.loaded_layer = qgsUtils.loadLayer(res_layer,loadProject=True)
+        # self.layer_cache = QgsVectorLayerCache(self.loaded_layer,24)
+        # self.attribute_model = QgsAttributeTableModel(self.layer_cache)
+        # self.attribute_model.loadLayer()
         # self.dlg.resultsView.setModel(self.attribute_model)
         # self.dlg.resultsView.show()
         
     def unloadResults(self):
         self.dlg.resultsGlobalRes.setText(str(0))
         self.loaded_layer = None
-        self.layer_cache = None
-        self.attribute_model = None
+        # self.layer_cache = None
+        # self.attribute_model = None
         #self.model.items = []
         # self.dlg.resultsView.setModel(None)
         

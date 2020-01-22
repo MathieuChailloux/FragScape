@@ -67,7 +67,7 @@ class LanduseFieldItem(abstract_model.DictItem):
 class LanduseModel(abstract_model.DictModel):
 
     INPUT_FIELD = "in_layer"
-    CLIP_LAYER = "clip_layer"
+    # CLIP_LAYER = "clip_layer"
     SELECT_MODE_FIELD = "select_mode"
     SELECT_FIELD_FIELD = "select_field"
     SELECT_DESCR_FIELD = "select_field"
@@ -88,7 +88,7 @@ class LanduseModel(abstract_model.DictModel):
         self.select_field = None
         self.descr_field = None
         self.dataClipFlag = False
-        self.clip_layer = None
+        # self.clip_layer = None
         self.select_mode = self.SELECT_FIELD_MODE
         self.select_expr = ""
         super().__init__(self,LanduseFieldItem.FIELDS)
@@ -103,6 +103,10 @@ class LanduseModel(abstract_model.DictModel):
         return LanduseFieldItem(v,d,i)
         
     def changeLayer(self,path):
+        if not path:
+            self.landuseLayer = path
+            self.setSelectExpr("")
+            return
         if not utils.pathEquals(path,self.landuseLayer):
             self.landuseLayer = path
             self.setSelectExpr("")
@@ -128,11 +132,11 @@ class LanduseModel(abstract_model.DictModel):
                     # self.setDescrField(None)
             # self.setSelectExpr("")
             
-    def setDataClipFlag(self,flag):
-        self.dataClipFlag = flag
+    # def setDataClipFlag(self,flag):
+        # self.dataClipFlag = flag
             
-    def setDataClipLayer(self,layer_path):
-        self.clip_layer = layer_path
+    # def setDataClipLayer(self,layer_path):
+        # self.clip_layer = layer_path
         
     def setSelectField(self,fieldname):
         utils.debug("Setting select_field to " + str(fieldname))
@@ -214,15 +218,16 @@ class LanduseModel(abstract_model.DictModel):
             utils.internal_error("Unexpected selection mode : " + str(self.select_mode))
         return expr
                 
-    def applyVector(self,context,feedback):
+    def applyVector(self,input,context,feedback):
         self.checkFieldSelected()
-        clip_layer = self.clip_layer if self.dataClipFlag else None
+        # clip_layer = self.clip_layer if self.dataClipFlag else None
+        clip_layer = self.fsModel.paramsModel.getExtentLayer()
         expr = self.getSelectionExpr()
         # if not expr:
            # utils.user_error("No expression selected : TODO select everything")
         dissolveLayer = self.getDissolveLayer()
         qgsUtils.removeVectorLayer(dissolveLayer)
-        parameters = { self.ALG_INPUT : self.landuseLayer,
+        parameters = { self.ALG_INPUT : input,
                        self.ALG_CLIP_LAYER : clip_layer,
                        self.ALG_SELECT_EXPR : expr,
                        self.ALG_OUTPUT : dissolveLayer }
@@ -232,8 +237,8 @@ class LanduseModel(abstract_model.DictModel):
         qgsUtils.loadVectorLayer(dissolveLayer,loadProject=True)
         return res
        
-    def applyRaster(self,context,feedback):
-        input = self.landuseLayer
+    def applyRaster(self,input,context,feedback):
+        # input = self.landuseLayer
         formula = self.mkRasterFormula(feedback)
         output = self.getOutputRaster()
         qgsUtils.removeRaster(output)
@@ -246,15 +251,17 @@ class LanduseModel(abstract_model.DictModel):
         feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
-        clip_layer = self.clip_layer if self.dataClipFlag else None
-        utils.debug("clip_layer1 = " + str(self.clip_layer))
-        utils.debug("dataflag = " + str(self.dataClipFlag))
-        utils.debug("clip_layer = " + str(clip_layer))
+        clipped = self.fsModel.paramsModel.clipByExtent(self.landuseLayer,
+            name="landuse",context=context,feedback=feedback)
+        # clip_layer = self.clip_layer if self.dataClipFlag else None
+        # utils.debug("clip_layer1 = " + str(self.clip_layer))
+        # utils.debug("dataflag = " + str(self.dataClipFlag))
+        # utils.debug("clip_layer = " + str(clip_layer))
         # Vector or raster
         if self.fsModel.paramsModel.modeIsVector():
-            res = self.applyVector(context,feedback)
+            res = self.applyVector(clipped,context,feedback)
         else:
-            res = self.applyRaster(context,feedback)
+            res = self.applyRaster(clipped,context,feedback)
         feedbacks.progressFeedback.endSection()
         
     def toXML(self,indent=" "):
@@ -269,8 +276,8 @@ class LanduseModel(abstract_model.DictModel):
                 return ""
             #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.landuseLayer))
             attribs_dict[self.SELECT_MODE_FIELD] : self.select_mode
-            if self.dataClipFlag and self.clip_layer:
-                attribs_dict[self.CLIP_LAYER] = self.fsModel.normalizePath(self.clip_layer)
+            # if self.dataClipFlag and self.clip_layer:
+                # attribs_dict[self.CLIP_LAYER] = self.fsModel.normalizePath(self.clip_layer)
             if self.select_field:
                 attribs_dict[self.SELECT_FIELD_FIELD] = self.select_field
             if self.descr_field:
@@ -341,8 +348,8 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseSelectExpr.fieldChanged.connect(self.model.setSelectExpr)
         self.dlg.landuseLoadFields.clicked.connect(self.loadFields)
         #self.dlg.landuseRun.clicked.connect(self.applyItems)
-        self.dlg.landuseClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
-        self.dlg.landuseClipLayer.fileChanged.connect(self.model.setDataClipLayer)
+        # self.dlg.landuseClipDataFlag.stateChanged.connect(self.switchDataClipFlag)
+        # self.dlg.landuseClipLayer.fileChanged.connect(self.model.setDataClipLayer)
         self.dlg.landuseOpenTable.clicked.connect(self.importFields)
         self.dlg.landuseSaveTable.clicked.connect(self.saveFields)
         #self.dlg.landuseSelectionMode.activated.connect(self.switchSelectionMode)
@@ -351,15 +358,15 @@ class LanduseConnector(abstract_model.AbstractConnector):
     # def runModel(self):
         # self.model.applyItemsWithContext(None,None,[])
         
-    def switchDataClipFlag(self,state):
-        utils.debug("switchDataClipFlag")
-        if state == 0:
-            self.model.dataClipFlag = False
-        elif state == 2:
-            self.model.dataClipFlag = True
-        else:
-            utils.internal_error("Unexpected check state : " + str(state))
-        self.dlg.landuseClipLayer.setEnabled(self.model.dataClipFlag)
+    # def switchDataClipFlag(self,state):
+        # utils.debug("switchDataClipFlag")
+        # if state == 0:
+            # self.model.dataClipFlag = False
+        # elif state == 2:
+            # self.model.dataClipFlag = True
+        # else:
+            # utils.internal_error("Unexpected check state : " + str(state))
+        # self.dlg.landuseClipLayer.setEnabled(self.model.dataClipFlag)
         
     def setLayerUI(self,layer):
         utils.debug("setlayerUI")

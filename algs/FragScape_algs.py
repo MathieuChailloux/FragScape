@@ -40,6 +40,7 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
                        QgsProperty,
                        QgsWkbTypes,
+                       QgsCoordinateReferenceSystem,
                        QgsProcessingMultiStepFeedback)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
@@ -58,6 +59,9 @@ class FragScapeVectorAlgorithm(QgsProcessingAlgorithm):
     
     def groupId(self):
         return "fsVect"
+        
+    def tr(self, string):
+        return QCoreApplication.translate('Processing', string)
             
 class PrepareLanduseAlgorithm(FragScapeVectorAlgorithm):
 
@@ -213,7 +217,7 @@ class PrepareFragmentationAlgorithm(FragScapeVectorAlgorithm):
         clip = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         clip_flag = (clip is None)
         select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        #feedback.pushDebugInfo("select_expr : " + str(select_expr))
+        feedback.pushDebugInfo("select_expr : " + str(select_expr))
         #feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
         buffer_expr = self.parameterAsExpression(parameters,self.BUFFER,context)
         name = self.parameterAsString(parameters,self.NAME,context)
@@ -333,11 +337,13 @@ class MeffAlgUtils:
     NB_DIGITS = 5
     
     INPUT = "INPUT"
-    OVERLAY = "OVERLAY"
+    REPORTING = "REPORTING"
+    CLASS = "CLASS"
     CRS = "CRS"
     INCLUDE_CBC = "INCLUDE_CBC"
     UNIT = "UNIT"
     OUTPUT = "OUTPUT"
+    OUTPUT_VAL = "OUTPUT_VAL"
     
     UNIT_DIVISOR = [1, 100, 10000, 1000000]
 
@@ -358,6 +364,8 @@ class MeffAlgUtils:
     CBC_NET_PRODUCT = "CBC_net_product"
     
     UNIT_DIVISOR = [1, 100, 10000, 1000000]
+    
+    DEFAULT_CRS = QgsCoordinateReferenceSystem("epsg:2154")
     
     def getUnitOptions(self):
         return [self.tr("m² (square meters)"),
@@ -395,41 +403,41 @@ class MeffAlgUtils:
         output_fields.append(net_product_field)
         if include_cbc:
             output_fields.append(cbc_net_product_field)
-        feedback.pushDebugInfo("fields =  " + str(output_fields.names()))
         return output_fields
         
-    def mkReportSink(self,parameters,context,wkbType,crs=None):
-        output_fields = self.mkReportFields()
-        if not crs:
-            crs = params.defaultCrs
-        (sink, dest_id) = self.parameterAsSink(
-            parameters,
-            self.OUTPUT,
-            context,
-            output_fields,
-            wkbType,
-            crs)
-        if sink is None:
-            raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
-        return (sink, dest_id)
+    # def mkReportSink(self,parameters,context,wkbType,crs=None):
+        # output_fields = self.mkReportFields()
+        # if not crs:
+            # crs = params.defaultCrs
+        # (sink, dest_id) = self.parameterAsSink(
+            # parameters,
+            # self.OUTPUT,
+            # context,
+            # output_fields,
+            # wkbType,
+            # crs)
+        # if sink is None:
+            # raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
+        # return (sink, dest_id)
         
         
-    def initResFeat(self,report_layer):
-        if not report_layer or report_layer.featureCount() == 0:
-            raise QgsProcessingException("Invalide reporting layer")
-        output_fields = self.mkReportFields()
-        res_feat = QgsFeature(output_fields)
-        report_feat = report_layer.getFeatures()[0]
-        res_feat.setGeometry(report_feat.geometry)
-        res_feat[self.ID] = report_feat.id()
+    # def initResFeat(self,report_layer):
+        # if not report_layer or report_layer.featureCount() == 0:
+            # raise QgsProcessingException("Invalid reporting layer")
+        # output_fields = self.mkReportFields()
+        # res_feat = QgsFeature(output_fields)
+        # report_feat = report_layer.getFeatures()[0]
+        # res_feat.setGeometry(report_feat.geometry)
+        # res_feat[self.ID] = report_feat.id()
         
     def mkResFeat(self,nb_patches,sum_ai,sum_ai_sq,report_area):
         if not self.report_layer or self.report_layer.featureCount() == 0:
-            raise QgsProcessingException("Invalide reporting layer")
+            raise QgsProcessingException("Invalid reporting layer")
+        for f in self.report_layer.getFeatures():
+            report_feat = f
         output_fields = self.mkReportFields()
         res_feat = QgsFeature(output_fields)
-        report_feat = self.report_layer.getFeatures()[0]
-        res_feat.setGeometry(report_feat.geometry)
+        res_feat.setGeometry(report_feat.geometry())
         res_feat[self.ID] = report_feat.id()
         res_feat[self.NB_PATCHES] = nb_patches
         # Metrics
@@ -451,33 +459,29 @@ class MeffAlgUtils:
     def name(self):
         return self.ALG_NAME
  
-class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
+class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
 
     ALG_NAME = "effectiveMeshSizeGlobal"
 
     # Algorithm parameters
-    INPUT = "INPUT"
-    SELECT_EXPR = "SELECT_EXPR"
+    # INPUT = "INPUT"
+    # SELECT_EXPR = "SELECT_EXPR"
     BOUNDARY = "BOUNDARY"
-    CRS = "CRS"
+    # CRS = "CRS"
     # CUT_MODE = "CUT_MODE"
-    INCLUDE_CBC = "INCLUDE_CBC"
-    UNIT = "UNIT"
-    OUTPUT = "OUTPUT"
+    # INCLUDE_CBC = "INCLUDE_CBC"
+    # UNIT = "UNIT"
+    # OUTPUT = "OUTPUT"
     
-    UNIT_DIVISOR = [1, 100, 10000, 1000000]
+    # UNIT_DIVISOR = [1, 100, 10000, 1000000]
     
     OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
-      
-    
-    def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
         
     def createInstance(self):
         return EffectiveMeshSizeGlobalAlgorithm()
         
-    def name(self):
-        return self.ALG_NAME
+    # def name(self):
+        # return self.ALG_NAME
         
     def displayName(self):
         return self.tr("3.1 - Effective mesh size (Global)")
@@ -496,11 +500,11 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
                 self.INPUT,
                 self.tr("Input layer"),
                 [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(
-            QgsProcessingParameterExpression(
-                self.SELECT_EXPR,
-                self.tr("Filter expression"),
-                optional=True))
+        # self.addParameter(
+            # QgsProcessingParameterExpression(
+                # self.SELECT_EXPR,
+                # self.tr("Filter expression"),
+                # optional=True))
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.BOUNDARY,
@@ -536,7 +540,7 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
         feedback.pushDebugInfo("source = " + str(source))
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
+        # select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         boundary = self.parameterAsVectorLayer(parameters,self.BOUNDARY,context)
         feedback.pushDebugInfo("boundary = " + str(boundary))
         if boundary is None:
@@ -575,11 +579,11 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
             qgsTreatments.saveSelectedFeatures(source,intersected_path,context,feedback)
             # source = qgsUtils.loadVectorLayer(intersected_path)
         # Selected
-        if select_expr:# != "":
-            selected_path = params.mkTmpLayerPath('res_source_selected.gpkg')
-            qgsTreatments.extractByExpression(intersected_path,select_expr,selected_path,context,feedback)
-        else:
-            selected_path = intersected_path
+        # if select_expr:
+            # selected_path = params.mkTmpLayerPath('res_source_selected.gpkg')
+            # qgsTreatments.extractByExpression(intersected_path,select_expr,selected_path,context,feedback)
+        # else:
+        selected_path = intersected_path
         source = qgsUtils.loadVectorLayer(selected_path)
         # Dissolve
         if boundary.featureCount() > 1:
@@ -688,49 +692,49 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm):
             res_feat[self.CBC_NET_PRODUCT] = round(cbc_net_product,NB_DIGITS)
             res_feat[self.CBC_MESH_SIZE] = round(cbc_net_product / report_area,NB_DIGITS)
         sink.addFeature(res_feat)
-        return {self.OUTPUT: dest_id, self.OUTPUT_GLOBAL_MEFF : res_feat[self.MESH_SIZE]}
+        return {self.OUTPUT: dest_id, self.OUTPUT_VAL : res_feat[self.MESH_SIZE]}
 
         
 
-class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm):
+class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
 
     ALG_NAME = "effectiveMeshSizeReporting"
 
     # Algorithm parameters
-    INPUT = "INPUT"
-    SELECT_EXPR = "SELECT_EXPR"
-    REPORTING = "REPORTING"
-    CRS = "CRS"
+    # INPUT = "INPUT"
+    # SELECT_EXPR = "SELECT_EXPR"
+    # REPORTING = "REPORTING"
+    # CRS = "CRS"
     # CUT_MODE = "CUT_MODE"
-    INCLUDE_CBC = "INCLUDE_CBC"
-    UNIT = "UNIT"
-    OUTPUT = "OUTPUT"
+    # INCLUDE_CBC = "INCLUDE_CBC"
+    # UNIT = "UNIT"
+    # OUTPUT = "OUTPUT"
     
     OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
     
     # Output layer fields
-    ID = "fid"
-    NB_PATCHES = "nb_patches"
-    REPORT_AREA = "report_area"
-    INTERSECTING_AREA = "intersecting_area"
+    # ID = "fid"
+    # NB_PATCHES = "nb_patches"
+    # REPORT_AREA = "report_area"
+    # INTERSECTING_AREA = "intersecting_area"
     # Main measures
-    MESH_SIZE = "effective_mesh_size"
-    DIVI = "landscape_division"
-    SPLITTING_INDEX = "splitting_index"
+    # MESH_SIZE = "effective_mesh_size"
+    # DIVI = "landscape_division"
+    # SPLITTING_INDEX = "splitting_index"
     # Auxiliary measures
-    COHERENCE = "coherence"
-    SPLITTING_DENSITY = "splitting_density"
-    NET_PRODUCT = "net_product"
+    # COHERENCE = "coherence"
+    # SPLITTING_DENSITY = "splitting_density"
+    # NET_PRODUCT = "net_product"
     
     
-    def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
+    # def tr(self, string):
+        # return QCoreApplication.translate('Processing', string)
         
     def createInstance(self):
         return EffectiveMeshSizeReportingAlgorithm()
         
-    def name(self):
-        return self.ALG_NAME
+    # def name(self):
+        # return self.ALG_NAME
         
     def displayName(self):
         return self.tr("3.2 - Effective mesh size (Reporting)")
@@ -749,11 +753,11 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm):
                 self.INPUT,
                 self.tr("Input layer"),
                 [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(
-            QgsProcessingParameterExpression(
-                self.SELECT_EXPR,
-                self.tr("Filter expression"),
-                optional=True))
+        # self.addParameter(
+            # QgsProcessingParameterExpression(
+                # self.SELECT_EXPR,
+                # self.tr("Filter expression"),
+                # optional=True))
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.REPORTING,
@@ -793,7 +797,7 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm):
             sg_path = params.mkTmpLayerPath('singleGeom.gpkg')
             qgsTreatments.multiToSingleGeom(source,sg_path,context,feedback)
             source = qgsUtils.loadVectorLayer(sg_path)
-        select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
+        # select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
         feedback.pushDebugInfo("reporting = " + str(reporting))
         if reporting is None:
@@ -836,7 +840,7 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm):
             qgsTreatments.saveSelectedFeatures(reporting,select_path,context,feedback)
             report_computed_path = params.mkTmpLayerPath("reportingComputed" + str(report_feat.id()) + ".gpkg")
             parameters = { EffectiveMeshSizeGlobalAlgorithm.INPUT : source,
-                           EffectiveMeshSizeGlobalAlgorithm.SELECT_EXPR : select_expr,
+                           # EffectiveMeshSizeGlobalAlgorithm.SELECT_EXPR : select_expr,
                            EffectiveMeshSizeGlobalAlgorithm.BOUNDARY : select_path,
                            EffectiveMeshSizeGlobalAlgorithm.CRS : crs,
                            # EffectiveMeshSizeGlobalAlgorithm.CUT_MODE : cut_mode,
