@@ -82,8 +82,10 @@ class ReportingModel(abstract_model.DictModel):
     def getOutLayer(self):
         if self.out_layer:
             return self.fsModel.getOrigPath(self.out_layer)
+        elif self.includeCBC:
+            return self.fsModel.mkOutputFile("reportingResultsCBC.gpkg")
         else:
-            return params.mkTmpLayerPath("reportingResults.gpkg")
+            return self.fsModel.mkOutputFile("reportingResults.gpkg")
         
     # def mkIntersectionLayer(self):
         # pass
@@ -101,6 +103,8 @@ class ReportingModel(abstract_model.DictModel):
         selected = input_layer
         crs = self.fsModel.paramsModel.crs
         results_path = self.getOutLayer()
+        feedback.pushDebugInfo("CBC mode = " + str(self.includeCBC))
+        feedback.pushDebugInfo("results_path = " + str(results_path))
         global_results_path = self.fsModel.mkOutputFile("reportingResultsGlobal.gpkg")
         qgsUtils.removeVectorLayer(results_path)
         qgsUtils.removeVectorLayer(global_results_path)
@@ -136,7 +140,17 @@ class ReportingModel(abstract_model.DictModel):
                 # MeffRasterReport.ALG_NAME,parameters,
                 # context=context,feedback=feedback,onlyOutput=False)
             # res_layer = res[MeffAlgUtils.OUTPUT]
-            if self.reporting_layer:
+            if self.includeCBC:
+                dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
+                qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
+                parameters[MeffAlgUtils.OUTPUT] = results_path
+                parameters[MeffAlgUtils.REPORTING] = dissolved_path
+                res = qgsTreatments.applyProcessingAlg('FragScape',
+                    MeffRCBC.ALG_NAME,parameters,
+                    context=context,feedback=feedback,onlyOutput=False)
+                res_layer = res[MeffAlgUtils.OUTPUT]
+                res_val = res[MeffAlgUtils.OUTPUT_VAL]
+            elif self.reporting_layer:
                 parameters[MeffAlgUtils.OUTPUT] = results_path
                 res1 = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRasterReport.ALG_NAME,parameters,
@@ -270,7 +284,7 @@ class ReportingConnector:
             
     def setIncludeCBC(self,state):
         boolVal = state > 0
-        self.includeCBC = state
+        self.model.includeCBC = boolVal
             
     def setUnit(self,idx):
         self.model.unit = idx

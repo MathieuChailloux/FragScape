@@ -347,6 +347,10 @@ class MeffAlgUtils:
     
     UNIT_DIVISOR = [1, 100, 10000, 1000000]
 
+    SUM_AI = "sum_ai"
+    SUM_AI_SQ = "sum_ai_sq"
+    SUM_AI_SQ_CBC = "sum_ai_sq_cbc"
+
     # Output layer fields
     ID = "fid"
     NB_PATCHES = "nb_patches"
@@ -389,13 +393,12 @@ class MeffAlgUtils:
             cbc_net_product_field = QgsField(self.CBC_NET_PRODUCT, QVariant.Double)
         output_fields = QgsFields()
         output_fields.append(report_id_field)
-        output_fields.append(mesh_size_field)
         if include_cbc:
             output_fields.append(cbc_mesh_size_field)
+        output_fields.append(mesh_size_field)
         output_fields.append(nb_patches_field)
         output_fields.append(report_area_field)
         output_fields.append(intersecting_area_field)
-        output_fields.append(mesh_size_field)
         output_fields.append(div_field)
         output_fields.append(split_index_field)
         output_fields.append(coherence_field)
@@ -430,23 +433,38 @@ class MeffAlgUtils:
         # res_feat.setGeometry(report_feat.geometry)
         # res_feat[self.ID] = report_feat.id()
         
-    def mkResFeat(self,nb_patches,sum_ai,sum_ai_sq,report_area):
-        sum_ai = float(sum_ai)
-        utils.debug("sum_ai(debug)= " + str(sum_ai))
+    def mkResFeat(self,include_cbc):
         if not self.report_layer or self.report_layer.featureCount() == 0:
             raise QgsProcessingException("Invalid reporting layer")
         for f in self.report_layer.getFeatures():
             report_feat = f
-        output_fields = self.mkReportFields()
+        output_fields = self.mkReportFields(include_cbc)
         res_feat = QgsFeature(output_fields)
         res_feat.setGeometry(report_feat.geometry())
         res_feat[self.ID] = report_feat.id()
-        res_feat[self.NB_PATCHES] = nb_patches
-        # Metrics
-        report_area = float(report_area)
+        # res_feat[self.NB_PATCHES] = nb_patches
+        # report_area = float(report_area)
+        # report_area_sq = report_area * report_area
+        # res_feat[self.NET_PRODUCT] = round(sum_ai_sq,NB_DIGITS)
+        # utils.debug("sum_ai(debug2)= " + str(sum_ai))
+        # res_feat[self.REPORT_AREA] = report_area
+        # res_feat[self.INTERSECTING_AREA] = sum_ai
+        # res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
+        # res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai if sum_ai > 0 else 0
+        # res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS)
+        # res_feat[self.SPLITTING_INDEX] = report_area_sq / sum_ai_sq if sum_ai_sq > 0 else 0
+        # res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
+        return res_feat
+        #res = float(sum_ai_sq) / float(tot_area)
+        
+    def fillResFeat(self,res_feat,res_dict):
+        report_area = float(res_dict[self.REPORT_AREA])
         report_area_sq = report_area * report_area
+        sum_ai = float(res_dict[self.SUM_AI])
+        sum_ai_sq = float(res_dict[self.SUM_AI_SQ])
+        res_feat[self.NB_PATCHES] = res_dict[self.NB_PATCHES]
+        # Metrics
         res_feat[self.NET_PRODUCT] = round(sum_ai_sq,NB_DIGITS)
-        utils.debug("sum_ai(debug2)= " + str(sum_ai))
         res_feat[self.REPORT_AREA] = report_area
         res_feat[self.INTERSECTING_AREA] = sum_ai
         res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
@@ -454,9 +472,47 @@ class MeffAlgUtils:
         res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS)
         res_feat[self.SPLITTING_INDEX] = report_area_sq / sum_ai_sq if sum_ai_sq > 0 else 0
         res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
-        return res_feat
-        #res = float(sum_ai_sq) / float(tot_area)
+        # CBC Metrics
+        if self.SUM_AI_SQ_CBC in res_dict:
+            sum_ai_sq_cbc = float(res_dict[self.SUM_AI_SQ_CBC])
+            res_feat[self.CBC_NET_PRODUCT] = round(sum_ai_sq_cbc,NB_DIGITS)
+            res_feat[self.CBC_MESH_SIZE] = round(sum_ai_sq_cbc / report_area,NB_DIGITS)
+            
         
+    def mkResSink(self,parameters,res_feat,context,include_cbc=False):
+        report_fields = self.mkReportFields(include_cbc)
+        wkb_type = self.report_layer.wkbType()
+        report_crs = self.report_layer.sourceCrs()
+        sink, dest_id = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            report_fields,
+            wkb_type,
+            report_crs)
+        sink.addFeature(res_feat)
+        return dest_id
+        
+    def mkOutputs(self,parameters,res_dict,context):
+        # include_cbc = self.SUM_AI_SQ_CBC in res_dict
+        # res_feat = self.mkResFeat(include_cbc)
+        # self.fillResFeat(res_feat,res_dict)
+        if self.report_layer:
+            nb_feats = self.report_layer.featureCount()
+            if nb_feats != 1:
+                raise QgsProcessingException("Report layer has "
+                    + str(nb_feats) + " features but only 1 was expected")
+            include_cbc = self.SUM_AI_SQ_CBC in res_dict
+            utils.debug("include_cbc = " + str(include_cbc))
+            res_feat = self.mkResFeat(include_cbc)
+            self.fillResFeat(res_feat,res_dict)
+            dest_id = self.mkResSink(parameters,res_feat,context,include_cbc)
+            res_layer = dest_id
+            res_val = res_feat[self.CBC_MESH_SIZE]
+        else:
+            res_layer = None
+            res_val = round(res_dict[self.SUM_AI_SQ] / res_dict[self.REPORT_AREA], self.NB_DIGITS)
+        return (res_layer, res_val)
     
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
