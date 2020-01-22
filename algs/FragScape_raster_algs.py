@@ -46,7 +46,8 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterFeatureSource)      
 
-from ..qgis_lib_mc import qgsUtils, qgsTreatments
+from ..qgis_lib_mc import qgsUtils, qgsTreatments, feedbacks
+from ..steps import params
 from .FragScape_algs import MeffAlgUtils
                        
 def tr(string):
@@ -62,6 +63,18 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
     
     def __init__(self):
         QgsProcessingAlgorithm.__init__(self)
+            
+    def createInstance(self):
+        assert(False)
+    
+    def displayName(self):
+        assert(False)
+        
+    def shortHelpString(self):
+        assert(False)
+        
+    def name(self):
+        return self.ALG_NAME
     
     def group(self):
         return "Raster"
@@ -114,7 +127,7 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         # if report_layer:
             # self.sink = self.mkReportSink(parameters,context,report_layer.wkbType())
             #self.sink = None
-        if not self.report_opt:
+        if not self.report_opt and not report_layer:
             raise QgsProcessingException("No reporting layer given")
         self.report_layer = report_layer
         # output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
@@ -142,7 +155,7 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         self.cl = cl
         self.pix_area = pix_area
         self.input_clipped = clipped
-        return (input, None)
+        return (input, output)
         
     def labelAndPatchLen(self,input,feedback):
         classes, array = qgsUtils.getRasterValsAndArray(input)
@@ -194,18 +207,19 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
             
 class MeffRasterReportAlgorithm(FragScapeRasterAlgorithm):
     
-    def setAlgName(self,name):
-        self.alg_name = name
+    def setBaseAlgName(self,name):
+        self.base_alg_name = name
         
     def initAlgorithm(self, config=None):
-        super().initAlgorithm(repot_opt=False)
-        self.addOutput(QgsProcessingOutputNumber(
-            self.OUTPUT_VAL, "Output effective mesh size"))
+        super().initAlgorithm(config=config,report_opt=False)
+        # self.addOutput(QgsProcessingOutputNumber(
+            # self.OUTPUT_VAL, "Output effective mesh size"))
         
     def processAlgorithm(self, parameters, context, feedback):
         (input, output) = self.prepareInputs(parameters,context,feedback)
         output_layer = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)
         nb_feats = self.report_layer.featureCount()
+        crs = self.report_layer.sourceCrs()
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
         if nb_feats == 0:
             raise QgsProcessingException("Empty reporting layer")
@@ -218,18 +232,19 @@ class MeffRasterReportAlgorithm(FragScapeRasterAlgorithm):
             self.report_layer.selectByIds([report_id])
             select_path = params.mkTmpLayerPath("reportingSelection"
                 + str(report_feat.id()) + ".gpkg")
-            qgsTreatments.saveSelectedFeatures(self.report_layer,select_path,context,feedback)
+            qgsTreatments.saveSelectedFeatures(self.report_layer,select_path,context,multi_feedback)
             report_computed_path = params.mkTmpLayerPath("reportingComputed"
                 + str(report_feat.id()) + ".gpkg")
             parameters = { self.INPUT : input,
                 self.CLASS : self.cl,
                 self.REPORTING : select_path,
                 self.OUTPUT : report_computed_path }
-            qgsTreatments.applyProcessingAlg('FragScape',self.alg_name,
+            qgsTreatments.applyProcessingAlg('FragScape',self.base_alg_name,
                 parameters, context,multi_feedback)
             report_layers.append(report_computed_path)
-        qgsTreatments.mergeVectorLayers(report_layers,crs,output)
-        return {self.OUTPUT: output}
+        feedback.pushDebugInfo("report_layers = " + str(report_layers))
+        qgsTreatments.mergeVectorLayers(report_layers,crs,output_layer)
+        return {self.OUTPUT: output_layer}
         
 
 class MeffRaster(FragScapeRasterAlgorithm):
@@ -238,9 +253,6 @@ class MeffRaster(FragScapeRasterAlgorithm):
             
     def createInstance(self):
         return MeffRaster()
-        
-    def name(self):
-        return self.ALG_NAME
         
     def displayName(self):
         return tr("Raster Effective Mesh Size")
@@ -324,7 +336,13 @@ class MeffRaster(FragScapeRasterAlgorithm):
         # res = float(sum_ai_sq) / float(tot_area)
         
         if self.report_layer:
+            nb_feats = self.report_layer.featureCount()
+            if nb_feats != 1:
+                raise QgsProcessingException("Report layer has "
+                    + str(nb_feats) + " features but only 1 was expected")
+            feedback.pushDebugInfo("sum_ai_before = " + str(sum_ai))
             res_feat = self.mkResFeat(nb_patches,sum_ai,sum_ai_sq,report_area)
+            feedback.pushDebugInfo("sum_ai_after = " + str(res_feat[self.INTERSECTING_AREA]))
             res_val = res_feat[self.MESH_SIZE]
             report_fields = self.mkReportFields()
             wkb_type = self.report_layer.wkbType()
@@ -336,11 +354,11 @@ class MeffRaster(FragScapeRasterAlgorithm):
                 self.OUTPUT,
                 context,
                 report_fields,
-                # QgsFields(),
-                self.report_layer.wkbType(),
+                wkb_type,
                 report_crs)
             # assert(False)
             sink.addFeature(res_feat)
+            feedback.pushDebugInfo("sum_ai_after = " + str(res_feat[self.INTERSECTING_AREA]))
             res_layer = dest_id
             res_val = res_feat[self.MESH_SIZE]
         else:
@@ -350,9 +368,21 @@ class MeffRaster(FragScapeRasterAlgorithm):
 
 class MeffRasterReport(MeffRasterReportAlgorithm):
 
+    ALG_NAME = "meffRasterReport"
+            
+    def createInstance(self):
+        return MeffRasterReport()
+    
+    def displayName(self):
+        return self.tr("Effective mesh size per feature")
+        
+    def shortHelpString(self):
+        return tr("Computes effective mesh size on a raster layer")
+
     def __init__(self):
         super().__init__()
-        self.setAlgName(MeffRaster.ALG_NAME)
+        self.setBaseAlgName(MeffRaster.ALG_NAME)        
+        
         
 class MeffRasterCBC(FragScapeRasterAlgorithm):
 

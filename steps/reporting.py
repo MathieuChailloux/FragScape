@@ -38,6 +38,7 @@ from ..algs.FragScape_algs import (
     EffectiveMeshSizeReportingAlgorithm as MeffReportV )
 from ..algs.FragScape_raster_algs import (
     MeffRaster as MeffR,
+    MeffRasterReport,
     MeffRasterCBC as MeffRCBC )
 from . import params, fragm
 
@@ -70,6 +71,7 @@ class ReportingModel(abstract_model.DictModel):
         super().__init__(self,self.fields)
                 
     def getInputLayer(self):
+        utils.debug("input_layer = " + str(self.input_layer))
         if not self.input_layer:
             self.input_layer = self.fsModel.fragmModel.getFinalLayer()
         return self.input_layer
@@ -99,7 +101,7 @@ class ReportingModel(abstract_model.DictModel):
         selected = input_layer
         crs = self.fsModel.paramsModel.crs
         results_path = self.getOutLayer()
-        global_results_path = params.mkTmpLayerPath("reportingResultsGlobal.gpkg")
+        global_results_path = self.fsModel.mkOutputFile("reportingResultsGlobal.gpkg")
         qgsUtils.removeVectorLayer(results_path)
         qgsUtils.removeVectorLayer(global_results_path)
         if self.fsModel.modeIsVector():
@@ -126,29 +128,42 @@ class ReportingModel(abstract_model.DictModel):
             res_layer = res1[MeffReportV.OUTPUT]
             res_val = res2[MeffReportV.OUTPUT_VAL]
         else:
-            parameters = { MeffR.INPUT : selected,
-                MeffR.CLASS : 1,
-                MeffR.REPORTING : self.reporting_layer,
-                MeffR.OUTPUT : global_results_path }
-            res1 = qgsTreatments.applyProcessingAlg('FragScape',
-                MeffR.ALG_NAME,parameters,context=context,feedback=feedback,onlyOutput=False)
-            res_layer = res1[MeffR.OUTPUT]
-            res_val = res1[MeffR.OUTPUT_VAL]
+            parameters = { MeffAlgUtils.INPUT : selected,
+                MeffAlgUtils.CLASS : 1,
+                MeffAlgUtils.REPORTING : self.reporting_layer,
+                MeffAlgUtils.OUTPUT : global_results_path }
+            # res = qgsTreatments.applyProcessingAlg('FragScape',
+                # MeffRasterReport.ALG_NAME,parameters,
+                # context=context,feedback=feedback,onlyOutput=False)
+            # res_layer = res[MeffAlgUtils.OUTPUT]
+            if self.reporting_layer:
+                parameters[MeffAlgUtils.OUTPUT] = results_path
+                res1 = qgsTreatments.applyProcessingAlg('FragScape',
+                    MeffRasterReport.ALG_NAME,parameters,
+                    context=context,feedback=feedback,onlyOutput=False)
+                res_layer = res1[MeffAlgUtils.OUTPUT]
+                dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
+                qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
+                parameters[MeffAlgUtils.REPORTING] = dissolved_path
+                parameters[MeffAlgUtils.OUTPUT] = global_results_path
+                res2 = qgsTreatments.applyProcessingAlg('FragScape',
+                    MeffR.ALG_NAME,parameters,
+                    context=context,feedback=feedback,onlyOutput=False)
+                res_val = res2[MeffAlgUtils.OUTPUT_VAL]
+            else:
+                res = qgsTreatments.applyProcessingAlg('FragScape',
+                    MeffR.ALG_NAME,parameters,
+                    context=context,feedback=feedback,onlyOutput=False)
+                res_layer = res[MeffAlgUtils.OUTPUT]
+                res_val = res[MeffAlgUtils.OUTPUT_VAL]
         feedbacks.progressFeedback.endSection()
         return (res_layer,res_val)
                 
     def toXML(self,indent=" "):
-        # if not self.reporting_layer:
-            # utils.warn("No reporting layer selected")
-            # return ""
-        #layerRelPath = self.fsModel.normalizePath(qgsUtils.pathOfLayer(self.layer))
         modelParams = {}
-        # if self.input_layer:
-            # pass
-        # if self.select_expr:
-            # modelParams[self.SELECT_EXPR] = self.select_expr
-        # if self.method >= 0:
-            # modelParams[self.METHOD] = self.method
+        if self.input_layer:
+            inputRelPath = self.fsModel.normalizePath(self.input_layer)
+            modelParams[self.INPUT] = inputRelPath
         modelParams[self.INCLUDE_CBC] = self.includeCBC
         if self.unit:
             modelParams[self.UNIT] = self.unit
@@ -161,8 +176,8 @@ class ReportingModel(abstract_model.DictModel):
         return xmlStr
         
     def fromXMLAttribs(self,attribs):
-        # if self.SELECT_EXPR in attribs:
-            # self.select_expr = attribs[self.SELECT_EXPR]
+        if self.INPUT in attribs:
+            self.input_layer = self.fsModel.getOrigPath(attribs[self.INPUT])
         if self.REPORTING in attribs:
             self.reporting_layer = self.fsModel.getOrigPath(attribs[self.REPORTING])
         if self.METHOD in attribs:
@@ -280,9 +295,8 @@ class ReportingConnector:
         
     def updateUI(self):
         abs_input_layer = self.model.getInputLayer()
-        utils.debug("")
         if os.path.isfile(abs_input_layer):
-            loaded_layer = qgsUtils.loadVectorLayer(abs_input_layer,loadProject=True)
+            loaded_layer = qgsUtils.loadLayer(abs_input_layer,loadProject=True)
             self.dlg.resultsInputLayer.setLayer(loaded_layer)
         else:
             utils.warn("Could not find results input layer : " + str(abs_input_layer))

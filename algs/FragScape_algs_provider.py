@@ -32,7 +32,7 @@ from .FragScape_algs import (PrepareLanduseAlgorithm,
                              ApplyFragmentationAlgorithm,
                              EffectiveMeshSizeGlobalAlgorithm,
                              EffectiveMeshSizeReportingAlgorithm)
-from .FragScape_raster_algs import MeffRaster, MeffRasterCBC
+from .FragScape_raster_algs import MeffRaster, MeffRasterReport, MeffRasterCBC
 
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):
 
@@ -43,6 +43,7 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
                         EffectiveMeshSizeGlobalAlgorithm(),
                         EffectiveMeshSizeReportingAlgorithm(),
                         MeffRaster(),
+                        MeffRasterReport(),
                         MeffRasterCBC()]
         for a in self.alglist:
             a.initAlgorithm()

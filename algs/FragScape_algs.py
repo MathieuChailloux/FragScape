@@ -431,6 +431,8 @@ class MeffAlgUtils:
         # res_feat[self.ID] = report_feat.id()
         
     def mkResFeat(self,nb_patches,sum_ai,sum_ai_sq,report_area):
+        sum_ai = float(sum_ai)
+        utils.debug("sum_ai(debug)= " + str(sum_ai))
         if not self.report_layer or self.report_layer.featureCount() == 0:
             raise QgsProcessingException("Invalid reporting layer")
         for f in self.report_layer.getFeatures():
@@ -441,8 +443,11 @@ class MeffAlgUtils:
         res_feat[self.ID] = report_feat.id()
         res_feat[self.NB_PATCHES] = nb_patches
         # Metrics
+        report_area = float(report_area)
         report_area_sq = report_area * report_area
         res_feat[self.NET_PRODUCT] = round(sum_ai_sq,NB_DIGITS)
+        utils.debug("sum_ai(debug2)= " + str(sum_ai))
+        res_feat[self.REPORT_AREA] = report_area
         res_feat[self.INTERSECTING_AREA] = sum_ai
         res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
         res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai if sum_ai > 0 else 0
