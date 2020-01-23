@@ -149,6 +149,7 @@ class FragmModel(abstract_model.DictModel):
                          }
             return FragmItem(new_dict)
         else:
+            dict[FragmItem.FRAGM]  = bool(dict[FragmItem.FRAGM])
             return FragmItem(dict)
         
     # def getFragmLayer(self):
@@ -317,7 +318,8 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.parser_name = "FragmConnector"
         self.dlg = dlg
         self.onlySelection = False
-        self.fragmFlag = True
+        # self.fragmFlag = True
+        self.fragmStatus = None
         self.clip_layer = None
         super().__init__(fragmModel,self.dlg.fragmView,
                         self.dlg.fragmAdd,self.dlg.fragmRemove,
@@ -333,7 +335,8 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.layerComboDlg = qgsUtils.LayerComboDialog(self.dlg,
                                                        self.dlg.fragmInputLayerCombo,
                                                        self.dlg.fragmInputLayer)
-        self.dlg.fragmCheckbox.stateChanged.connect(self.switchFragmFlag)
+        # self.dlg.fragmCheckbox.stateChanged.connect(self.switchFragmFlag)
+        self.dlg.fragmStatus.currentIndexChanged.connect(self.switchFragmStatus)
         self.dlg.selectionUp.clicked.connect(self.upgradeItem)
         self.dlg.selectionDown.clicked.connect(self.downgradeItem)
         
@@ -349,9 +352,19 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.dlg.fragmExpr.setLayer(layer)
         self.dlg.fragmBuffer.setLayer(layer)
     
-    def switchFragmFlag(self,state):
-        utils.debug("switchFragmFlag")
-        self.fragmFlag = not self.fragmFlag
+    # def switchFragmFlag(self,state):
+        # utils.debug("switchFragmFlag")
+        # self.fragmFlag = not self.fragmFlag
+        
+    def switchFragmStatus(self,index):
+        if index == 0:
+            self.fragmStatus = None
+        elif index == 1:
+            self.fragmStatus = True
+        elif index == 2:
+            self.fragmStatus = False
+        else:
+            utils.debug("Unexpected fragmentation status : " + str(index))
     
     # def setInLayer(self,path):
         # utils.debug("setInLayer " + str(path))
@@ -369,9 +382,12 @@ class FragmConnector(abstract_model.AbstractConnector):
         #if not buffer:
         #    utils.user_error("Empty buffer")
         name = self.dlg.fragmName.text()
-        is_fragm = self.fragmFlag
+        # is_fragm = self.fragmFlag
+        is_fragm = self.fragmStatus
         if not name:
             utils.user_error("Empty name")
+        if is_fragm is None:
+            utils.user_error("No fragmentation status selected")
         dict = { FragmItem.INPUT : in_layer_path,
                  FragmItem.SELECT_EXPR : expr,
                  FragmItem.BUFFER : buffer,
