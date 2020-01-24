@@ -251,6 +251,7 @@ class MeffRasterReportAlgorithm(FragScapeRasterAlgorithm):
             parameters = { self.INPUT : input,
                 self.CLASS : self.cl,
                 self.REPORTING : select_path,
+                self.UNIT : parameters[self.UNIT],
                 self.OUTPUT : report_computed_path }
             qgsTreatments.applyProcessingAlg('FragScape',self.base_alg_name,
                 parameters, context,multi_feedback)
@@ -354,7 +355,6 @@ class MeffRaster(FragScapeRasterAlgorithm):
             self.NB_PATCHES : nb_patches,
             self.DIVISOR : self.unit_divisor
         }
-        feedback.pushDebugInfo("unit_divisor = " + str(unit_divisor))
         res_layer, res_val = self.mkOutputs(parameters,res_dict,context)
         
         # res_layer, res_val = self.mkOutputs(parameters,res_dict,feedback)
@@ -398,7 +398,7 @@ class MeffRasterReport(MeffRasterReportAlgorithm):
         return MeffRasterReport()
     
     def displayName(self):
-        return self.tr("Effective mesh size per feature")
+        return self.tr("Raster Effective Mesh Size per feature")
         
     def shortHelpString(self):
         return tr("Computes effective mesh size on a raster layer")
@@ -526,23 +526,30 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         clipped = qgsTreatments.clipRasterFromVector(labeled_path,self.report_layer,
             clipped_path,crop_cutline=False,context=context,feedback=feedback)
         clip_classes, clip_array = qgsUtils.getRasterValsAndArray(str(clipped_path))
+        clip_labels = [int(cl) for cl in clip_classes]
+        nb_patches_clipped = len(clip_labels)
+        feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
+        feedback.pushDebugInfo("nb labels = " + str(len(labels)))
+        feedback.pushDebugInfo("nb clip labels = " + str(len(clip_labels)))
         
         # Patches length
         init_time = time.time()
-        patches_len = scipy.ndimage.labeled_comprehension(labeled_array,labeled_array,labels,len,int,0)
+        patches_len = scipy.ndimage.labeled_comprehension(labeled_array,labeled_array,clip_labels,len,int,0)
         feedback.pushDebugInfo("patches_len = " + str(patches_len))
         time1 = time.time()
         feedback.pushDebugInfo(("time 1 = " + str(time1 - init_time)))
-        patches_len2 = scipy.ndimage.labeled_comprehension(clip_array,clip_array,labels,len,int,0)
+        patches_len2 = scipy.ndimage.labeled_comprehension(clip_array,clip_array,clip_labels,len,int,0)
         #patches_len2 = np.copy(patches_len)
         feedback.pushDebugInfo("patches_len2 = " + str(patches_len2))
         time2 = time.time()
         feedback.pushDebugInfo(("time 1 = " + str(time2 - time1)))
+        feedback.pushDebugInfo("nb patches_len = " + str(len(patches_len)))
+        feedback.pushDebugInfo("nb patches_len2 = " + str(len(patches_len2)))
         
         sum_ai = 0
         sum_ai_sq = 0
         sum_ai_sq_cbc = 0
-        for cpt, lbl in enumerate(labels):
+        for cpt, lbl in enumerate(clip_labels):
             lbl_val = int(lbl)
             patch_len = patches_len[cpt]
             cbc_len = patches_len2[cpt]

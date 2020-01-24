@@ -246,8 +246,41 @@ class LanduseModel(abstract_model.DictModel):
             nodata_val=255,out_type=0,context=context,feedback=feedback)
         qgsUtils.loadRasterLayer(output,loadProject=True)
         return res
-                
+        
     def applyItemsWithContext(self,context,feedback,indexes):
+        feedbacks.progressFeedback.beginSection("Landuse classification")
+        self.fsModel.checkWorkspaceInit()
+        self.checkLayerSelected()
+        clipped_path = self.fsModel.paramsModel.clipByExtent(self.landuseLayer,
+            name="landuse",context=context,feedback=feedback)
+        clipped_layer, clipped_type = qgsUtils.loadLayerGetType(clipped_path)
+        vector_mode = self.fsModel.paramsModel.modeIsVector():
+        if clipped_type == 'Vector':
+            selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
+            qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
+            if vector_mode:
+                res = qgsTreatments.dissolveLayer(selected_path,output,context=context,feedback=feedback)
+            else:
+                crs, extent, resolution = self.fsModel.getRasterParams()
+                res = qgsTreatments.applyRasterization(selected_path,output,
+                    extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
+                    all_touch=True,context=context,feedback=feedback)
+        else:
+            selected_path = params.mkTmpLayerPath('landuseSelection.tif')
+            qgsTreatments.applyRasterCalc(input,selected_path,formula,
+                nodata_val=255,out_type=0,context=context,feedback=feedback)
+            if vector_mode:
+                crs, extent, resolution = self.fsModel.getRasterParams()
+                res = qgsTreatments.applyWarpReproject(selected_path,output,
+                    dst_crs=self.crs,resolution=resolution,extent=extent,
+                    context=context,feedback=feedback)
+            else:
+                raise QgsProcessingException("Raster mode with vector input not yet implemented")
+        qgsUtils.loadLayer(res,loadProject=True)
+        feedbacks.progressFeedback.endSection()
+            
+                
+    def applyItemsWithContextOld(self,context,feedback,indexes):
         feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()

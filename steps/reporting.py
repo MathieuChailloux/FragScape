@@ -34,8 +34,8 @@ from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatme
 from ..algs import FragScape_algs_provider
 from ..algs.FragScape_algs import (
     MeffAlgUtils,
-    EffectiveMeshSizeGlobalAlgorithm as MeffGlobalV,
-    EffectiveMeshSizeReportingAlgorithm as MeffReportV )
+    MeffVectorGlobal as MeffGlobalV,
+    MeffVectorReport as MeffReportV )
 from ..algs.FragScape_raster_algs import (
     MeffRaster as MeffR,
     MeffRasterReport,
@@ -122,7 +122,7 @@ class ReportingModel(abstract_model.DictModel):
                 context=context,feedback=feedback,onlyOutput=False)
             parameters2 = { MeffGlobalV.INPUT : selected,
                            # MeffGlobalV.SELECT_EXPR : self.select_expr,
-                           MeffGlobalV.BOUNDARY : self.reporting_layer,
+                           MeffGlobalV.REPORTING : self.reporting_layer,
                            MeffGlobalV.CRS : crs,
                            MeffGlobalV.INCLUDE_CBC : self.includeCBC,
                            MeffGlobalV.UNIT : self.unit,
@@ -312,7 +312,7 @@ class ReportingConnector:
         
     def updateUI(self):
         abs_input_layer = self.model.getInputLayer()
-        if os.path.isfile(abs_input_layer):
+        if abs_input_layer and os.path.isfile(abs_input_layer):
             loaded_layer = qgsUtils.loadLayer(abs_input_layer,loadProject=True)
             self.dlg.resultsInputLayer.setLayer(loaded_layer)
         else:
