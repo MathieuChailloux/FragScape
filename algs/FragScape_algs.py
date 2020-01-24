@@ -345,11 +345,10 @@ class MeffAlgUtils:
     OUTPUT = "OUTPUT"
     OUTPUT_VAL = "OUTPUT_VAL"
     
-    UNIT_DIVISOR = [1, 100, 10000, 1000000]
-
     SUM_AI = "sum_ai"
     SUM_AI_SQ = "sum_ai_sq"
     SUM_AI_SQ_CBC = "sum_ai_sq_cbc"
+    DIVISOR = "divisor"
 
     # Output layer fields
     ID = "fid"
@@ -458,10 +457,15 @@ class MeffAlgUtils:
         #res = float(sum_ai_sq) / float(tot_area)
         
     def fillResFeat(self,res_feat,res_dict):
-        report_area = float(res_dict[self.REPORT_AREA])
+        divisor = float(res_dict[self.DIVISOR])
+        report_area = float(res_dict[self.REPORT_AREA]) / divisor
         report_area_sq = report_area * report_area
-        sum_ai = float(res_dict[self.SUM_AI])
-        sum_ai_sq = float(res_dict[self.SUM_AI_SQ])
+        sum_ai = float(res_dict[self.SUM_AI])  / divisor
+        sum_ai_sq = float(res_dict[self.SUM_AI_SQ]) / (divisor * divisor)
+        utils.debug("sum_ai = " + str(sum_ai))
+        utils.debug("sum_ai_sq = " + str(sum_ai_sq))
+        utils.debug("report_area = " + str(report_area))
+        utils.debug("report_area_sq = " + str(report_area_sq))
         res_feat[self.NB_PATCHES] = res_dict[self.NB_PATCHES]
         # Metrics
         res_feat[self.NET_PRODUCT] = round(sum_ai_sq,NB_DIGITS)
@@ -474,7 +478,7 @@ class MeffAlgUtils:
         res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
         # CBC Metrics
         if self.SUM_AI_SQ_CBC in res_dict:
-            sum_ai_sq_cbc = float(res_dict[self.SUM_AI_SQ_CBC])
+            sum_ai_sq_cbc = float(res_dict[self.SUM_AI_SQ_CBC]) / (divisor * divisor)
             res_feat[self.CBC_NET_PRODUCT] = round(sum_ai_sq_cbc,NB_DIGITS)
             res_feat[self.CBC_MESH_SIZE] = round(sum_ai_sq_cbc / report_area,NB_DIGITS)
             
@@ -551,11 +555,11 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         return self.tr("Computes effective mesh size from patch layer and boundary of reporting layer (features are dissolved if needed)")
 
     def initAlgorithm(self, config=None):
-        self.unit_options = [
-            self.tr("m² (square meters)"),
-            self.tr("dm² (square decimeters / ares)"),
-            self.tr("hm² (square hectometers / hectares)"),
-            self.tr("km² (square kilometers)")]
+        # self.unit_options = [
+            # self.tr("m² (square meters)"),
+            # self.tr("dm² (square decimeters / ares)"),
+            # self.tr("hm² (square hectometers / hectares)"),
+            # self.tr("km² (square kilometers)")]
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -588,7 +592,7 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
             QgsProcessingParameterEnum(
                 self.UNIT,
                 description=self.tr("Report areas unit"),
-                options=self.unit_options))
+                options=self.getUnitOptions()))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
@@ -609,6 +613,7 @@ class EffectiveMeshSizeGlobalAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         crs = self.parameterAsCrs(parameters,self.CRS,context)
         # cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
         include_cbc = self.parameterAsBool(parameters,self.INCLUDE_CBC,context)
+        feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
         unit = self.parameterAsEnum(parameters,self.UNIT,context)
         utils.debug("unit : " + str(unit))
         unit_divisor = self.UNIT_DIVISOR[unit]
@@ -804,11 +809,11 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils)
         return self.tr("Computes effective mesh size from patch layer for each feature of reporting layer.")
 
     def initAlgorithm(self, config=None):
-        self.unit_options = [
-            self.tr("m² (square meters)"),
-            self.tr("dm² (square decimeters / ares)"),
-            self.tr("hm² (square hectometers / hectares)"),
-            self.tr("km² (square kilometers)")]
+        # self.unit_options = [
+            # self.tr("m² (square meters)"),
+            # self.tr("dm² (square decimeters / ares)"),
+            # self.tr("hm² (square hectometers / hectares)"),
+            # self.tr("km² (square kilometers)")]
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -841,7 +846,7 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils)
             QgsProcessingParameterEnum(
                 self.UNIT,
                 description=self.tr("Report areas unit"),
-                options=self.unit_options))
+                options=self.getUnitOptions()))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
@@ -866,6 +871,7 @@ class EffectiveMeshSizeReportingAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils)
         crs = self.parameterAsCrs(parameters,self.CRS,context)
         # cut_mode = self.parameterAsBool(parameters,self.CUT_MODE,context)
         include_cbc = self.parameterAsBool(parameters,self.INCLUDE_CBC,context)
+        feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
         unit = self.parameterAsEnum(parameters,self.UNIT,context)
         output = parameters[self.OUTPUT]
         # CRS reprojection

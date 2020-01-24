@@ -149,7 +149,10 @@ class FragmModel(abstract_model.DictModel):
                          }
             return FragmItem(new_dict)
         else:
-            dict[FragmItem.FRAGM]  = bool(dict[FragmItem.FRAGM])
+            if FragmItem.FRAGM in dict:
+                dict[FragmItem.FRAGM]  = bool(dict[FragmItem.FRAGM])
+            else:
+                dict[FragmItem.FRAGM]  = True
             return FragmItem(dict)
         
     # def getFragmLayer(self):
@@ -171,11 +174,8 @@ class FragmModel(abstract_model.DictModel):
     def getmergeLayerTmp(self):
         return QgsProcessingUtils.generateTempFilename("landuseFragm_tmp.tif")
         
-    # def getFinalLayer(self):
-        # if self.fsModel.modeIsVector():
-            # return self.getSingleGeomLayer()
-        # else:
-            # return self.getMergedLayer()
+    def getFinalLayer(self):
+        self.getFinalLayers()[1]
             
     def getFinalLayers(self):
         extentLayer = self.fsModel.paramsModel.getExtentLayer()

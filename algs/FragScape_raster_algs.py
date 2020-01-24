@@ -44,6 +44,7 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingOutputRasterLayer,
                        QgsFields,
                        QgsProcessingParameterFeatureSink,
+                       QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSource)      
 
 from ..qgis_lib_mc import qgsUtils, qgsTreatments, feedbacks
@@ -98,6 +99,11 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
                 types=[QgsProcessing.TypeVectorPolygon],
                 optional=report_opt))
         self.addParameter(
+            QgsProcessingParameterEnum(
+                self.UNIT,
+                description=self.tr("Report areas unit"),
+                options=self.getUnitOptions()))
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
                 self.tr("Output layer"))),
@@ -130,6 +136,12 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         if not self.report_opt and not report_layer:
             raise QgsProcessingException("No reporting layer given")
         self.report_layer = report_layer
+        feedback.pushDebugInfo("parameters = " + str(parameters))
+        feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
+        unit = self.parameterAsEnum(parameters,self.UNIT,context)
+        feedback.pushDebugInfo("unit = " + str(unit))
+        self.unit_divisor = self.UNIT_DIVISOR[unit]
+        feedback.pushDebugInfo("unit_divisor = " + str(self.unit_divisor))
         # output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
         output = parameters[self.OUTPUT]
         # Input properties
@@ -339,8 +351,10 @@ class MeffRaster(FragScapeRasterAlgorithm):
         res_dict = { self.REPORT_AREA : report_area,
             self.SUM_AI : sum_ai,
             self.SUM_AI_SQ : sum_ai_sq,
-            self.NB_PATCHES : nb_patches
+            self.NB_PATCHES : nb_patches,
+            self.DIVISOR : self.unit_divisor
         }
+        feedback.pushDebugInfo("unit_divisor = " + str(unit_divisor))
         res_layer, res_val = self.mkOutputs(parameters,res_dict,context)
         
         # res_layer, res_val = self.mkOutputs(parameters,res_dict,feedback)
@@ -540,6 +554,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         feedback.pushDebugInfo("sum_ai = " + str(sum_ai))
         feedback.pushDebugInfo("sum_ai_sq = " + str(sum_ai_sq))
         feedback.pushDebugInfo("sum_ai_sq_cbc = " + str(sum_ai_sq_cbc))
+        feedback.pushDebugInfo("unit_divisor = " + str(self.unit_divisor))
         if sum_ai_sq == 0:
             feedback.reportError("Empty area for patches, please check your selection.")
         
@@ -553,7 +568,8 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             self.SUM_AI : sum_ai,
             self.SUM_AI_SQ : sum_ai_sq,
             self.SUM_AI_SQ_CBC : sum_ai_sq_cbc,
-            self.NB_PATCHES : nb_patches
+            self.NB_PATCHES : nb_patches,
+            self.DIVISOR : self.unit_divisor,
         }
         res_layer, res_val = self.mkOutputs(parameters,res_dict,context)
         

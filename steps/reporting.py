@@ -98,6 +98,7 @@ class ReportingModel(abstract_model.DictModel):
                 
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
+        feedback.pushDebugInfo("unit = " + str(self.unit))
         feedbacks.progressFeedback.beginSection(reportingMsg)
         input_layer = self.getInputLayer()
         selected = input_layer
@@ -135,6 +136,7 @@ class ReportingModel(abstract_model.DictModel):
             parameters = { MeffAlgUtils.INPUT : selected,
                 MeffAlgUtils.CLASS : 1,
                 MeffAlgUtils.REPORTING : self.reporting_layer,
+                MeffAlgUtils.UNIT : self.unit,
                 MeffAlgUtils.OUTPUT : global_results_path }
             # res = qgsTreatments.applyProcessingAlg('FragScape',
                 # MeffRasterReport.ALG_NAME,parameters,
@@ -287,6 +289,7 @@ class ReportingConnector:
         self.model.includeCBC = boolVal
             
     def setUnit(self,idx):
+        utils.debug("setUnit " + str(idx))
         self.model.unit = idx
     
     def setInputLayer(self,layer):
