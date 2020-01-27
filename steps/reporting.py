@@ -143,10 +143,10 @@ class ReportingModel(abstract_model.DictModel):
                 # context=context,feedback=feedback,onlyOutput=False)
             # res_layer = res[MeffAlgUtils.OUTPUT]
             if self.includeCBC:
-                dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
-                qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
+                # dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
+                # qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
                 parameters[MeffAlgUtils.OUTPUT] = results_path
-                parameters[MeffAlgUtils.REPORTING] = dissolved_path
+                parameters[MeffAlgUtils.REPORTING] = self.reporting_layer
                 res = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRCBC.ALG_NAME,parameters,
                     context=context,feedback=feedback,onlyOutput=False)

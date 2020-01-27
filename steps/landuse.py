@@ -254,7 +254,7 @@ class LanduseModel(abstract_model.DictModel):
         clipped_path = self.fsModel.paramsModel.clipByExtent(self.landuseLayer,
             name="landuse",context=context,feedback=feedback)
         clipped_layer, clipped_type = qgsUtils.loadLayerGetType(clipped_path)
-        vector_mode = self.fsModel.paramsModel.modeIsVector():
+        vector_mode = self.fsModel.paramsModel.modeIsVector()
         if clipped_type == 'Vector':
             selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
             qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
