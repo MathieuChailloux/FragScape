@@ -102,11 +102,13 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
             QgsProcessingParameterEnum(
                 self.UNIT,
                 description=self.tr("Report areas unit"),
-                options=self.getUnitOptions()))
+                options=self.getUnitOptions(),
+                defaultValue=0))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
-                self.tr("Output layer"))),
+                self.tr("Output layer"),
+                optional=True)),
         self.addOutput(QgsProcessingOutputNumber(
             self.OUTPUT_VAL, "Output layer"))
             
@@ -137,13 +139,15 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
             raise QgsProcessingException("No reporting layer given")
         self.report_layer = report_layer
         feedback.pushDebugInfo("parameters = " + str(parameters))
-        feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
+        # feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
         unit = self.parameterAsEnum(parameters,self.UNIT,context)
         feedback.pushDebugInfo("unit = " + str(unit))
         self.unit_divisor = self.UNIT_DIVISOR[unit]
         feedback.pushDebugInfo("unit_divisor = " + str(self.unit_divisor))
-        # output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
-        output = parameters[self.OUTPUT]
+        output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        if not output:
+            raise QgsProcessingException("No output layer given")
+        # output = parameters[self.OUTPUT]
         # Input properties
         input_dpr = input.dataProvider()
         nodata = input_dpr.sourceNoDataValue(1)
@@ -154,6 +158,10 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         feedback.pushDebugInfo("nodata = " + str(nodata))
         feedback.pushDebugInfo("Pixel area " + str(x_res) + " x " + str(y_res)
                                 + " = " + str(pix_area))
+        if math.isnan(nodata):
+            input_type = input_dpr.dataType(1)
+            unique_vals = qgsTreatments.getRasterUniqueVals(input,feedback)
+            nodata = qgsUtils.getNDCandidate(input_type,unique_vals)
         # Clip input
         if report_layer:
             input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped.tif")
@@ -343,6 +351,12 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             context=context,feedback=feedback)
         clip_report = qgsTreatments.getRasterUniqueValsReport(clipped,context,feedback)
         feedback.pushDebugInfo("clip_report = " + str(clip_report))
+        input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped_clipped.tif")
+        input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
+            input_clipped_path,crop_cutline=False,data_type=0,
+            context=context,feedback=feedback)
+        input_clip_report = qgsTreatments.getRasterUniqueValsReport(input_clipped_path,context,feedback)
+        feedback.pushDebugInfo("input_clip_report = " + str(input_clip_report))
         clip_classes, clip_array = qgsUtils.getRasterValsAndArray(str(clipped_path))
         clip_labels = [int(cl) for cl in clip_classes]
         if 0 in clip_labels:
@@ -377,15 +391,17 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             feedback.reportError("Empty area for patches, please check your selection.")
         
         nb_pix_old = len(clip_array[clip_array != self.nodata])
-        nb_pix2 = clip_report['TOTAL_PIXEL_COUNT']
-        nb_pix_nodata2 = clip_report['NODATA_PIXEL_COUNT']
+        nb_pix2 = input_clip_report['TOTAL_PIXEL_COUNT']
+        nb_pix_nodata2 = input_clip_report['NODATA_PIXEL_COUNT']
         nb_pix = nb_pix2 - nb_pix_nodata2
         nb_0 = len(clip_array[clip_array == 0])
+        nb_not_0 = len(clip_array[clip_array != 0])
         feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         feedback.pushDebugInfo("nb_pix_old = " + str(nb_pix_old))
         feedback.pushDebugInfo("nb_pix2 = " + str(nb_pix2))
         feedback.pushDebugInfo("nb_pix_nodata2 = " + str(nb_pix_nodata2))
         feedback.pushDebugInfo("nb_0 = " + str(nb_0))
+        feedback.pushDebugInfo("nb_not_0 = " + str(nb_not_0))
         tot_area = nb_pix * self.pix_area
         feedback.pushDebugInfo("tot_area = " + str(tot_area))
         #area_sq = math.pow(nb_pix,2)

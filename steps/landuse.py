@@ -169,6 +169,12 @@ class LanduseModel(abstract_model.DictModel):
     def getOutputRaster(self):
         return self.fsModel.mkOutputFile("landuseSelection.tif")
         
+    def getOutputLayer(self):
+        if self.fsModel.paramsModel.modeIsVector():
+            return self.getDissolveLayer()
+        else:
+            return self.getOutputRaster()
+        
     # def switchDataClipFlag(self,state):
         # utils.debug("switchDataClipFlag")
         # self.dataClipFlag = not self.dataClipFlag
@@ -255,27 +261,39 @@ class LanduseModel(abstract_model.DictModel):
             name="landuse",context=context,feedback=feedback)
         clipped_layer, clipped_type = qgsUtils.loadLayerGetType(clipped_path)
         vector_mode = self.fsModel.paramsModel.modeIsVector()
+        if vector_mode:
+            output = self.getDissolveLayer()
+            qgsUtils.removeVectorLayer(output)
+        else:
+            output = self.getOutputRaster()
+            qgsUtils.removeRaster(output)
         if clipped_type == 'Vector':
+            expr = self.getSelectionExpr()
             selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
-            qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
+            qgsTreatments.selectGeomByExpression(clipped_layer,expr,selected_path,'landuseSelection')
             if vector_mode:
                 res = qgsTreatments.dissolveLayer(selected_path,output,context=context,feedback=feedback)
             else:
                 crs, extent, resolution = self.fsModel.getRasterParams()
                 res = qgsTreatments.applyRasterization(selected_path,output,
-                    extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
+                    extent=extent,resolution=resolution,
+                    out_type=0,nodata_val=255,burn_val=burn_val,
                     all_touch=True,context=context,feedback=feedback)
         else:
             selected_path = params.mkTmpLayerPath('landuseSelection.tif')
-            qgsTreatments.applyRasterCalc(input,selected_path,formula,
+            formula = self.mkRasterFormula(feedback)
+            qgsTreatments.applyRasterCalc(clipped_layer,selected_path,formula,
                 nodata_val=255,out_type=0,context=context,feedback=feedback)
             if vector_mode:
-                crs, extent, resolution = self.fsModel.getRasterParams()
-                res = qgsTreatments.applyWarpReproject(selected_path,output,
-                    dst_crs=self.crs,resolution=resolution,extent=extent,
-                    context=context,feedback=feedback)
-            else:
                 raise QgsProcessingException("Raster mode with vector input not yet implemented")
+            else:
+                crs, extent, resolution = self.fsModel.getRasterParams()
+                feedback.pushDebugInfo("crs type = " +str(type(crs)))
+                feedback.pushDebugInfo("crs  = " + str(crs))
+                feedback.pushDebugInfo("crs is None  = " + str(crs is None))
+                res = qgsTreatments.applyWarpReproject(selected_path,output,
+                    dst_crs=crs,resolution=resolution,
+                    context=context,feedback=feedback)
         qgsUtils.loadLayer(res,loadProject=True)
         feedbacks.progressFeedback.endSection()
             

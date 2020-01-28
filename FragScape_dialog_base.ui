@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>994</width>
-    <height>780</height>
+    <height>796</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -83,7 +83,7 @@
             <x>0</x>
             <y>0</y>
             <width>759</width>
-            <height>686</height>
+            <height>713</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -210,7 +210,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 1.0 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification (binary classification according to fragmentation status)&lt;br/&gt;3) Additional data (roads, rivers, ...) integration&lt;br/&gt;4) Fragmentation metrics (such as effective mesh size) computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage : &lt;a href=&quot;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 1.0 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification (binary classification according to fragmentation status)&lt;br/&gt;3) Additional data (roads, rivers, ...) integration&lt;br/&gt;4) Fragmentation metrics (such as effective mesh size) computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage : &lt;a href=&quot;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="wordWrap">
                      <bool>true</bool>
@@ -2574,8 +2574,27 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="1" rowspan="2">
     <widget class="QFrame" name="frame_10">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>50</height>
+      </size>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -2599,14 +2618,14 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="minimumSize">
          <size>
-          <width>61</width>
-          <height>61</height>
+          <width>85</width>
+          <height>21</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>61</width>
-          <height>61</height>
+          <width>85</width>
+          <height>21</height>
          </size>
         </property>
         <property name="toolTip">
@@ -2616,7 +2635,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="resources.qrc">:/plugins/FragScape/icons/logoIrstea.png</pixmap>
+         <pixmap resource="resources.qrc">:/plugins/FragScape/icons/logoINRAE.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -2627,14 +2646,14 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_13">
         <property name="minimumSize">
          <size>
-          <width>122</width>
-          <height>61</height>
+          <width>80</width>
+          <height>40</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>122</width>
-          <height>61</height>
+          <width>80</width>
+          <height>40</height>
          </size>
         </property>
         <property name="text">
@@ -2652,14 +2671,14 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label">
         <property name="minimumSize">
          <size>
-          <width>122</width>
-          <height>61</height>
+          <width>100</width>
+          <height>50</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>122</width>
-          <height>61</height>
+          <width>100</width>
+          <height>50</height>
          </size>
         </property>
         <property name="text">
@@ -2674,13 +2693,6 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QProgressBar" name="progressBar">
-     <property name="value">
-      <number>0</number>
-     </property>
     </widget>
    </item>
   </layout>

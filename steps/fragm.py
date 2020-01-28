@@ -265,9 +265,10 @@ class FragmModel(abstract_model.DictModel):
         feedback.pushDebugInfo("res_path = " + str(res_path))
         # qgsUtils.removeVectorLayer(res_path)
         vector_mode = self.fsModel.modeIsVector()
+        landuseLayer = self.fsModel.landuseModel.getOutputLayer()
         if vector_mode:
             qgsUtils.removeVectorLayer(res_path)
-            landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
+            # landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
             crs = self.fsModel.paramsModel.crs
             parameters = { self.APPLY_LANDUSE : landuseLayer,
                            self.APPLY_FRAGMENTATION : prepared_layers,
@@ -279,7 +280,7 @@ class FragmModel(abstract_model.DictModel):
             # qgsUtils.loadVectorLayer(tmp_path,loadProject=True)
         else:
             qgsUtils.removeRaster(res_path)
-            landuseLayer = self.fsModel.landuseModel.getOutputRaster()
+            # landuseLayer = self.fsModel.landuseModel.getOutputRaster()
             prepared_layers.insert(0,landuseLayer)
             res = qgsTreatments.applyMergeRaster(prepared_layers,tmp_path,
                 nodata_val=255,out_type=0,nodata_input=255,

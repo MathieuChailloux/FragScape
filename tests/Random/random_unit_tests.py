@@ -73,10 +73,15 @@ class BaseFeedback(QgsProcessingFeedback):
             raise Exception(error)
         
 def getFSParams(fname,cls):
-    return { 'INPUT' : fname, 'CLASS' : cls }
+    return { 'INPUT' : fname,
+        'CLASS' : cls,
+        'OUTPUT' : 'memory:' }
     
 def getFSCBCParams(fname,cls):
-    return { 'INPUT' : fname, 'CLASS' : cls, 'REPORTING_LAYER' : report_fname }
+    return { 'INPUT' : fname,
+        'CLASS' : cls,
+        'REPORTING' : report_fname,
+        'OUTPUT' : 'memory:'  }
 
 
 nb_tests_ok = 0  
@@ -88,12 +93,15 @@ def launchTest(alg_name,parameters,expected_res,test_name="NA"):
     feedback = BaseFeedback()
     error_alg_mode = (expected_res != None)
     try:
-        res = processing.run(alg_name,parameters,feedback=feedback)['OUTPUT']
+        res = processing.run(alg_name,parameters,feedback=feedback)['OUTPUT_VAL']
     except Exception as e:
         debug(str(e))
         res = None
     # TODO : fix * 100
     nb_tests_total += 1
+    nbdigits = 5
+    if expected_res:
+        expected_res = round(expected_res,nbdigits)
     if res == expected_res:
         print("Test " + test_name + " OK")
         nb_tests_ok += 1

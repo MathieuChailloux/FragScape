@@ -137,6 +137,12 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         super().__init__()
         self.mode = self.VECTOR_MODE
         self.save_tmp = False
+        self.workspace = None
+        self.outputDir = None
+        self.tmpDir = None
+        self.resolution = 0.0
+        self.projectFile = ""
+        self.crs = defaultCrs
         self.fields = [self.WORKSPACE,self.EXTENT_LAYER,
             self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]# def checkInit():
 
