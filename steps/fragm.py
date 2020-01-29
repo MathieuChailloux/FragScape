@@ -25,7 +25,8 @@
 import os.path
 import time
 
-from qgis.core import QgsProject, QgsMapLayerProxyModel, QgsVectorLayer, QgsProcessingFeedback, QgsProcessingMultiStepFeedback
+from qgis.core import (QgsMapLayerProxyModel,
+                       QgsWkbTypes)
 import processing
 from processing import QgsProcessingUtils
 
@@ -33,9 +34,6 @@ from ..qgis_lib_mc import utils, abstract_model, qgsUtils, qgsTreatments, feedba
 from ..algs import FragScape_algs
 from . import params, landuse
 
-
-
-fragmModel = None
 
 class FragmItem(abstract_model.DictItem):
 
@@ -55,9 +53,6 @@ class FragmItem(abstract_model.DictItem):
         self.selectionLayer = None
         self.bufferLayer = None
         
-    def applyItem(self):
-        pass
-        
     def equals(self,other):
         return (self.dict[self.NAME] == other.dict[self.NAME])
         
@@ -75,49 +70,14 @@ class FragmItem(abstract_model.DictItem):
         if not self.selectionLayer:
             name = self.dict[self.NAME]
             self.selectionLayer = params.mkTmpLayerPath(name + ".gpkg")
-            #self.selectionLayer = QgsProcessingUtils.generateTempFilename(name + ".gpkg")
         return self.selectionLayer
        
     def getBufferLayer(self):
         if not self.bufferLayer:
             name = self.dict[self.NAME]
             self.bufferLayer = params.mkTmpLayerPath(name + "_buf.gpkg")
-            #self.bufferLayer = QgsProcessingUtils.generateTempFilename(name + "_buf.gpkg")
         return self.bufferLayer
         
-    # def prepareVector(self,context,feedback):
-        # in_layer_path = item.dict[self.INPUT]
-        # in_layer_abs_path = self.fsModel.getOrigPath(in_layer_path)
-        # clip_layer_path = item.dict[self.CLIP_LAYER]
-        # if clip_layer_path:
-            # clip_layer_abs_path = self.fsModel.getOrigPath(clip_layer_path)
-        # else:
-            # clip_layer_abs_path = None
-        # select_expr = item.dict[self.SELECT_EXPR]
-        # buffer_expr = item.dict[self.PREPARE_BUFFER]
-        # utils.debug("select_expr : " + str(select_expr))
-        # utils.debug("buffer_expr : " + str(buffer_expr))
-        # outPath = item.getOutputLayer()
-        # name = item.dict[self.PREPARE_NAME]
-        # parameters = { self.PREPARE_INPUT : in_layer_abs_path,
-                       # self.PREPARE_CLIP_LAYER : clip_layer_abs_path,
-                       # self.PREPARE_SELECT_EXPR : select_expr,
-                       # self.PREPARE_BUFFER : buffer_expr,
-                       # self.PREPARE_NAME : item.dict[self.PREPARE_NAME],
-                       # self.PREPARE_OUTPUT : outPath }
-        # prepared = qgsTreatments.applyProcessingAlg(
-            # "FragScape","prepareFragm",parameters,
-            # context=context,feedback=step_feedback)
-            
-
-        
-    # def instantiateSelectionLayer(self):
-        # out_path = self.getSelectionLayer()
-        # qgsUtils.removeVectorLayer(out_path)
-        # in_layer_path = self.dict["in_layer"]
-        # in_layer = qgsUtils.loadVectorLayer(in_layer_path)
-        # selection_layer = qgsUtils.createLayerFromExisting(in_layer,self.dict["name"])
-        # return selection_layer
         
 class FragmModel(abstract_model.DictModel):
 
@@ -154,15 +114,6 @@ class FragmModel(abstract_model.DictModel):
             else:
                 dict[FragmItem.FRAGM]  = True
             return FragmItem(dict)
-        
-    # def getFragmLayer(self):
-        # return params.mkTmpLayerPath("fragm.gpkg")
-        
-    # def getBuffersMergedLayer(self):
-        # return params.mkTmpLayerPath("fragmBuffersMerged.shp")
-        
-    # def getLanduseFragmLayer(self):
-        # return params.mkTmpLayerPath("landuseFragm.gpkg")
         
     def getSingleGeomLayer(self):
         return self.fsModel.mkOutputFile("landuseFragmSingleGeom.gpkg")
@@ -213,10 +164,11 @@ class FragmModel(abstract_model.DictModel):
         outRPath = item.getOutputRLayer()
         feedback.pushDebugInfo("outRPath = " + str(outRPath))
         # Processing
-        # clipped = self.fsModel.paramsModel.clipByExtent(input,name=name,context=context,feedback=feedback)
+        step_feedback = feedbacks.ProgressMultiStepFeedback(2,feedback)
         clipped = self.fsModel.paramsModel.clipByExtent(input,
-            name=name,context=context,feedback=feedback)
-        feedback.pushDebugInfo("clipped = " + str(clipped))
+            name=name,context=context,feedback=step_feedback)
+        step_feedback.pushDebugInfo("clipped = " + str(clipped))
+        step_feedback.setCurrentStep(1)
         if input_vector:
             parameters = { self.PREPARE_INPUT : clipped,
                            self.PREPARE_SELECT_EXPR : select_expr,
@@ -225,8 +177,11 @@ class FragmModel(abstract_model.DictModel):
                            self.PREPARE_OUTPUT : outPath }
             prepared = qgsTreatments.applyProcessingAlg(
                 "FragScape","prepareFragm",parameters,
-                context=context,feedback=feedback)
+                context=context,feedback=step_feedback)
             if vector_mode:
+                clipped_layer = qgsUtils.loadVectorLayer(clipped)
+                if not buffer_expr and clipped_layer.geometryType() != QgsWkbTypes.PolygonGeometry:
+                    utils.user_error("Empty buffer with non-polygon layer " + str(clipped))
                 res = prepared
             else:
                 self.fsModel.checkResolutionInit()
@@ -234,7 +189,7 @@ class FragmModel(abstract_model.DictModel):
                 crs, extent, resolution = self.fsModel.getRasterParams()
                 res = qgsTreatments.applyRasterization(prepared,outRPath,
                     extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
-                    all_touch=True,context=context,feedback=feedback)
+                    all_touch=True,context=context,feedback=step_feedback)
         elif vector_mode:
             utils.internal_error("Not implemented yet : Raster to Vector")
         else:
@@ -243,14 +198,15 @@ class FragmModel(abstract_model.DictModel):
             # normalized = self.fsModel.paramsModel.normalizeRaster(input,
                 # out_path=normalized_path,context=context,feedback=feedback)
             res = qgsTreatments.applyRasterCalc(clipped,outRPath,str(burn_val),
-                out_type=0,context=context,feedback=feedback)
+                out_type=0,context=context,feedback=step_feedback)
+        step_feedback.setCurrentStep(2)
         return res
             
     def applyItemsWithContext(self,context,feedback,indexes=None):
         fragmMsg = "Application of fragmentation data to landuse"
         feedbacks.progressFeedback.beginSection(fragmMsg)
         prepared_layers = []
-        nb_items = len(self.items)
+        nb_items = len(self.items) + 1
         curr_step = 1
         step_feedback = feedbacks.ProgressMultiStepFeedback(nb_items,feedback)
         for item in self.items:
@@ -259,10 +215,12 @@ class FragmModel(abstract_model.DictModel):
             curr_step += 1
             step_feedback.setCurrentStep(curr_step)
             prepared_layers.append(prepared)
-        feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
+        step_feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
         # MERGE
         tmp_path, res_path = self.getFinalLayers()
-        feedback.pushDebugInfo("res_path = " + str(res_path))
+        tmp_path = res_path
+        res = res_path
+        step_feedback.pushDebugInfo("res_path = " + str(res_path))
         # qgsUtils.removeVectorLayer(res_path)
         vector_mode = self.fsModel.modeIsVector()
         landuseLayer = self.fsModel.landuseModel.getOutputLayer()
@@ -276,40 +234,19 @@ class FragmModel(abstract_model.DictModel):
                            self.APPLY_OUTPUT : tmp_path }
             res = qgsTreatments.applyProcessingAlg(
                 "FragScape","applyFragm",parameters,
-                context=context,feedback=feedback)
-            # qgsUtils.loadVectorLayer(tmp_path,loadProject=True)
+                context=context,feedback=step_feedback)
         else:
             qgsUtils.removeRaster(res_path)
             # landuseLayer = self.fsModel.landuseModel.getOutputRaster()
             prepared_layers.insert(0,landuseLayer)
             res = qgsTreatments.applyMergeRaster(prepared_layers,tmp_path,
                 nodata_val=255,out_type=0,nodata_input=255,
-                context=context,feedback=feedback)
-            # qgsUtils.loadRasterLayer(tmp_path,loadProject=True)
-        # TODO CLIP
-        res = self.fsModel.paramsModel.clipByExtent(tmp_path,
-            out_path=res_path,context=context,feedback=feedback)
+                context=context,feedback=step_feedback)
+        # res = self.fsModel.paramsModel.clipByExtent(tmp_path,
+            # out_path=res_path,context=context,feedback=step_feedback)
         qgsUtils.loadLayer(res,loadProject=True)
         feedbacks.progressFeedback.endSection()
         return res
-            
-            
-            
-        # if self.fsModel.modeIsVector():
-            # res = self.applyVector(context,feedback)
-        # else:
-            # res = self.applyRaster(context,feedback)
-        # feedbacks.progressFeedback.endSection()
-        # return res
-            
-    # def fromXMLRoot(self,root):
-        # utils.debug("fromXML")
-        # for item in root:
-            # utils.debug(str(item))
-            # dict = item.attrib
-            # fragmItem = self.mkItemFromDict(dict)
-            # self.addItem(fragmItem)
-        # self.layoutChanged.emit()
             
         
         
@@ -336,14 +273,12 @@ class FragmConnector(abstract_model.AbstractConnector):
         self.layerComboDlg = qgsUtils.LayerComboDialog(self.dlg,
                                                        self.dlg.fragmInputLayerCombo,
                                                        self.dlg.fragmInputLayer)
-        # self.dlg.fragmCheckbox.stateChanged.connect(self.switchFragmFlag)
         self.dlg.fragmStatus.currentIndexChanged.connect(self.switchFragmStatus)
         self.dlg.selectionUp.clicked.connect(self.upgradeItem)
         self.dlg.selectionDown.clicked.connect(self.downgradeItem)
         
     def applyItems(self):
         self.dlg.resultsInputLayer.setLayer(None)
-        # self.dlg.resultsSelection.setLayer(None)
         super().applyItems()
         tmp_path, res_path = self.model.getFinalLayers()
         res_layer = qgsUtils.loadLayer(res_path)
@@ -352,10 +287,6 @@ class FragmConnector(abstract_model.AbstractConnector):
     def setInLayerFromCombo(self,layer):
         self.dlg.fragmExpr.setLayer(layer)
         self.dlg.fragmBuffer.setLayer(layer)
-    
-    # def switchFragmFlag(self,state):
-        # utils.debug("switchFragmFlag")
-        # self.fragmFlag = not self.fragmFlag
         
     def switchFragmStatus(self,index):
         if index == 0:
@@ -366,12 +297,6 @@ class FragmConnector(abstract_model.AbstractConnector):
             self.fragmStatus = False
         else:
             utils.debug("Unexpected fragmentation status : " + str(index))
-    
-    # def setInLayer(self,path):
-        # utils.debug("setInLayer " + str(path))
-        # layer = qgsUtils.loadVectorLayer(path,loadProject=True)
-        # utils.debug("layer = " + str(layer))
-        # self.dlg.fragmInputLayerCombo.setLayer(layer)
         
     def mkItem(self):
         in_layer = self.dlg.fragmInputLayerCombo.currentLayer()

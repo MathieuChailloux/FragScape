@@ -128,8 +128,6 @@ class PrepareLanduseAlgorithm(FragScapeVectorAlgorithm):
         feedback.pushDebugInfo("input ok")
         clip_layer = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
-        # select_layer = params.mkTmpLayerPath("select.gpkg")
-        # feedback.pushDebugInfo("select_layer = " + str(select_layer))
         if clip_layer is None:
             clipped = input
         else:
@@ -137,7 +135,6 @@ class PrepareLanduseAlgorithm(FragScapeVectorAlgorithm):
             qgsTreatments.applyVectorClip(input,clip_layer,clipped_path,context,feedback)
             clipped = qgsUtils.loadVectorLayer(clipped_path)
             feedback.pushDebugInfo("clipped  = " + str(clipped))
-            #clipped = clipped_path
         selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
         qgsTreatments.selectGeomByExpression(clipped,expr,selected_path,'landuseSelection')
         # selected = qgsUtils.loadVectorLayer(selected_path)
@@ -207,26 +204,22 @@ class PrepareFragmentationAlgorithm(FragScapeVectorAlgorithm):
                 
     def processAlgorithm(self,parameters,context,feedback):
         # Parameters
-        #assert(False)
         feedback.pushDebugInfo("parameters = " + str(parameters))
         input = self.parameterAsVectorLayer(parameters,self.INPUT,context)
         if input is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
         qgsUtils.normalizeEncoding(input)
-        #input = qgsUtils.loadVectorLayer(parameters[self.INPUT])
         clip = self.parameterAsVectorLayer(parameters,self.CLIP_LAYER,context)
         clip_flag = (clip is None)
         select_expr = self.parameterAsExpression(parameters,self.SELECT_EXPR,context)
         feedback.pushDebugInfo("select_expr : " + str(select_expr))
-        #feedback.pushDebugInfo("select_expr type : " + str(type(select_expr)))
         buffer_expr = self.parameterAsExpression(parameters,self.BUFFER,context)
         name = self.parameterAsString(parameters,self.NAME,context)
         if not name:
             name = 'fragm'
-        #buffer_expr = ""
         feedback.pushDebugInfo("buffer_expr : " + str(buffer_expr))
         if buffer_expr == "" and input.geometryType() != QgsWkbTypes.PolygonGeometry:
-           feedback.reportError("Empty buffer with non-polygon layer")
+           feedback.pushDebugInfo("Empty buffer with non-polygon layer")
         output = parameters[self.OUTPUT]
         if clip is None:
             clipped = input
@@ -239,15 +232,12 @@ class PrepareFragmentationAlgorithm(FragScapeVectorAlgorithm):
         else:
             selected_path = params.mkTmpLayerPath(name + 'Selected.gpkg')
             qgsTreatments.selectGeomByExpression(clipped,select_expr,selected_path,name)
-            #selected = qgsUtils.loadVectorLayer(selected_path)
             selected = selected_path
-            #selected = qgsTreatments.extractByExpression(clipped,select_expr,'memory:',context,feedback)
         if buffer_expr == "":
             buffered = selected
         else:
             buffer_expr_prep = QgsProperty.fromExpression(buffer_expr)
             buffered = qgsTreatments.applyBufferFromExpr(selected,buffer_expr_prep,output,context,feedback)
-        #buffered = qgsTreatments.applyBufferFromExpr(selected,parameters[self.BUFFER],output,context,feedback)
         if buffered == input:
             buffered = qgsUtils.pathOfLayer(buffered)
         return {self.OUTPUT : buffered}
@@ -295,15 +285,14 @@ class ApplyFragmentationAlgorithm(FragScapeVectorAlgorithm):
                 
     def processAlgorithm(self,parameters,context,feedback):
         # Parameters
-        #feedback.pushInfo("parameters = " + str(parameters))
         landuse = self.parameterAsVectorLayer(parameters,self.LANDUSE,context)
         if landuse is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.LANDUSE))
         qgsUtils.normalizeEncoding(landuse)
         fragm_layers = self.parameterAsLayerList(parameters,self.FRAGMENTATION,context)
-        #output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
         crs = self.parameterAsCrs(parameters,self.CRS,context)
-        output = parameters[self.OUTPUT]
+        # output = parameters[self.OUTPUT]
         # Merge fragmentation layers
         fragm_path = params.mkTmpLayerPath("fragm.gpkg")
         fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,crs,fragm_path)
@@ -476,13 +465,9 @@ class MeffAlgUtils:
         
     def name(self):
         return self.ALG_NAME
- 
+
+
 class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
-    
-    # BOUNDARY = old name or REPORTING
-    # BOUNDARY = "BOUNDARY"
-    # OUTPUT_GLOBAL_MEFF = old name or OUTPUT_VAL
-    # OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
     
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -548,21 +533,6 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
     def processAlgorithm(self,parameters,context,feedback):
         feedback.pushDebugInfo("Start " + str(self.name()))
         # Parameters
-        # source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        # feedback.pushDebugInfo("source = " + str(source))
-        # if source is None:
-            # raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        # boundary = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
-        # feedback.pushDebugInfo("reporting = " + str(boundary))
-        # if boundary is None:
-            # raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
-        # crs = self.parameterAsCrs(parameters,self.CRS,context)
-        # include_cbc = self.parameterAsBool(parameters,self.INCLUDE_CBC,context)
-        # feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
-        # unit = self.parameterAsEnum(parameters,self.UNIT,context)
-        # utils.debug("unit : " + str(unit))
-        # unit_divisor = self.UNIT_DIVISOR[unit]
-        # utils.debug("unit divisor : " + str(unit_divisor))
         source, boundary = self.prepareInputs(parameters, context, feedback)
         # CRS reprojection
         source_crs = source.crs().authid()
@@ -590,47 +560,6 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
             qgsTreatments.dissolveLayer(boundary,dissolved_path,context,feedback)
             boundary = qgsUtils.loadVectorLayer(dissolved_path)
             self.report_layer = boundary
-        # Output fields
-        # report_id_field = QgsField(self.ID, QVariant.Int)
-        # mesh_size_field = QgsField(self.MESH_SIZE, QVariant.Double)
-        # nb_patches_field = QgsField(self.NB_PATCHES, QVariant.Int)
-        # report_area_field = QgsField(self.REPORT_AREA, QVariant.Double)
-        # intersecting_area_field = QgsField(self.INTERSECTING_AREA, QVariant.Double)
-        # div_field = QgsField(self.DIVI, QVariant.Double)
-        # split_index_field = QgsField(self.SPLITTING_INDEX, QVariant.Double)
-        # coherence_field = QgsField(self.COHERENCE, QVariant.Double)
-        # split_density_field = QgsField(self.SPLITTING_DENSITY, QVariant.Double)
-        # net_product_field = QgsField(self.NET_PRODUCT, QVariant.Double)
-        # if include_cbc:
-            # cbc_mesh_size_field = QgsField(self.CBC_MESH_SIZE, QVariant.Double)
-            # cbc_net_product_field = QgsField(self.CBC_NET_PRODUCT, QVariant.Double)
-        # output_fields = QgsFields()
-        # output_fields.append(report_id_field)
-        # output_fields.append(mesh_size_field)
-        # if include_cbc:
-            # output_fields.append(cbc_mesh_size_field)
-        # output_fields.append(nb_patches_field)
-        # output_fields.append(report_area_field)
-        # output_fields.append(intersecting_area_field)
-        # output_fields.append(mesh_size_field)
-        # output_fields.append(div_field)
-        # output_fields.append(split_index_field)
-        # output_fields.append(coherence_field)
-        # output_fields.append(split_density_field)
-        # output_fields.append(net_product_field)
-        # if include_cbc:
-            # output_fields.append(cbc_net_product_field)
-        # feedback.pushDebugInfo("fields =  " + str(output_fields.names()))
-        # (sink, dest_id) = self.parameterAsSink(
-            # parameters,
-            # self.OUTPUT,
-            # context,
-            # output_fields,
-            # boundary.wkbType(),
-            # crs
-        # )
-        # if sink is None:
-            # raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
         # Algorithm
         # progress step
         nb_feats = source.featureCount()
@@ -694,56 +623,8 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         
     def shortHelpString(self):
         return self.tr("Computes effective mesh size from patch layer for each feature of reporting layer.")
-
-    # def initAlgorithm(self, config=None):
-        # self.addParameter(
-            # QgsProcessingParameterFeatureSource(
-                # self.INPUT,
-                # self.tr("Input layer"),
-                # [QgsProcessing.TypeVectorPolygon]))
-        # self.addParameter(
-            # QgsProcessingParameterFeatureSource(
-                # self.REPORTING,
-                # self.tr("Reporting layer"),
-                # [QgsProcessing.TypeVectorPolygon]))
-        # self.addParameter(
-            # QgsProcessingParameterCrs(
-                # self.CRS,
-                # description=self.tr("Output CRS"),
-                # defaultValue=params.defaultCrs))
-        # self.addParameter(
-            # QgsProcessingParameterBoolean(
-                # self.INCLUDE_CBC,
-                # self.tr("Include Cross-boundary connection metrics")))
-        # self.addParameter(
-            # QgsProcessingParameterEnum(
-                # self.UNIT,
-                # description=self.tr("Report areas unit"),
-                # options=self.getUnitOptions()))
-        # self.addParameter(
-            # QgsProcessingParameterFeatureSink(
-                # self.OUTPUT,
-                # self.tr("Output layer")))
                 
     def processAlgorithm(self,parameters,context,feedback):
-        feedback.pushDebugInfo("begin")
-        # Parameters
-        # source = self.parameterAsVectorLayer(parameters,self.INPUT,context)
-        # feedback.pushDebugInfo("source = " + str(source))
-        # if source is None:
-            # raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
-        # if not qgsUtils.isMultipartLayer(source):
-            # sg_path = params.mkTmpLayerPath('singleGeom.gpkg')
-            # qgsTreatments.multiToSingleGeom(source,sg_path,context,feedback)
-            # source = qgsUtils.loadVectorLayer(sg_path)
-        # reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
-        # feedback.pushDebugInfo("reporting = " + str(reporting))
-        # if reporting is None:
-            # raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
-        # crs = self.parameterAsCrs(parameters,self.CRS,context)
-        # include_cbc = self.parameterAsBool(parameters,self.INCLUDE_CBC,context)
-        # feedback.pushDebugInfo("unit_init = " + str(parameters[self.UNIT]))
-        # unit = self.parameterAsEnum(parameters,self.UNIT,context)
         source, reporting = self.prepareInputs(parameters, context, feedback)
         output = parameters[self.OUTPUT]
         # Algorithm
@@ -752,7 +633,6 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
         if nb_feats == 0:
             raise QgsProcessingException("Empty layer")
-        progress_step = 100.0 / nb_feats
         curr_step = 0
         # gna gna
         multi_feedback = feedbacks.ProgressMultiStepFeedback(nb_feats, feedback)
@@ -762,7 +642,7 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
             report_id = report_feat.id()
             reporting.selectByIds([report_id])
             select_path = params.mkTmpLayerPath("reportingSelection" + str(report_feat.id()) + ".gpkg")
-            qgsTreatments.saveSelectedFeatures(reporting,select_path,context,feedback)
+            qgsTreatments.saveSelectedFeatures(reporting,select_path,context,multi_feedback)
             report_computed_path = params.mkTmpLayerPath("reportingComputed" + str(report_feat.id()) + ".gpkg")
             parameters = { MeffVectorGlobal.INPUT : source,
                            MeffVectorGlobal.REPORTING : select_path,

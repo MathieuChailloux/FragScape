@@ -25,20 +25,11 @@
 import csv
 
 from qgis.core import (QgsMapLayerProxyModel,
-                        QgsProcessing,
-                        QgsProcessingAlgorithm,
                         QgsProcessingException,
-                        QgsProcessingParameterFeatureSource,
-                        QgsProcessingParameterExpression,
-                        QgsProcessingParameterFeatureSink,
                         QgsFieldProxyModel)
-# from PyQt5 import QtGui, QtCore, QtWidgets
-# from PyQt5.QtCore import QCoreApplication
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
 from ..algs import FragScape_algs 
 from . import params
-
-landuseModel = None
 
         
 class LanduseFieldItem(abstract_model.DictItem):
@@ -141,7 +132,7 @@ class LanduseModel(abstract_model.DictModel):
         return self.fsModel.mkOutputFile("landuseSelectionDissolve.gpkg")
             
     def getOutputRaster(self):
-        return self.fsModel.mkOutputFile("landuseSelection.tif")
+        return self.fsModel.mkOutputFile("landuseSelectionWarp.tif")
         
     def getOutputLayer(self):
         if self.fsModel.paramsModel.modeIsVector():
@@ -229,8 +220,9 @@ class LanduseModel(abstract_model.DictModel):
             else:
                 crs, extent, resolution = self.fsModel.getRasterParams()
                 res = qgsTreatments.applyWarpReproject(selected_path,output,
-                    dst_crs=crs,resolution=resolution,
-                    context=context,feedback=feedback)
+                    resampling_mode='mode',dst_crs=crs,
+                    extent=extent,extent_crs=crs,resolution=resolution,
+                    nodata_val=255,context=context,feedback=feedback)
         qgsUtils.loadLayer(res,loadProject=True)
         feedbacks.progressFeedback.endSection()
         

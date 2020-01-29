@@ -23,19 +23,14 @@
 """
 
 import os.path
-# import pathlib
 
 from qgis.core import (QgsCoordinateReferenceSystem,
-                        QgsRectangle,
-                        QgsProject,
-                        QgsCoordinateTransform,
                         QgsProcessingUtils,
                         QgsMapLayerProxyModel)
 from qgis.gui import QgsFileWidget
-from PyQt5.QtCore import QVariant, QAbstractTableModel, QModelIndex, Qt
-from PyQt5.QtWidgets import QAbstractItemView, QFileDialog, QHeaderView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-from ..qgis_lib_mc import utils, qgsUtils, qgsTreatments, abstract_model
+from ..qgis_lib_mc import utils, abstract_model
 
 # FragScape global parameters
 
@@ -44,84 +39,20 @@ params = None
 
 # Default CRS is set to epsg:2154 (France area, metric system)
 defaultCrs = QgsCoordinateReferenceSystem("epsg:2154")
-
-# Checks that workspace is intialized and is an existing directory.
-# def checkWorkspaceInit():
-    # if not params.workspace:
-        # utils.user_error("Workspace parameter not initialized")
-    # if not os.path.isdir(params.workspace):
-        # utils.user_error("Workspace directory '" + params.workspace + "' does not exist")
-        
-# Returns relative path w.r.t. workspace directory.
-# File separator is set to common slash '/'.
-# def normalizePath(path):
-    # checkWorkspaceInit()
-    # if not path:
-        # utils.user_error("Empty path")
-    # norm_path = utils.normPath(path)
-    # if os.path.isabs(norm_path):
-        # rel_path = os.path.relpath(norm_path,params.workspace)
-    # else:
-        # rel_path = norm_path
-    # final_path = utils.normPath(rel_path)
-    # return final_path
-        
-# Returns absolute path from normalized path (cf 'normalizePath' function)
-# def getOrigPath(path):
-    # checkWorkspaceInit()
-    # if path == "":
-        # utils.user_error("Empty path")
-    # elif os.path.isabs(path):
-        # return path
-    # else:
-        # return os.path.normpath(utils.joinPath(params.workspace,path))
-    
-# Checks that all parameters are initialized
-# def checkInit():
-    # checkWorkspaceInit()
-    # if not params.territoryLayer:
-        # utils.user_error("Territory layer parameter not initialized")
-    # utils.checkFileExists(getOrigPath(params.territoryLayer),"Territory layer ")
-    # if not params.crs:
-        # utils.user_error("CRS parameter not initialized")
-    # if not params.crs.isValid():
-        # utils.user_error("Invalid CRS")
-
-# Returns normalized path from QgsMapLayerComboBox
-# def getPathFromLayerCombo(combo):
-    # layer = combo.currentLayer()
-    # layer_path = normalizePath(qgsUtils.pathOfLayer(layer))
-    # return layer_path
-        
-# def getTerritoryLayer():
-    # utils.debug("PARAMS clip flag = " + str(getDataClipFlag()))
-    # if getDataClipFlag():
-        # return getOrigPath(params.territoryLayer)
-    # else:
-        # return None
-    
-# def getDataClipFlag():
-    # return params.dataClipFlag
-
-# def mkOutputFile(name):
-    # checkWorkspaceInit()
-    # new_path = utils.joinPath(params.outputDir,name)
-    # return new_path
     
 def mkTmpLayerPath(layer_name):
     if params is None:
         utils.warn.generateTempFilename("Parameter module not initialized")
-        #assert(False)
         path = QgsProcessingUtils(layer_name)
     elif params.tmpDir is None:
         utils.warn("Output directories not initialized")
-        #assert(False)
         path = QgsProcessingUtils.generateTempFilename(layer_name)
     elif params.save_tmp:
         path = utils.joinPath(params.tmpDir,layer_name)
     else:
         path = QgsProcessingUtils.generateTempFilename(layer_name)
     return path
+        
         
 class ParamsModel(abstract_model.NormalizingParamsModel):
 
@@ -144,7 +75,7 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         self.projectFile = ""
         self.crs = defaultCrs
         self.fields = [self.WORKSPACE,self.EXTENT_LAYER,
-            self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]# def checkInit():
+            self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]
 
     # Checks that all parameters are initialized
     def checkInit(self,check_res=True):
@@ -197,200 +128,6 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         xmlStr += "/>"
         return xmlStr
         
-    
-#class ParamsModel(abstract_model.AbstractGroupModel):
-class ParamsModelOld(QAbstractTableModel):
-
-    WORKSPACE = "workspace"
-    PROJECT = "projectFile"
-    EXTENT_LAYER = "extentLayer"
-    MODE = "mode"
-    RESOLUTION = "resolution"
-    SAVE_TMP = "saveTmpFiles"
-    CRS = "crs"
-    
-    VECTOR_MODE = 0
-    RASTER_MODE = 1
-
-    def __init__(self,fsModel):
-        self.parser_name = "Params"
-        self.fsModel = fsModel
-        self.workspace = None
-        self.outputDir = None
-        self.tmpDir = None
-        #self.dataClipFlag = True
-        self.extentLayer = None
-        self.mode = self.VECTOR_MODE
-        self.resolution = 0.0
-        self.projectFile = ""
-        self.save_tmp = False
-        self.crs = defaultCrs
-        self.fields = [self.WORKSPACE,self.EXTENT_LAYER,self.MODE,
-            self.RESOLUTION,self.PROJECT,self.CRS]
-        QAbstractTableModel.__init__(self)
-        
-    def setExtentLayer(self,path):
-        path = self.normalizePath(path)
-        utils.info("Setting extent layer to " + str(path))
-        self.extentLayer = path
-        self.layoutChanged.emit()
-        
-    def setResolution(self,resolution):
-        utils.info("Setting resolution to " + str(resolution))
-        self.resolution = resolution
-        self.layoutChanged.emit()
-        
-    def setSaveTmp(self,state):
-        if state == 0:
-            self.save_tmp = False
-        elif state == 2:
-            self.save_tmp = True
-        else:
-            utils.internal_error("Unexpected state for save_tmp checkbox : " + str(state))
-        
-    def setCrs(self,crs):
-        utils.info("Setting extent CRS to " + crs.description())
-        self.crs = crs
-        self.layoutChanged.emit()
-        
-    def getCrsStr(self):
-        return self.crs.authid().lower()
-
-    def getTransformator(self,in_crs):
-        transformator = QgsCoordinateTransform(in_crs,self.crs,QgsProject.instance())
-        return transformator
-    
-    # def getBoundingBox(self,in_extent_rect,in_crs):
-        # transformator = self.getTransformator(in_crs)
-        # out_extent_rect = transformator.transformBoundingBox(in_extent_rect)
-        # return out_extent_rect
-        
-    def setWorkspace(self,path):
-        norm_path = utils.normPath(path)
-        self.workspace = norm_path
-        utils.info("Workspace directory set to '" + norm_path)
-        if not os.path.isdir(norm_path):
-            utils.user_error("Directory '" + norm_path + "' does not exist")
-        self.outputDir = utils.createSubdir(norm_path,"outputs")
-        utils.info("Outputs directory set to '" + str(norm_path))
-        self.tmpDir = utils.createSubdir(norm_path,"tmp")
-        utils.info("Temporary directory set to '" + str(self.tmpDir))
-        
-    """ Path/workspace utils """
-    # Checks that workspace is intialized and is an existing directory.
-    def checkWorkspaceInit(self):
-        if not self.workspace:
-            utils.user_error("Workspace parameter not initialized")
-        if not os.path.isdir(self.workspace):
-            utils.user_error("Workspace directory '" + self.workspace + "' does not exist")
-            
-    # Returns relative path w.r.t. workspace directory.
-    # File separator is set to common slash '/'.
-    def normalizePath(self,path):
-        self.checkWorkspaceInit()
-        if not path:
-            utils.user_error("Empty path")
-        norm_path = utils.normPath(path)
-        if os.path.isabs(norm_path):
-            rel_path = os.path.relpath(norm_path,self.workspace)
-        else:
-            rel_path = norm_path
-        final_path = utils.normPath(rel_path)
-        return final_path
-            
-    # Returns absolute path from normalized path (cf 'normalizePath' function)
-    def getOrigPath(self,path):
-        self.checkWorkspaceInit()
-        if path == "":
-            utils.user_error("Empty path")
-        elif os.path.isabs(path):
-            return path
-        else:
-            return os.path.normpath(utils.joinPath(self.workspace,path))
-    
-    def mkOutputFile(self,name):
-        self.checkWorkspaceInit()
-        new_path = utils.joinPath(self.outputDir,name)
-        return new_path
-        
-    """ MVC functions """
-    def rowCount(self,parent=QModelIndex()):
-        return len(self.fields)
-        
-    def columnCount(self,parent=QModelIndex()):
-        return 1
-              
-    def getNItem(self,n):
-        items = [self.workspace,
-                 self.projectFile,
-                 self.crs.description(),
-                 ""]
-        return items[n]
-            
-    def data(self,index,role):
-        if not index.isValid():
-            return QVariant()
-        row = index.row()
-        item = self.getNItem(row)
-        if role != Qt.DisplayRole:
-            return QVariant()
-        elif row < self.rowCount():
-            return(QVariant(item))
-        else:
-            return QVariant()
-            
-    def flags(self, index):
-        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
-        
-    def headerData(self,col,orientation,role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant("value")
-        elif orientation == Qt.Vertical and role == Qt.DisplayRole:
-            return QVariant(self.fields[col])
-        return QVariant()
-        
-    """ XML """
-    def fromXMLRoot(self,root):
-        dict = root.attrib
-        utils.debug("params dict = " + str(dict))
-        return self.fromXMLDict(dict)
-
-    def fromXMLDict(self,dict):
-        if self.CRS in dict:
-            crs = QgsCoordinateReferenceSystem(dict[self.CRS])
-            self.setCrs(crs)
-        if self.MODE in dict:
-            try:
-                self.switchMode(int(dict[self.MODE]))
-            except ValueError:
-                utils.user_error("Unexpected mode : " + str(dict[self.MODE]))
-        if self.RESOLUTION in dict:
-            try:
-                self.setResolution(float(dict[self.RESOLUTION]))
-            except ValueError:
-                utils.user_error("Unexpected resolution : " + str(dict[self.RESOLUTION]))
-        if self.WORKSPACE in dict:
-           if not self.workspace and os.path.isdir(dict[self.WORKSPACE]):
-               self.setWorkspace(dict[self.WORKSPACE])
-        # if self.TERRITORY in dict:
-            # self.setTerritoryLayer(dict[self.TERRITORY])
-        #if self.CLIP in dict:
-            # Cast with bool() not working
-            # flag = dict[self.CLIP] == "True"
-            # self.dataClipFlag = flag
-        #self.model.layoutChanged.emit()
-        
-    def toXML(self,indent=""):
-        xmlStr = indent + "<" + self.parser_name
-        if self.workspace:
-            xmlStr += " " + self.WORKSPACE + "=\"" + str(self.workspace) + "\""
-        xmlStr += " " + self.MODE + "=\"" + str(self.mode) + "\""
-        xmlStr += " " + self.RESOLUTION + "=\"" + str(self.resolution) + "\""
-        xmlStr += " " + self.CRS + "=\"" + self.getCrsStr() + "\""
-        #xmlStr += " " + self.CLIP + "=\"" + str(self.dataClipFlag) + "\""
-        xmlStr += "/>"
-        return xmlStr
-        
 
 class ParamsConnector:
 
@@ -398,7 +135,6 @@ class ParamsConnector:
         self.parser_name = "Params"
         self.dlg = dlg
         self.model = paramsModel
-        #self.model = ParamsModel()
         
     def initGui(self):
         self.dlg.paramsView.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
@@ -418,6 +154,8 @@ class ParamsConnector:
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.model.layoutChanged.emit()
         
+    # Switch between vector and raster modes.
+    # Widgets are updated (enable, filters, ...)
     def switchMode(self,mode):
         utils.debug("switchDataClipFlag " + str(mode))
         vector_widgets = self.dlg.getVectorWidgets()
@@ -445,46 +183,17 @@ class ParamsConnector:
         else:
             utils.internal_error("Unexpected mode : " + str(mode))
         self.model.setMode(mode)
-        # self.dlg.landuseConnector.switchSelectionMode(0)
         self.dlg.landuseSelectionMode.setCurrentIndex(0)
         
     def updateUI(self):
         self.dlg.workspace.setFilePath(self.model.workspace)
         self.dlg.paramsMode.setCurrentIndex(self.model.mode)
-        # checkState = 2 if self.model.dataClipFlag else 0
-        # self.dlg.dataClipFlag.setCheckState(checkState)
         self.dlg.paramsCrs.setCrs(self.model.crs)
 
     def fromXMLRoot(self,root):
         self.model.fromXMLRoot(root)
         self.updateUI()
 
-    # def fromXMLDict(self,dict):
-        # self.model.fromXMLDict(dict)
-        # checkState = 2 if self.model.dataClipFlag else 0
-        # self.dlg.dataClipFlag.setCheckState(checkState)
-        # self.model.layoutChanged.emit()
-        # if "workspace" in dict:
-            # if os.path.isdir(dict["workspace"]):
-                # self.model.setWorkspace(dict["workspace"])
-        # if "territoryLayer" in dict:
-            # self.model.setTerritoryLayer(dict["territoryLayer"])
-        # if "dataClipFlag" in dict:
-            # flag = dict["dataClipFlag"] == "True"
-            # if flag == True:
-                # self.dlg.dataClipFlag.setCheckState(2)
-            # else:
-                # self.dlg.dataClipFlag.setCheckState(0)
-        # self.model.layoutChanged.emit()
-
     def toXML(self,indent=""):
         return self.model.toXML(indent)
-        # xmlStr = indent + "<" + self.parser_name
-        # if self.model.workspace:
-            # xmlStr += " " + ParamsModel.WORKSPACE + "=\"" + str(self.model.workspace) + "\""
-        # xmlStr += " " + ParamsModel.CLIP + "=\"" + str(self.model.dataClipFlag) + "\""
-        # if self.model.territoryLayer:
-            # xmlStr += " " + ParamsModel.TERRITORY + "=\"" + str(self.model.territoryLayer) + "\""
-        # xmlStr += "/>"
-        # return xmlStr
         
