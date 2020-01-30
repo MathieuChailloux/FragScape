@@ -56,7 +56,7 @@ class FragmItem(abstract_model.DictItem):
     def equals(self,other):
         return (self.dict[self.NAME] == other.dict[self.NAME])
         
-    def getOutputLayer(self):
+    def getOutputVLayer(self):
         name = self.dict[self.NAME]
         self.outputLayer = params.mkTmpLayerPath(name + ".gpkg")
         return self.outputLayer
@@ -124,9 +124,6 @@ class FragmModel(abstract_model.DictModel):
         return self.fsModel.mkOutputFile("landuseFragm.tif")
     def getmergeLayerTmp(self):
         return QgsProcessingUtils.generateTempFilename("landuseFragm_tmp.tif")
-        
-    def getFinalLayer(self):
-        self.getFinalLayers()[1]
             
     def getFinalLayers(self):
         extentLayer = self.fsModel.paramsModel.getExtentLayer()
@@ -143,6 +140,10 @@ class FragmModel(abstract_model.DictModel):
             else:
                 tmp_path = final_path
         return (tmp_path, final_path)
+        
+    def getFinalLayer(self):
+        layers = self.getFinalLayers()
+        return layers[1]
             
     def prepareItem(self,item,context,feedback):
         self.fsModel.checkWorkspaceInit()
@@ -159,12 +160,12 @@ class FragmModel(abstract_model.DictModel):
         is_fragm = item.dict[FragmItem.FRAGM]
         burn_val = (1 if is_fragm else 0)
         vector_mode = self.fsModel.modeIsVector()
-        outPath = item.getOutputLayer()
-        feedback.pushDebugInfo("outPath = " + str(outPath))
+        outVPath = item.getOutputVLayer()
+        feedback.pushDebugInfo("outVPath = " + str(outVPath))
         outRPath = item.getOutputRLayer()
         feedback.pushDebugInfo("outRPath = " + str(outRPath))
         # Processing
-        step_feedback = feedbacks.ProgressMultiStepFeedback(2,feedback)
+        step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
         clipped = self.fsModel.paramsModel.clipByExtent(input,
             name=name,context=context,feedback=step_feedback)
         step_feedback.pushDebugInfo("clipped = " + str(clipped))
@@ -174,10 +175,11 @@ class FragmModel(abstract_model.DictModel):
                            self.PREPARE_SELECT_EXPR : select_expr,
                            self.PREPARE_BUFFER : buffer_expr,
                            self.PREPARE_NAME : name,
-                           self.PREPARE_OUTPUT : outPath }
+                           self.PREPARE_OUTPUT : outVPath }
             prepared = qgsTreatments.applyProcessingAlg(
                 "FragScape","prepareFragm",parameters,
                 context=context,feedback=step_feedback)
+            step_feedback.setCurrentStep(2)
             if vector_mode:
                 clipped_layer = qgsUtils.loadVectorLayer(clipped)
                 if not buffer_expr and clipped_layer.geometryType() != QgsWkbTypes.PolygonGeometry:
@@ -187,61 +189,69 @@ class FragmModel(abstract_model.DictModel):
                 self.fsModel.checkResolutionInit()
                 self.fsModel.checkExtentInit()
                 crs, extent, resolution = self.fsModel.getRasterParams()
-                res = qgsTreatments.applyRasterization(prepared,outRPath,
+                res = FragScape_algs.applyRasterizationFixAllTouch(prepared,outRPath,
                     extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
                     all_touch=True,context=context,feedback=step_feedback)
         elif vector_mode:
             utils.internal_error("Not implemented yet : Raster to Vector")
         else:
             self.fsModel.checkResolutionInit()
-            # normalized_path = QgsProcessingUtils.generateTempFilename(name + '_normalized.tif')
+            landuseLayer = self.fsModel.landuseModel.getOutputLayer()
+            calc_path = QgsProcessingUtils.generateTempFilename(name + '_calc.tif')
             # normalized = self.fsModel.paramsModel.normalizeRaster(input,
                 # out_path=normalized_path,context=context,feedback=feedback)
-            res = qgsTreatments.applyRasterCalc(clipped,outRPath,str(burn_val),
-                out_type=0,context=context,feedback=step_feedback)
-        step_feedback.setCurrentStep(2)
+            expr = 'A / A'
+            calc = qgsTreatments.applyRasterCalc(clipped,calc_path,expr,
+                out_type=0,nodata_val=255,context=context,feedback=step_feedback)
+            step_feedback.setCurrentStep(2)
+            crs, extent, resolution = self.fsModel.getRasterParams()
+            res = qgsTreatments.applyWarpReproject(calc_path,outRPath,
+                dst_crs=crs,extent=extent,extent_crs=crs,
+                resolution=resolution,nodata_val=255,
+                context=context,feedback=step_feedback)
+        step_feedback.setCurrentStep(3)
         return res
             
     def applyItemsWithContext(self,context,feedback,indexes=None):
         fragmMsg = "Application of fragmentation data to landuse"
         feedbacks.progressFeedback.beginSection(fragmMsg)
+        # Out layer
+        vector_mode = self.fsModel.modeIsVector()
+        res_path = self.getFinalLayer()
+        feedback.pushDebugInfo("res_path = " + str(res_path))
+        if vector_mode:
+            qgsUtils.removeVectorLayer(res_path)
+        else:
+            qgsUtils.removeRaster(res_path)
+        # Prepare
         prepared_layers = []
-        nb_items = len(self.items) + 1
-        curr_step = 1
-        step_feedback = feedbacks.ProgressMultiStepFeedback(nb_items,feedback)
+        nb_steps = len(self.items) + 1
+        curr_step = 0
+        step_feedback = feedbacks.ProgressMultiStepFeedback(nb_steps,feedback)
         for item in self.items:
-            feedback.pushDebugInfo("item = " + str(item))
+            step_feedback.pushDebugInfo("item = " + str(item))
             prepared = self.prepareItem(item,context,step_feedback)
             curr_step += 1
             step_feedback.setCurrentStep(curr_step)
             prepared_layers.append(prepared)
         step_feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
         # MERGE
-        tmp_path, res_path = self.getFinalLayers()
-        tmp_path = res_path
-        res = res_path
-        step_feedback.pushDebugInfo("res_path = " + str(res_path))
-        # qgsUtils.removeVectorLayer(res_path)
-        vector_mode = self.fsModel.modeIsVector()
         landuseLayer = self.fsModel.landuseModel.getOutputLayer()
         if vector_mode:
-            qgsUtils.removeVectorLayer(res_path)
-            # landuseLayer = self.fsModel.landuseModel.getDissolveLayer()
             crs = self.fsModel.paramsModel.crs
             parameters = { self.APPLY_LANDUSE : landuseLayer,
                            self.APPLY_FRAGMENTATION : prepared_layers,
                            self.APPLY_CRS : crs,
-                           self.APPLY_OUTPUT : tmp_path }
+                           self.APPLY_OUTPUT : res_path }
             res = qgsTreatments.applyProcessingAlg(
                 "FragScape","applyFragm",parameters,
                 context=context,feedback=step_feedback)
         else:
-            qgsUtils.removeRaster(res_path)
-            # landuseLayer = self.fsModel.landuseModel.getOutputRaster()
             prepared_layers.insert(0,landuseLayer)
-            res = qgsTreatments.applyMergeRaster(prepared_layers,tmp_path,
+            res = qgsTreatments.applyMergeRaster(prepared_layers,res_path,
                 nodata_val=255,out_type=0,nodata_input=255,
                 context=context,feedback=step_feedback)
+        step_feedback.setCurrentStep(nb_steps)
         # res = self.fsModel.paramsModel.clipByExtent(tmp_path,
             # out_path=res_path,context=context,feedback=step_feedback)
         qgsUtils.loadLayer(res,loadProject=True)
@@ -311,7 +321,7 @@ class FragmConnector(abstract_model.AbstractConnector):
         # is_fragm = self.fragmFlag
         is_fragm = self.fragmStatus
         if not name:
-            utils.user_error("Empty name")
+            utils.user_error("Empty name (no identifier specified)")
         if is_fragm is None:
             utils.user_error("No fragmentation status selected")
         dict = { FragmItem.INPUT : in_layer_path,

@@ -24,7 +24,8 @@
 
 from PyQt5.QtCore import QCoreApplication, QVariant
 from qgis.core import QgsProcessing, QgsProcessingAlgorithm, QgsProcessingException
-from qgis.core import (QgsProcessingParameterFeatureSource,
+from qgis.core import (Qgis,
+                       QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterExpression,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingProvider,
@@ -44,7 +45,7 @@ from qgis.core import (QgsProcessingParameterFeatureSource,
                        QgsProcessingMultiStepFeedback)
 from qgis.core import QgsField, QgsFields, QgsFeature, QgsFeatureSink
 
-import processing
+from processing.algs.gdal.rasterize import rasterize
 import xml.etree.ElementTree as ET
 
 from ..qgis_lib_mc import utils, qgsTreatments, qgsUtils, feedbacks
@@ -75,6 +76,71 @@ class FragScapeVectorAlgorithm(QgsProcessingAlgorithm):
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
             
+
+class RasterizeFixAllTouch(rasterize):
+
+    ALG_NAME = 'rasterizefixalltouch'
+
+    def createInstance(self):
+        return RasterizeFixAllTouch()
+        
+    def name(self):
+        return self.ALG_NAME
+        
+    def displayName(self):
+        return self.tr('Rasterize (with ALL_TOUCH fix)')
+        
+    def group(self):
+        return "Auxiliary algorithms"
+        
+    def groupId(self):
+        return 'aux'
+        
+    def shortHelpString(self):
+        return self.tr('Wrapper for gdal:rasterize algorithm allowing to use ALL_TOUCH option (every pixel touching input geometry are rasterized).')
+
+    def initAlgorithm(self, config=None):
+        super().initAlgorithm(config)
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.ALL_TOUCH,
+                description = 'ALL_TOUCH option',
+                defaultValue=False,
+                optional=True))
+    
+# Apply rasterization on field 'field' of vector layer 'in_path'.
+# Output raster layer in 'out_path'.
+# Resolution set to 25 if not given.
+# Extent can be given through 'extent_path'. If not, it is extracted from input layer.
+# Output raster layer is loaded in QGIS if 'load_flag' is True.
+def applyRasterizationFixAllTouch(in_path,out_path,extent,resolution,
+                   field=None,burn_val=None,out_type=Qgis.Float32,
+                   nodata_val=qgsTreatments.nodata_val,all_touch=False,overwrite=False,
+                   context=None,feedback=None):
+    TYPES = ['Byte', 'Int16', 'UInt16', 'UInt32', 'Int32', 'Float32',
+         'Float64', 'CInt16', 'CInt32', 'CFloat32', 'CFloat64']
+    if overwrite:
+        qgsUtils.removeRaster(out_path)
+    extra_param_name = 'EXTRA'
+    if hasattr(rasterize,extra_param_name):
+        res = qgsTreatments.applyRasterization(in_path,out_path,extent,resolution,
+                field,burn_val,out_type,nodata_val,all_touch,overwrite,
+                context,feedback)
+    else:
+        parameters = { 'ALL_TOUCH' : True,
+                   'BURN' : burn_val,
+                   'DATA_TYPE' : out_type,
+                   'EXTENT' : extent,
+                   'FIELD' : field,
+                   'HEIGHT' : resolution,
+                   'INPUT' : in_path,
+                   'NODATA' : nodata_val,
+                   'OUTPUT' : out_path,
+                   'UNITS' : 1, 
+                   'WIDTH' : resolution }
+        res = qgsTreatments.applyProcessingAlg("FragScape","rasterizefixalltouch",parameters,context,feedback)
+    return res
+
 class PrepareLanduseAlgorithm(FragScapeVectorAlgorithm):
 
     ALG_NAME = "prepareLanduse"

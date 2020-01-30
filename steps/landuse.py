@@ -26,7 +26,8 @@ import csv
 
 from qgis.core import (QgsMapLayerProxyModel,
                         QgsProcessingException,
-                        QgsFieldProxyModel)
+                        QgsFieldProxyModel,
+                        QgsVectorLayer)
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
 from ..algs import FragScape_algs 
 from . import params
@@ -188,9 +189,11 @@ class LanduseModel(abstract_model.DictModel):
         feedbacks.progressFeedback.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
+        step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
         clipped_path = self.fsModel.paramsModel.clipByExtent(self.landuseLayer,
-            name="landuse",context=context,feedback=feedback)
+            name="landuse",context=context,feedback=step_feedback)
         clipped_layer, clipped_type = qgsUtils.loadLayerGetType(clipped_path)
+        step_feedback.setCurrentStep(1)
         vector_mode = self.fsModel.paramsModel.modeIsVector()
         if vector_mode:
             output = self.getDissolveLayer()
@@ -202,19 +205,22 @@ class LanduseModel(abstract_model.DictModel):
             expr = self.getSelectionExpr()
             selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
             qgsTreatments.selectGeomByExpression(clipped_layer,expr,selected_path,'landuseSelection')
+            step_feedback.setCurrentStep(2)
             if vector_mode:
-                res = qgsTreatments.dissolveLayer(selected_path,output,context=context,feedback=feedback)
+                res = qgsTreatments.dissolveLayer(selected_path,output,
+                    context=context,feedback=step_feedback)
             else:
                 crs, extent, resolution = self.fsModel.getRasterParams()
-                res = qgsTreatments.applyRasterization(selected_path,output,
+                res = FragScape_algs.applyRasterizationFixAllTouch(selected_path,output,
                     extent=extent,resolution=resolution,
                     out_type=0,nodata_val=255,burn_val=burn_val,
-                    all_touch=True,context=context,feedback=feedback)
+                    all_touch=False,context=context,feedback=step_feedback)
         else:
             selected_path = params.mkTmpLayerPath('landuseSelection.tif')
-            formula = self.mkRasterFormula(feedback)
+            formula = self.mkRasterFormula(step_feedback)
             qgsTreatments.applyRasterCalc(clipped_layer,selected_path,formula,
-                nodata_val=255,out_type=0,context=context,feedback=feedback)
+                nodata_val=255,out_type=0,context=context,feedback=step_feedback)
+            step_feedback.setCurrentStep(2)
             if vector_mode:
                 raise QgsProcessingException("Raster mode with vector input not yet implemented")
             else:
@@ -222,7 +228,8 @@ class LanduseModel(abstract_model.DictModel):
                 res = qgsTreatments.applyWarpReproject(selected_path,output,
                     resampling_mode='mode',dst_crs=crs,
                     extent=extent,extent_crs=crs,resolution=resolution,
-                    nodata_val=255,context=context,feedback=feedback)
+                    nodata_val=255,context=context,feedback=step_feedback)
+        step_feedback.setCurrentStep(3)
         qgsUtils.loadLayer(res,loadProject=True)
         feedbacks.progressFeedback.endSection()
         
@@ -305,7 +312,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
     def connectComponents(self):
         super().connectComponents()
         self.dlg.landuseInputLayerCombo.layerChanged.connect(self.setLayer)
-        #self.dlg.landuseInputLayer.fileChanged.connect(self.loadLayer)
+        # self.dlg.landuseInputLayer.fileChanged.connect(self.loadLayer)
         self.layerComboDlg = qgsUtils.LayerComboDialog(self.dlg,
                                                        self.dlg.landuseInputLayerCombo,
                                                        self.dlg.landuseInputLayer)
@@ -324,13 +331,31 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseSelectExpr.setLayer(layer)
         
     def setLayer(self,layer):
-        utils.debug("setLayer")
+        utils.debug("setLayer " + str(layer))
+        layer_is_vector = isinstance(layer,QgsVectorLayer)
         if layer:
             layer_path = qgsUtils.pathOfLayer(layer)
             self.model.changeLayer(layer_path)
+            vector_widgets = self.getVectorWidgets()
+            utils.debug("nb widgets " + str(len(vector_widgets)))
+            for w in vector_widgets:
+                utils.debug("setting " + str(layer_is_vector))
+                w.setEnabled(layer_is_vector)
+            if layer_is_vector:
+                self.dlg.landuseSelectField.setLayer(layer)
+                self.dlg.landuseDescrField.setLayer(layer)
+                self.setLayerUI(layer)
+            else:
+                self.setLayerUI(None)
         else:
+            utils.debug("Noooone")
             self.model.changeLayer(None)
-        self.setLayerUI(layer)
+            self.setLayerUI(layer)
+    def getVectorWidgets(self):
+        widgets = [self.dlg.landuseSelectionMode,
+            self.dlg.landuseSelectField,
+            self.dlg.landuseDescrField]
+        return widgets
         
     def loadVectorFields(self):
         curr_layer = self.model.landuseLayer
@@ -366,7 +391,8 @@ class LanduseConnector(abstract_model.AbstractConnector):
         curr_layer = self.model.landuseLayer
         if not curr_layer:
             utils.user_error("No layer selected in landuse tab")
-        if self.model.fsModel.modeIsVector():
+        loaded_layer, layer_type = qgsUtils.loadLayerGetType(curr_layer)
+        if layer_type == 'Vector':
             new_items = self.loadVectorFields()
         else:
             new_items = self.loadRasterFields()

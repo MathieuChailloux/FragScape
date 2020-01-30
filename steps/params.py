@@ -25,6 +25,7 @@
 import os.path
 
 from qgis.core import (QgsCoordinateReferenceSystem,
+                        QgsUnitTypes,
                         QgsProcessingUtils,
                         QgsMapLayerProxyModel)
 from qgis.gui import QgsFileWidget
@@ -92,6 +93,16 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         self.tmpDir = utils.createSubdir(norm_path,"tmp")
         utils.info("Temporary directory set to '" + str(self.tmpDir))
         
+    def setCrs(self,crs):
+        excluded_units = [ QgsUnitTypes.DistanceDegrees,
+            QgsUnitTypes.DistanceUnknownUnit ]
+        if crs:
+            unit = crs.mapUnits()
+            if unit in excluded_units:
+                utils.user_error("Unexpected projection system "
+                    + str(crs) + ", please chose a metric system")
+        super().setCrs(crs)
+        
     def setSaveTmp(self,state):
         if state == 0:
             self.save_tmp = False
@@ -157,11 +168,13 @@ class ParamsConnector:
     # Switch between vector and raster modes.
     # Widgets are updated (enable, filters, ...)
     def switchMode(self,mode):
-        utils.debug("switchDataClipFlag " + str(mode))
+        utils.debug("switchMode " + str(mode))
         vector_widgets = self.dlg.getVectorWidgets()
         raster_widgets = self.dlg.getRasterWidgets()
         layer_combos = [ self.dlg.resultsInputLayer]
-        layer_combo_dlg = [self.dlg.landuseConnector.layerComboDlg ]
+        layer_combo_dlg = [self.dlg.landuseConnector.layerComboDlg,
+            self.dlg.fragmConnector.layerComboDlg ]
+        # layer_combo_dlg = [ ]
         if mode == self.model.VECTOR_MODE:
             for w in vector_widgets:
                 w.setEnabled(True)
@@ -179,11 +192,11 @@ class ParamsConnector:
             for lc in layer_combos:
                 lc.setFilters(QgsMapLayerProxyModel.RasterLayer)
             for lcd in layer_combo_dlg:
-                lcd.setRasterMode()
+                lcd.setBothMode()
         else:
             utils.internal_error("Unexpected mode : " + str(mode))
-        self.model.setMode(mode)
         self.dlg.landuseSelectionMode.setCurrentIndex(0)
+        self.model.setMode(mode)
         
     def updateUI(self):
         self.dlg.workspace.setFilePath(self.model.workspace)

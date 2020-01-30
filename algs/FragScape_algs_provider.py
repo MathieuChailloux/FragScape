@@ -27,7 +27,8 @@ import os
 from PyQt5.QtGui import QIcon
 from qgis.core import QgsApplication, QgsProcessingProvider
 
-from .FragScape_algs import (PrepareLanduseAlgorithm,
+from .FragScape_algs import (RasterizeFixAllTouch,
+                             PrepareLanduseAlgorithm,
                              PrepareFragmentationAlgorithm,
                              ApplyFragmentationAlgorithm,
                              MeffVectorGlobal,
@@ -37,7 +38,8 @@ from .FragScape_raster_algs import MeffRaster, MeffRasterReport, MeffRasterCBC
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
-        self.alglist = [PrepareLanduseAlgorithm(),
+        self.alglist = [RasterizeFixAllTouch(),
+                        PrepareLanduseAlgorithm(),
                         PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
                         MeffVectorGlobal(),

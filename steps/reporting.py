@@ -91,12 +91,13 @@ class ReportingModel(abstract_model.DictModel):
         reportingMsg = "Reporting layer computation"
         feedback.pushDebugInfo("unit = " + str(self.unit))
         feedbacks.progressFeedback.beginSection(reportingMsg)
+        step_feedback = feedbacks.ProgressMultiStepFeedback(2,feedback)
         input_layer = self.getInputLayer()
         selected = input_layer
         crs = self.fsModel.paramsModel.crs
         results_path = self.getOutLayer()
-        feedback.pushDebugInfo("CBC mode = " + str(self.includeCBC))
-        feedback.pushDebugInfo("results_path = " + str(results_path))
+        step_feedback.pushDebugInfo("CBC mode = " + str(self.includeCBC))
+        step_feedback.pushDebugInfo("results_path = " + str(results_path))
         global_results_path = self.fsModel.mkOutputFile("reportingResultsGlobal.gpkg")
         qgsUtils.removeVectorLayer(results_path)
         qgsUtils.removeVectorLayer(global_results_path)
@@ -107,18 +108,21 @@ class ReportingModel(abstract_model.DictModel):
                            MeffReportV.INCLUDE_CBC : self.includeCBC,
                            MeffReportV.UNIT : self.unit,
                            MeffReportV.OUTPUT : results_path }
+            feedbacks.progressFeedback.setSubText("Report per feature")
             res1 = qgsTreatments.applyProcessingAlg('FragScape',
                 MeffReportV.ALG_NAME,parameters1,
-                context=context,feedback=feedback,onlyOutput=False)
+                context=context,feedback=step_feedback,onlyOutput=False)
+            step_feedback.setCurrentStep(1)
             parameters2 = { MeffGlobalV.INPUT : selected,
                            MeffGlobalV.REPORTING : self.reporting_layer,
                            MeffGlobalV.CRS : crs,
                            MeffGlobalV.INCLUDE_CBC : self.includeCBC,
                            MeffGlobalV.UNIT : self.unit,
                            MeffGlobalV.OUTPUT : global_results_path }
+            feedbacks.progressFeedback.setSubText("Report global")
             res2 = qgsTreatments.applyProcessingAlg('FragScape',
                 MeffGlobalV.ALG_NAME,parameters2,
-                context=context,feedback=feedback,onlyOutput=False)
+                context=context,feedback=step_feedback,onlyOutput=False)
             res_layer = res1[MeffReportV.OUTPUT]
             res_val = res2[MeffReportV.OUTPUT_VAL]
         else:
@@ -136,31 +140,38 @@ class ReportingModel(abstract_model.DictModel):
                 # qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
                 parameters[MeffAlgUtils.OUTPUT] = results_path
                 parameters[MeffAlgUtils.REPORTING] = self.reporting_layer
+                feedbacks.progressFeedback.setSubText("Report CBC")
+                step_feedback.setCurrentStep(1)
                 res = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRCBC.ALG_NAME,parameters,
-                    context=context,feedback=feedback,onlyOutput=False)
+                    context=context,feedback=step_feedback,onlyOutput=False)
                 res_layer = res[MeffAlgUtils.OUTPUT]
                 res_val = res[MeffAlgUtils.OUTPUT_VAL]
             elif self.reporting_layer:
                 parameters[MeffAlgUtils.OUTPUT] = results_path
+                feedbacks.progressFeedback.setSubText("Report per feature")
                 res1 = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRasterReport.ALG_NAME,parameters,
-                    context=context,feedback=feedback,onlyOutput=False)
+                    context=context,feedback=step_feedback,onlyOutput=False)
+                step_feedback.setCurrentStep(1)
                 res_layer = res1[MeffAlgUtils.OUTPUT]
                 dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
-                qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
+                qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,step_feedback)
                 parameters[MeffAlgUtils.REPORTING] = dissolved_path
                 parameters[MeffAlgUtils.OUTPUT] = global_results_path
+                feedbacks.progressFeedback.setSubText("Report global")
                 res2 = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffR.ALG_NAME,parameters,
-                    context=context,feedback=feedback,onlyOutput=False)
+                    context=context,feedback=step_feedback,onlyOutput=False)
                 res_val = res2[MeffAlgUtils.OUTPUT_VAL]
             else:
+                feedbacks.progressFeedback.setSubText("Report global")
                 res = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffR.ALG_NAME,parameters,
-                    context=context,feedback=feedback,onlyOutput=False)
+                    context=context,feedback=step_feedback,onlyOutput=False)
                 res_layer = res[MeffAlgUtils.OUTPUT]
                 res_val = res[MeffAlgUtils.OUTPUT_VAL]
+        step_feedback.setCurrentStep(2)
         feedbacks.progressFeedback.endSection()
         return (res_layer,res_val)
                 
