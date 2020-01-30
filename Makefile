@@ -4,7 +4,18 @@ ARCHIVE_NAME=FragScape.zip
 TO_COPY_DIRS=algs help i18n icons sample_data steps
 MC_LIB_DIR=qgis_lib_mc
 
+COMPILED_RESOURCE_FILES = resources.py
+
+RESOURCE_SRC=$(shell grep '^ *<file' resources.qrc | sed 's@</file>@@g;s/.*>//g' | tr '\n' ' ')
+
 .PHONY: archive
+
+default: compile
+
+compile: $(COMPILED_RESOURCE_FILES)
+
+%.py : %.qrc $(RESOURCES_SRC)
+	pyrcc5 -o $*.py  $<
 
 archive:
 	echo "Building delivery archive $(ARCHIVE_DIR)"

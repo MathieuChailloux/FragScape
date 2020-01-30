@@ -77,6 +77,7 @@ class FragScape:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'FragScape')
         self.toolbar.setObjectName(u'FragScape')
+        self.provider = None
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -213,7 +214,8 @@ class FragScape:
             # self.dlgRast.initializeGlobals()
         # remove the toolbar
         del self.toolbar
-        QgsApplication.processingRegistry().removeProvider(self.provider)
+        if self.provider:
+            QgsApplication.processingRegistry().removeProvider(self.provider)
 
     def runVectorDialog(self):
         self.runDialogGeneric(self.dlgVect)
