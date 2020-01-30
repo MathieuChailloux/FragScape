@@ -28,3 +28,7 @@ archive:
 	cp metadata.txt $(ARCHIVE_DIR)
 	cp resources.qrc $(ARCHIVE_DIR)
 	zip -r $(ARCHIVE_NAME) $(ARCHIVE_DIR)
+
+ui:
+	pyuic5 -o FragScape_dialog_base.py FragScape_dialog_base.ui
+	pyuic5 -o FragScapeAbout_dialog_base.py FragScapeAbout_dialog_base.ui
