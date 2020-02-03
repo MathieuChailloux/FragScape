@@ -484,14 +484,14 @@ class MeffAlgUtils:
         res_feat[self.INTERSECTING_AREA] = sum_ai
         res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
         res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai if sum_ai > 0 else 0
-        res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS)
+        res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS) if report_area > 0 else 0
         res_feat[self.SPLITTING_INDEX] = report_area_sq / sum_ai_sq if sum_ai_sq > 0 else 0
         res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
         # CBC Metrics
         if self.SUM_AI_SQ_CBC in res_dict:
             sum_ai_sq_cbc = float(res_dict[self.SUM_AI_SQ_CBC]) / (divisor * divisor)
             res_feat[self.CBC_NET_PRODUCT] = round(sum_ai_sq_cbc,NB_DIGITS)
-            res_feat[self.CBC_MESH_SIZE] = round(sum_ai_sq_cbc / report_area,NB_DIGITS)
+            res_feat[self.CBC_MESH_SIZE] = round(sum_ai_sq_cbc / report_area,NB_DIGITS) if report_area > 0 else 0
             
         
     def mkResSink(self,parameters,res_feat,context,include_cbc=False):
@@ -523,7 +523,10 @@ class MeffAlgUtils:
             res_val = res_feat[self.CBC_MESH_SIZE] if include_cbc else res_feat[self.MESH_SIZE]
         else:
             res_layer = None
-            res_val = round(res_dict[self.SUM_AI_SQ] / res_dict[self.REPORT_AREA], self.NB_DIGITS)
+            if res_dict[self.REPORT_AREA] > 0:
+                res_val = round(res_dict[self.SUM_AI_SQ] / res_dict[self.REPORT_AREA], self.NB_DIGITS)
+            else:
+                res_val = 0
         return (res_layer, res_val)
     
     def tr(self, string):

@@ -301,31 +301,40 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         super().initAlgorithm(config=config,report_opt=False)
         
     def computeFeature(self,parameters,context,feedback):
+        step_feedback = feedbacks.ProgressMultiStepFeedback(6,feedback)
         clipped_path = QgsProcessingUtils.generateTempFilename("labeled_clipped.tif")
         clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
             clipped_path,crop_cutline=False,nodata=self.nodata,data_type=self.label_out_type,
-            context=context,feedback=feedback)
-        clip_report = qgsTreatments.getRasterUniqueValsReport(clipped,context,feedback)
-        feedback.pushDebugInfo("clip_report = " + str(clip_report))
+            context=context,feedback=step_feedback)
+        step_feedback.setCurrentStep(1)
+        clip_report = qgsTreatments.getRasterUniqueValsReport(clipped,context,step_feedback)
+        step_feedback.pushDebugInfo("clip_report = " + str(clip_report))
+        step_feedback.setCurrentStep(2)
         input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped_clipped.tif")
         input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
             input_clipped_path,crop_cutline=False,data_type=0,
-            context=context,feedback=feedback)
-        input_clip_report = qgsTreatments.getRasterUniqueValsReport(input_clipped_path,context,feedback)
-        feedback.pushDebugInfo("input_clip_report = " + str(input_clip_report))
+            context=context,feedback=step_feedback)
+        step_feedback.setCurrentStep(3)
+        input_clip_report = qgsTreatments.getRasterUniqueValsReport(
+            input_clipped_path,context,step_feedback)
+        step_feedback.pushDebugInfo("input_clip_report = " + str(input_clip_report))
         clip_classes, clip_array = qgsUtils.getRasterValsAndArray(str(clipped_path))
         clip_labels = [int(cl) for cl in clip_classes]
+        step_feedback.setCurrentStep(4)
         if 0 in clip_labels:
             clip_labels.remove(0)
         nb_patches_clipped = len(clip_labels)
         # feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
         # feedback.pushDebugInfo("nb labels = " + str(len(labels)))
-        feedback.pushDebugInfo("nb clip labels = " + str(len(clip_labels)))
+        step_feedback.pushDebugInfo("nb clip labels = " + str(len(clip_labels)))
         
         # Patches length
-        patches_len2 = scipy.ndimage.labeled_comprehension(clip_array,clip_array,clip_labels,len,int,0)
-        feedback.pushDebugInfo("patches_len2 = " + str(patches_len2))
-        feedback.pushDebugInfo("nb patches_len2 = " + str(len(patches_len2)))
+        if clip_labels:
+            patches_len2 = scipy.ndimage.labeled_comprehension(
+                clip_array,clip_array,clip_labels,len,int,0)
+            step_feedback.pushDebugInfo("patches_len2 = " + str(patches_len2))
+            step_feedback.pushDebugInfo("nb patches_len2 = " + str(len(patches_len2)))
+        step_feedback.setCurrentStep(5)
         
         sum_ai = 0
         sum_ai_sq = 0
@@ -339,12 +348,12 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             sum_ai_sq += ai * ai
             sum_ai_sq_cbc += ai * ai_cbc
             sum_ai += ai
-        feedback.pushDebugInfo("sum_ai = " + str(sum_ai))
-        feedback.pushDebugInfo("sum_ai_sq = " + str(sum_ai_sq))
-        feedback.pushDebugInfo("sum_ai_sq_cbc = " + str(sum_ai_sq_cbc))
-        feedback.pushDebugInfo("unit_divisor = " + str(self.unit_divisor))
+        step_feedback.pushDebugInfo("sum_ai = " + str(sum_ai))
+        step_feedback.pushDebugInfo("sum_ai_sq = " + str(sum_ai_sq))
+        step_feedback.pushDebugInfo("sum_ai_sq_cbc = " + str(sum_ai_sq_cbc))
+        step_feedback.pushDebugInfo("unit_divisor = " + str(self.unit_divisor))
         if sum_ai_sq == 0:
-            feedback.reportError("Empty area for patches, please check your selection.")
+            step_feedback.reportError("Empty area for patches, please check your selection.")
         
         nb_pix_old = len(clip_array[clip_array != self.nodata])
         nb_pix2 = input_clip_report['TOTAL_PIXEL_COUNT']
@@ -352,17 +361,17 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         nb_pix = nb_pix2 - nb_pix_nodata2
         nb_0 = len(clip_array[clip_array == 0])
         nb_not_0 = len(clip_array[clip_array != 0])
-        feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
-        feedback.pushDebugInfo("nb_pix_old = " + str(nb_pix_old))
-        feedback.pushDebugInfo("nb_pix2 = " + str(nb_pix2))
-        feedback.pushDebugInfo("nb_pix_nodata2 = " + str(nb_pix_nodata2))
-        feedback.pushDebugInfo("nb_0 = " + str(nb_0))
-        feedback.pushDebugInfo("nb_not_0 = " + str(nb_not_0))
+        step_feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
+        step_feedback.pushDebugInfo("nb_pix_old = " + str(nb_pix_old))
+        step_feedback.pushDebugInfo("nb_pix2 = " + str(nb_pix2))
+        step_feedback.pushDebugInfo("nb_pix_nodata2 = " + str(nb_pix_nodata2))
+        step_feedback.pushDebugInfo("nb_0 = " + str(nb_0))
+        step_feedback.pushDebugInfo("nb_not_0 = " + str(nb_not_0))
         tot_area = nb_pix * self.pix_area
-        feedback.pushDebugInfo("tot_area = " + str(tot_area))
+        step_feedback.pushDebugInfo("tot_area = " + str(tot_area))
         #area_sq = math.pow(nb_pix,2)
         if nb_pix == 0:
-            feedback.reportError("Unexpected error : empty area for input layer")
+            step_feedback.reportError("Unexpected error : empty area for input layer")
         res_dict = { self.REPORT_AREA : tot_area,
             self.SUM_AI : sum_ai,
             self.SUM_AI_SQ : sum_ai_sq,
@@ -371,6 +380,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             self.DIVISOR : self.unit_divisor,
         }
         res = self.mkOutputs(parameters,res_dict,context)
+        step_feedback.setCurrentStep(6)
         return res
         
         

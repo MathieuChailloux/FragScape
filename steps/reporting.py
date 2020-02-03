@@ -27,7 +27,7 @@ import os.path
 from qgis.core import QgsMapLayerProxyModel
 from qgis.gui import QgsFileWidget
 
-from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
+from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments, styles
 from ..algs import FragScape_algs_provider
 from ..algs.FragScape_algs import (
     MeffAlgUtils,
@@ -91,7 +91,9 @@ class ReportingModel(abstract_model.DictModel):
         reportingMsg = "Reporting layer computation"
         feedback.pushDebugInfo("unit = " + str(self.unit))
         feedbacks.progressFeedback.beginSection(reportingMsg)
-        step_feedback = feedbacks.ProgressMultiStepFeedback(2,feedback)
+        vector_mode = self.fsModel.modeIsVector()
+        nb_steps = 2 if vector_mode or self.reporting_layer else 1
+        step_feedback = feedbacks.ProgressMultiStepFeedback(nb_steps,feedback)
         input_layer = self.getInputLayer()
         selected = input_layer
         crs = self.fsModel.paramsModel.crs
@@ -141,7 +143,6 @@ class ReportingModel(abstract_model.DictModel):
                 parameters[MeffAlgUtils.OUTPUT] = results_path
                 parameters[MeffAlgUtils.REPORTING] = self.reporting_layer
                 feedbacks.progressFeedback.setSubText("Report CBC")
-                step_feedback.setCurrentStep(1)
                 res = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRCBC.ALG_NAME,parameters,
                     context=context,feedback=step_feedback,onlyOutput=False)
@@ -171,7 +172,7 @@ class ReportingModel(abstract_model.DictModel):
                     context=context,feedback=step_feedback,onlyOutput=False)
                 res_layer = res[MeffAlgUtils.OUTPUT]
                 res_val = res[MeffAlgUtils.OUTPUT_VAL]
-        step_feedback.setCurrentStep(2)
+        step_feedback.setCurrentStep(nb_steps)
         feedbacks.progressFeedback.endSection()
         return (res_layer,res_val)
                 
@@ -242,7 +243,14 @@ class ReportingConnector:
         # UI update
         self.dlg.resultsGlobalRes.setText(str(res_val))
         if res_layer:
-            self.loaded_layer = qgsUtils.loadLayer(res_layer,loadProject=True)
+            self.loaded_layer = qgsUtils.loadVectorLayer(res_layer,loadProject=True)
+            if self.model.reporting_layer:
+                if self.model.includeCBC:
+                    fieldname = MeffAlgUtils.CBC_MESH_SIZE
+                else:
+                    fieldname = MeffAlgUtils.MESH_SIZE
+                styles.setGreenGraduatedStyle(self.loaded_layer,fieldname)
+            
         
     # def unloadResults(self):
         # self.dlg.resultsGlobalRes.setText(str(0))
