@@ -249,7 +249,7 @@ class ReportingConnector:
                     fieldname = MeffAlgUtils.CBC_MESH_SIZE
                 else:
                     fieldname = MeffAlgUtils.MESH_SIZE
-                styles.setGreenGraduatedStyle(self.loaded_layer,fieldname)
+                styles.setRdYlGnGraduatedStyle(self.loaded_layer,fieldname)
             
         
     # def unloadResults(self):

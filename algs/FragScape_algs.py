@@ -154,7 +154,7 @@ class PrepareLanduseAlgorithm(FragScapeVectorAlgorithm):
         return PrepareLanduseAlgorithm()
         
     def displayName(self):
-        return self.tr("1 - Prepare land cover data")
+        return self.tr("Prepare land cover data")
         
     def shortHelpString(self):
         return self.tr("This algorithms prepares land cover data by applying selection (from expression) and dissolving geometries")
@@ -229,10 +229,10 @@ class PrepareFragmentationAlgorithm(FragScapeVectorAlgorithm):
         return PrepareFragmentationAlgorithm()
         
     def displayName(self):
-        return self.tr("2.1 - Prepare fragmentation data")
+        return self.tr("Prepare vector data")
         
     def shortHelpString(self):
-        return self.tr("This algorithm prepares a fragmentation layer by applying clip, selection and buffer")
+        return self.tr("This algorithm prepares a vector layer by applying clip, selection and buffer")
 
     def initAlgorithm(self, config=None):
         self.addParameter(
@@ -323,7 +323,7 @@ class ApplyFragmentationAlgorithm(FragScapeVectorAlgorithm):
         return ApplyFragmentationAlgorithm()
         
     def displayName(self):
-        return self.tr("2.2 - Apply fragmentation")
+        return self.tr("Integrates vector data to land cover")
         
     def shortHelpString(self):
         return self.tr("This algorithm builds a layer of patches from a land cover layer and fragmentation layers. Overlaying geometries are removed and remaining ones are cast to single geometry type.")
