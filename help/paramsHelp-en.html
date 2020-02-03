@@ -12,9 +12,13 @@
 </p><p>
 <b>Parameters</b>
 <br/>
- Workspace must be set to produce FragScape output layers. This directory is used to build relative paths.
+ <i>Workspace</i> must be set to produce FragScape output layers. This directory is used to build relative paths.
 <br/>
- If option is checked, intermediate layers are stored in <i>Workspacee/tmp</i> directory.
+ <i>Mode</i> defines data destination format. Depending on land cover data, either Vector (more precise if input data is already vector) either Raster (faster but limited by available RAM) must be chosen. See documentation for benchmark.
+<br/>
+ <i>Resolution</i> defines pixel size in georeferenced unit (meter). Available and mandatory only in Raster mode.
+<br/>
+ <i>Extent layer</i> can be specified so that every input data is clipped to such extent. Can be vector or raster layer.
 <br/>
  <span style=" font-size:8pt;color:red;font-weight:600"><i>Projection</i> must be a metric projected coordinate system</span>. It defines shape are area of features so that it must be choosed according to geographic extent and project specific criterias (for instance : does shape matter ?).
 </p><p>
