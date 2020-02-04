@@ -24,7 +24,7 @@
 
 import os.path
 
-from qgis.core import QgsMapLayerProxyModel
+from qgis.core import QgsMapLayerProxyModel, QgsProcessingException
 from qgis.gui import QgsFileWidget
 
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments, styles
@@ -140,6 +140,8 @@ class ReportingModel(abstract_model.DictModel):
             if self.includeCBC:
                 # dissolved_path = params.mkTmpLayerPath('reporting_dissolved.gpkg')
                 # qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,feedback)
+                if not self.reporting_layer:
+                    raise QgsProcessingException("Reporting layer needed in CBC mode")
                 parameters[MeffAlgUtils.OUTPUT] = results_path
                 parameters[MeffAlgUtils.REPORTING] = self.reporting_layer
                 feedbacks.progressFeedback.setSubText("Report CBC")

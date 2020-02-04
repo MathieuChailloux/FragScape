@@ -473,6 +473,7 @@ class MeffAlgUtils:
         report_area_sq = report_area * report_area
         sum_ai = float(res_dict[self.SUM_AI])  / divisor
         sum_ai_sq = float(res_dict[self.SUM_AI_SQ]) / (divisor * divisor)
+        utils.debug("divisor = " + str(divisor))
         utils.debug("sum_ai = " + str(sum_ai))
         utils.debug("sum_ai_sq = " + str(sum_ai_sq))
         utils.debug("report_area = " + str(report_area))
@@ -520,13 +521,17 @@ class MeffAlgUtils:
             self.fillResFeat(res_feat,res_dict)
             dest_id = self.mkResSink(parameters,res_feat,context,include_cbc)
             res_layer = dest_id
-            res_val = res_feat[self.CBC_MESH_SIZE] if include_cbc else res_feat[self.MESH_SIZE]
+            if include_cbc:
+                res_val = res_feat[self.CBC_MESH_SIZE] / res_dict[self.DIVISOR]
+            else:
+                res_val = res_feat[self.MESH_SIZE] / res_dict[self.DIVISOR]
         else:
             res_layer = None
             if res_dict[self.REPORT_AREA] > 0:
-                res_val = round(res_dict[self.SUM_AI_SQ] / res_dict[self.REPORT_AREA], self.NB_DIGITS)
+                res_val = (res_dict[self.SUM_AI_SQ] / res_dict[self.REPORT_AREA]) / res_dict[self.DIVISOR]
             else:
                 res_val = 0
+        res_val = round(res_val, self.NB_DIGITS)
         return (res_layer, res_val)
     
     def tr(self, string):

@@ -166,8 +166,9 @@ class FragmModel(abstract_model.DictModel):
         feedback.pushDebugInfo("outRPath = " + str(outRPath))
         # Processing
         step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
-        clipped = self.fsModel.paramsModel.clipByExtent(input,
-            name=name,context=context,feedback=step_feedback)
+        # clipped = self.fsModel.paramsModel.clipByExtent(input,
+            # name=name,clip_raster=False,context=context,feedback=feedback)
+        clipped = input
         step_feedback.pushDebugInfo("clipped = " + str(clipped))
         step_feedback.setCurrentStep(1)
         if input_vector:
@@ -189,6 +190,7 @@ class FragmModel(abstract_model.DictModel):
                 self.fsModel.checkResolutionInit()
                 self.fsModel.checkExtentInit()
                 crs, extent, resolution = self.fsModel.getRasterParams()
+                burn_val = 0 if is_fragm else 1
                 res = FragScape_algs.applyRasterizationFixAllTouch(prepared,outRPath,
                     extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
                     all_touch=True,context=context,feedback=step_feedback)
