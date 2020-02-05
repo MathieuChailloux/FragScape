@@ -3,29 +3,31 @@
     <style type="text/css">p, li { white-space: pre-wrap;}</style>
   </head>
   <body style=" font-family:'MS Shell Dlg 2';font-size:8.25pt;font-weight:400;font-style:normal;">
-    <p><span style=" font-size:14pt;font-weight:600;">Fragmentation</span></p>
+    <p><span style=" font-size:14pt;font-weight:600;">Additional data</span></p>
     <br />
     <p style= " font-size:8pt;">
 <b>Description</b>
 <br/>
- This step aims to integrate fragmentation features to step2 output layer.
-<br/>
- For each feature type, selection parameters must be set then saved by clicking button <i>Save selection</i>. Saved parameters are displayed as a new line in visualisation table.
+ This step allow user to integrate additional data to selected land cover classes.
 </p><p>
 <b>Parameters</b>
 <br/>
- Input layer can contain point, line or surface features. Input layer can be clipped as in step2.
+ <i>Input layer</i> can be vector or raster.
 <br/>
- <i>Expression</i>: selection expression applied to input features. If expression is empty, all features are selected.
+ If input layer is vector, user can specify a selection <i>Expression</i> (matching features are selected) and a <i>Buffer</i> (applied to selected features to modelize physical footprint). If expression is empty, all features are selected.
 <br/>
- <i>Buffer</i>: buffer expression to modelize physical footprint. Mandatory for punctual and linear data.
+ Choose a unique <i>Identifier</i> for current selection.
 <br/>
- <i>Identifier</i>: unique identifier of current selection
+ Set <i>Fragmentation status</i> according to data nature (roads are fragmentation data, green infrastructures are not).
+<br/>
+ Press <i>Save selection</i> to save current parameters (selections are then processed all at once) and rank resulting selection (new line in table) according to its priority.
  </p><p>
 <b>Results</b>
 <br/>
+ Press <i>Integrate additional data</i> to process data selection and integration.
+<br/>
  Each selection is processed (clip, selection, buffer) and resulting layer (with identifier name) is stored in temporary directory.
 <br/>
- These layers are then merged, difference with step2 result is performed and cast to single geometry. Result layer is stored in <i>Workspace/outputs/landuseFragmSingleGeom.gpkg</i> file.
+ Selections are ranked (higher priority selection will erase lower priority selection) with interface arrows and merged with landuse layer (step 2 output). Resulting layer is loaded in QGIS.
     </p>
   </body>

@@ -12,16 +12,17 @@
 </p><p>
 <b>Parameters</b>
 <br/>
- Input layer is automatically updated when step 3 is performed.
+ <i>Input layer</i> is automatically updated when step 3 is performed and can be specified by user.
 <br/>
- Input features can be <i>filtered</i>, for instance by specifying a minimal area.
+ <i>Reporting layer</i> contains territory units for which fragmentation metrics are computed (e.g. metrics are computed for each feature of reporting layer).
+ <i>Cross-Boundary Connection (CBC)</i> is an update of effective mesh size to mitigate "border effect" (natural patches clipped at administrative borders of the territory). See Jaeger article for further details.
 <br/>
- <i>Reporting layer</i> contains territory units for which fragmentation metrics are computed (e.g. metrics are computed for each feature of reporting layer). <i>CUT</i> method clips any input feature according to reporting feature extent. <i>CBC</i> method weights such intersected area by initial area of the input feature. To apply CBC method, input features that intersect reporting units must not be clipped (nor intersect input layer boundaries).
+ Specify <i>Unit of area</i> for results metrics (by default results are rounded to 5 digits precision).
 </p><p>
 <b>Results</b>
 <br/>
- Territory global effective mesh size is displayed in user interface (step 4).
+ Territory global effective mesh size is displayed in user interface.
 <br/>
- Output layer contains fragmentation metrics for each reporting unit.
+ Output layer with fragmentation metrics for each reporting unit is loaded in QGIS with an automatic graduated style according to effective mesh size value (from red for fragmented territories to green for less fragmented territories).
     </p>
   </body>

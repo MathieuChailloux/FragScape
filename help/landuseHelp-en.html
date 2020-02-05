@@ -8,20 +8,24 @@
     <p style= " font-size:8pt;">
 <b>Description</b>
 <br/>
- This step aims to select target features from land cover layer (such as natural areas).
+ In this step, user must select natural and semi-natural environments from input land cover layer classes.
 </p><p>
 <b>Parameters</b>
 <br/>
- Land cover layer must cover the whole study area but it might be necessary to use a larger extent when using CBC method (see step 4) to mitigate "boundary problem".
+ <i>Input layer</i> contains land cover data, in vector or raster format. It must cover the whole study area, and data is clipped according to extent layer (specified in parameters tab).
 <br/>
- Input data can be clipped to decrease processing execution time.
+ <i>Selection mode</i> <i>By field values</i> automatically extracts land cover classes from specified <i>Selection field</i>. User can specify class <i>Description field</i> if existing in input layer.
 <br/>
- Selection mode <i>By field values</i> automatically extracts land cover classes from specified field. Classes to select must be checked. Description field contains land cover classes description and is optional.
+ Press <i>Show field values</i> to display selected field values in visualisation table. In this table, user must check classes matching natural and semi-natural environments. Unchecked classes are considered as fragmentation data.
 <br/>
- If selection criteria is more complex (depending on several field for instance), <i>By expression</i> mode must be used and corresponding expression specified.
+ If selection criteria is more complex (depending on several fields for instance), <i>By expression</i> mode must be used and corresponding expression specified.
 </p><p>
 <b>Results</b>
 <br/>
- Launch selection by clicking corresponding button. Features are selected and then dissolved <span style=" font-size:8pt;color:red;font-weight:600">(dissolve process can be very slow for huge territories)</span>. Result layer is loaded in QGIS and stored in <i>Workspace/outputs/landuseSelectionDissolve.gpkg</i> file.
+ Press <i>Launch selection</i> to select and agregate selected classes.
+<br/>
+ In vector mode, features are selected and then dissolved <span style=" font-size:8pt;font-weight:600">(dissolve process can be very slow for huge territories)</span>. In raster mode, layer is reclassified and warped according to parameters.
+<br/>
+ Result layer is loaded in QGIS.
     </p>
   </body>

@@ -12,18 +12,18 @@
 </p><p>
 <b>Param&egrave;tres</b>
 <br/>
- La <i>couche d'entr&eacute;e</i> est automatiquement mise &egrave; jour et correspond au r&eacute;sultat de l'&eacute;tape 3.
+ La <i>couche d'entr&eacute;e</i> est automatiquement mise &agrave; jour apr&egrave;s le lancement de l'&eacute;tape 3 mais peut &ecirc;tre sp&eacute;cifi&eacute;e par l'utilisateur.
 <br/>
- Il est possible de <i>filtrer</i> les polygones de cette couche d'entr&eacute;e, par exemple pour &eacute;liminer les petits polygones non significatifs, en renseignant l'expression correspondante.
+ La <i>couche de rapportage</i> correspond &agrave; la couche de d&eacute;coupage en unit&eacute;s territoriales (r&eacute;gion foresti&egrave;re, d&eacute;partement, ...). Les indicateurs de fragmentation seront calcul&eacute;s pour chaque unit&eacute; (il est possible de n'avoir qu'une seule entit&eacute; correspondant &egrave; l'ensemble du territoire).
 <br/>
- La <i>couche de rapportage</i> correspond &egrave; la couche de d&eacute;coupage en unit&eacute;s territoriales (r&eacute;gion foresti&egrave;re, d&eacute;partement, ...). Les indicateurs de fragmentation seront calcul&eacute;s pour chaque unit&eacute; (il est possible de n'avoir qu'une seule entit&eacute; correspondant &egrave; l'ensemble du territoire).
+ Les m&eacute;triques <i>Cross-Boundary Connection</i> permettent de compenser l'&laquo;effet fronti&egrave;re&raquo; (d&eacute;coupage des patchs naturels aux limites administratives). Pour aller plus loin, lire l'article de Jaeger.
 <br/>
- La <i>m&eacute;thode de d&eacute;coupage</i> d&eacute;termine la mani&egrave;re de g&eacute;rer les polygones intersectant la bordure de la couche de rapportage. La m&eacute;thode <i>CUT</i> d&eacute;coupe ces polygones en ne consid&eacute;rant que l'intersection avec la couche de rapportage. La m&eacute;thode <i>CBC</i> pond&egrave;re cette intersection par l'aire du polygone initial. Pour appliquer la m&eacute;thode <i>CBC</i> de fa&ccedil;on pertinente, il faut alors que les donn&eacute;es d'entr&eacute;e du plugin couvre une emprise plus large que celle de la couche de rapportage.
+ Choisir une <i>Unit&eacute; de surface</i> pour les m&eacute;triques calcul&eacute;es (par d&eacute;faut les r&eacute;sultats sont arrondis &agrave; 5 chiffres apr&egrave;s la virgule).
 </p><p>
 <b>R&eacute;sultat</b>
 <br/>
-La taille effective de maille de l'ensemble du territoire est affich&eacute;e dans l'interface graphique.
+ La taille effective de maille de l'ensemble du territoire est affich&eacute;e dans l'interface graphique.
 <br/>
-La <i>couche de sortie</i> contient diff&eacute;rents indicateurs de fragmentation li&eacute;s entre eux, dont la taille effective de maille, pour chaque unit&eacute; territoriale.
+ La <i>Couche de sortie</i> avec les indicateurs de fragmentation pour chaque unit&eacute; territoriale est charg&eacute;e dans QGIS avec un style automatique en fonction de la valeur de la taille effective de maille (du rouge pour les territoires les plus fragment&eacute;s au vert pour les moins fragment&eacute;s).
     </p>
   </body>
