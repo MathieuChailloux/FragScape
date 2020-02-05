@@ -31,7 +31,7 @@ from qgis.core import (QgsCoordinateReferenceSystem,
 from qgis.gui import QgsFileWidget
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
-from ..qgis_lib_mc import utils, abstract_model
+from ..qgis_lib_mc import utils, qgsUtils, abstract_model
 
 # FragScape global parameters
 

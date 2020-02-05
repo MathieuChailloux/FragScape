@@ -614,23 +614,24 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         feedback.pushDebugInfo("source_crs = " + str(source_crs))
         feedback.pushDebugInfo("boundary_crs = " + str(boundary_crs))
         feedback.pushDebugInfo("crs = " + str(self.crs.authid()))
+        source_name = boundary.sourceName()
         if source_crs != self.crs.authid():
-            source_path = params.mkTmpLayerPath('res_source_reproject.gpkg')
+            source_path = params.mkTmpLayerPath(source_name + "_source_reproject.gpkg")
             qgsTreatments.applyReprojectLayer(source,self.crs,source_path,context,feedback)
             source = qgsUtils.loadVectorLayer(source_path)
         if boundary_crs != self.crs.authid():
-            boundary_path = params.mkTmpLayerPath('res_boundary_reproject.gpkg')
+            boundary_path = params.mkTmpLayerPath(source_name + "_boundary_reproject.gpkg")
             qgsTreatments.applyReprojectLayer(boundary,self.crs,boundary_path,context,feedback)
             boundary = qgsUtils.loadVectorLayer(boundary_path)
         # Clip by boundary
-        intersected_path = params.mkTmpLayerPath('res_source_intersected.gpkg')
+        intersected_path = params.mkTmpLayerPath(source_name + "_source_intersected.gpkg")
         qgsTreatments.selectIntersection(source,boundary,context,feedback)
         qgsTreatments.saveSelectedFeatures(source,intersected_path,context,feedback)
         selected_path = intersected_path
         source = qgsUtils.loadVectorLayer(selected_path)
         # Dissolve
         if boundary.featureCount() > 1:
-            dissolved_path = params.mkTmpLayerPath('res_boundary_dissolved.gpkg')
+            dissolved_path = params.mkTmpLayerPath(source_name + "_boundary_dissolved.gpkg")
             qgsTreatments.dissolveLayer(boundary,dissolved_path,context,feedback)
             boundary = qgsUtils.loadVectorLayer(dissolved_path)
             self.report_layer = boundary
