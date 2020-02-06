@@ -1992,6 +1992,31 @@
                   <enum>QFrame::Raised</enum>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_8">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_5">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Input layer</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="1">
                    <widget class="QgsMapLayerComboBox" name="resultsInputLayer">
                     <property name="enabled">
@@ -2026,6 +2051,31 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_12">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>16</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <weight>50</weight>
+                      <bold>false</bold>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>Reporting layer</string>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="1">
                    <widget class="QgsFileWidget" name="resultsReportingLayer">
                     <property name="minimumSize">
@@ -2042,42 +2092,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="4" column="1">
-                   <widget class="QgsFileWidget" name="resultsOutLayer">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>21</height>
-                     </size>
-                    </property>
-                    <property name="accessibleName">
-                     <string/>
-                    </property>
-                    <property name="accessibleDescription">
-                     <string/>
-                    </property>
-                    <property name="dialogTitle">
-                     <string/>
-                    </property>
-                    <property name="defaultRoot">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_11">
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_13">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -2086,19 +2102,25 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>80</width>
+                      <width>120</width>
                       <height>16</height>
                      </size>
                     </property>
                     <property name="font">
                      <font>
                       <weight>50</weight>
-                      <italic>true</italic>
                       <bold>false</bold>
                      </font>
                     </property>
                     <property name="text">
-                     <string>Output layer [opt.]</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Include CBC metrics &lt;img src=&quot;:/plugins/FragScape/icons/question.svg&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QCheckBox" name="resultsCBC">
+                    <property name="text">
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -2124,56 +2146,6 @@
                     </property>
                     <property name="text">
                      <string>Unit of area</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_5">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>16</height>
-                     </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <weight>50</weight>
-                      <bold>false</bold>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Input layer</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_13">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>120</width>
-                      <height>16</height>
-                     </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <weight>50</weight>
-                      <bold>false</bold>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Include CBC metrics</string>
                     </property>
                    </widget>
                   </item>
@@ -2213,8 +2185,8 @@
                     </item>
                    </widget>
                   </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="selectionLayerLabel_12">
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="selectionLayerLabel_11">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -2223,24 +2195,52 @@
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>120</width>
+                      <width>80</width>
                       <height>16</height>
                      </size>
                     </property>
                     <property name="font">
                      <font>
                       <weight>50</weight>
+                      <italic>true</italic>
                       <bold>false</bold>
                      </font>
                     </property>
                     <property name="text">
-                     <string>Reporting layer</string>
+                     <string>Output layer [opt.]</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QCheckBox" name="resultsCBC">
-                    <property name="text">
+                  <item row="4" column="1">
+                   <widget class="QgsFileWidget" name="resultsOutLayer">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>21</height>
+                     </size>
+                    </property>
+                    <property name="accessibleName">
+                     <string/>
+                    </property>
+                    <property name="accessibleDescription">
+                     <string/>
+                    </property>
+                    <property name="dialogTitle">
+                     <string/>
+                    </property>
+                    <property name="defaultRoot">
                      <string/>
                     </property>
                    </widget>

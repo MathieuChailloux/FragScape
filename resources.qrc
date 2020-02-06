@@ -28,5 +28,6 @@
         <file>icons/logoTetis.png</file>
         <file>icons/logoAgroParisTech.png</file>
         <file>icons/iconHelpConsole.svg</file>
+        <file>icons/question.svg</file>
     </qresource>
 </RCC>
