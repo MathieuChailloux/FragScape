@@ -82,8 +82,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>696</width>
-            <height>711</height>
+            <width>679</width>
+            <height>713</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -281,6 +281,9 @@
                <width>16777215</width>
                <height>16777215</height>
               </size>
+             </property>
+             <property name="toolTipDuration">
+              <number>0</number>
              </property>
              <property name="currentIndex">
               <number>0</number>
@@ -2112,8 +2115,14 @@
                       <bold>false</bold>
                      </font>
                     </property>
+                    <property name="toolTip">
+                     <string>Cross-Boundary Connection (CBC) is a method to mitigate border effect (data clip at administrative borders)</string>
+                    </property>
+                    <property name="toolTipDuration">
+                     <number>0</number>
+                    </property>
                     <property name="text">
-                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Include CBC metrics &lt;img src=&quot;:/plugins/FragScape/icons/question.svg&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Include CBC metrics &lt;img src=&quot;:/plugins/FragScape/icons/search.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                    </widget>
                   </item>
