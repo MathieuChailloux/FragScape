@@ -28,7 +28,7 @@ version-file:
 	echo "\nqgis_lib_mc commit number "  >> $(COMMIT_FILE)
 	echo $(LIB_COMMIT) >> $(COMMIT_FILE)
 
-archive:
+archive: version-file
 	echo "Building delivery archive $(ARCHIVE_DIR)"
 	rm -rf $(ARCHIVE_DIR)
 	rm -f $(ARCHIVE_NAME)
@@ -49,6 +49,10 @@ archive:
 	cp LICENSE $(ARCHIVE_DIR)
 	cp metadata.txt $(ARCHIVE_DIR)
 	cp resources.qrc $(ARCHIVE_DIR)
+	echo "FragScape commit number "  > $(COMMIT_FILE)
+	echo $(FRAGSCAPE_COMMIT) >> $(COMMIT_FILE)
+	echo "\nqgis_lib_mc commit number "  >> $(COMMIT_FILE)
+	echo $(LIB_COMMIT) >> $(COMMIT_FILE)
 	zip -r $(ARCHIVE_NAME) $(ARCHIVE_DIR)
 
 ui:
