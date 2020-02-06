@@ -1,4 +1,5 @@
 
+PLUGINNAME=FragScape
 ARCHIVE_DIR=FragScape
 ARCHIVE_NAME=FragScape.zip
 TO_COPY_DIRS=algs help i18n icons sample_data steps
@@ -8,6 +9,10 @@ COMPILED_RESOURCE_FILES = resources.py
 
 RESOURCE_SRC=$(shell grep '^ *<file' resources.qrc | sed 's@</file>@@g;s/.*>//g' | tr '\n' ' ')
 
+FRAGSCAPE_COMMIT = $(shell git rev-parse HEAD)
+LIB_COMMIT = $(shell cd qgis_lib_mc; git rev-parse HEAD; cd ..)
+COMMIT_FILE = $(PLUGINNAME)/git-versions.txt
+
 .PHONY: archive
 
 default: compile
@@ -16,6 +21,12 @@ compile: $(COMPILED_RESOURCE_FILES)
 
 %.py : %.qrc $(RESOURCES_SRC)
 	pyrcc5 -o $*.py  $<
+
+version-file:
+	echo "FragScape commit number "  > $(COMMIT_FILE)
+	echo $(BIODISPERSAL_COMMIT) >> $(COMMIT_FILE)
+	echo "\nqgis_lib_mc commit number "  >> $(COMMIT_FILE)
+	echo $(LIB_COMMIT) >> $(COMMIT_FILE)
 
 archive:
 	echo "Building delivery archive $(ARCHIVE_DIR)"
