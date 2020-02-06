@@ -30,5 +30,6 @@
         <file>icons/iconHelpConsole.svg</file>
         <file>icons/question.svg</file>
         <file>icons/search.png</file>
+        <file>icons/search.svg</file>
     </qresource>
 </RCC>

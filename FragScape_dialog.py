@@ -56,8 +56,8 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'FragScape_dialog_base.ui'))
 
 
-# class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
-class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
+class FragScapeDialog(QtWidgets.QDialog, Ui_FragScapeDialogBase):
+# class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def __init__(self, parent=None):
         """Constructor."""
