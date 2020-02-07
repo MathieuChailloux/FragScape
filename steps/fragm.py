@@ -239,6 +239,9 @@ class FragmModel(abstract_model.DictModel):
         step_feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
         # MERGE
         landuseLayer = self.fsModel.landuseModel.getOutputLayer()
+        if not utils.fileExists(landuseLayer):
+            utils.user_error(self.tr("File " + str(landuseLayer)
+                + " does not exist, please launch step 2 before"))
         if vector_mode:
             crs = self.fsModel.paramsModel.crs
             parameters = { self.APPLY_LANDUSE : landuseLayer,

@@ -75,8 +75,18 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         self.resolution = 0.0
         self.projectFile = ""
         self.crs = defaultCrs
-        self.fields = [self.WORKSPACE,self.EXTENT_LAYER,
+        fields = [self.WORKSPACE,self.EXTENT_LAYER,
             self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]
+        super().__init__(fields)
+        
+    def getNItem(self,n):
+        items = [self.workspace,
+                 self.extentLayer,
+                 self.resolution,
+                 self.projectFile,
+                 self.crs.description(),
+                 self.mode]
+        return items[n]
 
     # Checks that all parameters are initialized
     def checkInit(self,check_res=True):
@@ -206,7 +216,4 @@ class ParamsConnector:
     def fromXMLRoot(self,root):
         self.model.fromXMLRoot(root)
         self.updateUI()
-
-    def toXML(self,indent=""):
-        return self.model.toXML(indent)
         
