@@ -110,7 +110,8 @@ class FragmModel(abstract_model.DictModel):
             return FragmItem(new_dict)
         else:
             if FragmItem.FRAGM in dict:
-                dict[FragmItem.FRAGM]  = bool(dict[FragmItem.FRAGM])
+                dict[FragmItem.FRAGM]  = dict[FragmItem.FRAGM] == "True"
+                utils.info("HEHO " + str(dict[FragmItem.FRAGM]))
             else:
                 dict[FragmItem.FRAGM]  = True
             return FragmItem(dict)
@@ -166,9 +167,9 @@ class FragmModel(abstract_model.DictModel):
         feedback.pushDebugInfo("outRPath = " + str(outRPath))
         # Processing
         step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
-        # clipped = self.fsModel.paramsModel.clipByExtent(input,
-            # name=name,clip_raster=False,context=context,feedback=feedback)
-        clipped = input
+        clipped = self.fsModel.paramsModel.clipByExtent(input,
+            name=name,clip_raster=False,context=context,feedback=feedback)
+        # clipped = input
         step_feedback.pushDebugInfo("clipped = " + str(clipped))
         step_feedback.setCurrentStep(1)
         if input_vector:
@@ -227,15 +228,20 @@ class FragmModel(abstract_model.DictModel):
             qgsUtils.removeRaster(res_path)
         # Prepare
         prepared_layers = []
-        nb_steps = len(self.items) + 1
+        nb_items = len(self.items)
+        nb_steps = nb_items + 1
+        if vector_mode:
+            nb_steps = nb_steps * 2
         curr_step = 0
         step_feedback = feedbacks.ProgressMultiStepFeedback(nb_steps,feedback)
-        for item in self.items:
+        reversed_items = [i for i in reversed(self.items)]
+        for item in reversed_items:
             step_feedback.pushDebugInfo("item = " + str(item))
             prepared = self.prepareItem(item,context,step_feedback)
             curr_step += 1
             step_feedback.setCurrentStep(curr_step)
             prepared_layers.append(prepared)
+            item_fragm = item.dict[FragmItem.FRAGM]
         step_feedback.pushDebugInfo("prepared_layers = " + str(prepared_layers))
         # MERGE
         landuseLayer = self.fsModel.landuseModel.getOutputLayer()
@@ -244,13 +250,39 @@ class FragmModel(abstract_model.DictModel):
                 + " does not exist, please launch step 2 before"))
         if vector_mode:
             crs = self.fsModel.paramsModel.crs
-            parameters = { self.APPLY_LANDUSE : landuseLayer,
-                           self.APPLY_FRAGMENTATION : prepared_layers,
-                           self.APPLY_CRS : crs,
-                           self.APPLY_OUTPUT : res_path }
-            res = qgsTreatments.applyProcessingAlg(
-                "FragScape","applyFragm",parameters,
+            curr_layer = landuseLayer
+            for cpt, prepared_layer in enumerate(prepared_layers):
+                item = reversed_items[cpt]
+                item_fragm = item.dict[FragmItem.FRAGM]
+                item_name = item.dict[FragmItem.NAME]
+                step_feedback.pushDebugInfo("item name = " + str(item_name))
+                tmp_path = params.mkTmpLayerPath("fragm_" + item_name + ".gpkg")
+                if item_fragm:
+                    curr_layer = qgsTreatments.applyDifference(
+                        curr_layer,prepared_layer,tmp_path,
+                        context=context,feedback=step_feedback)
+                else:
+                    curr_layer = qgsTreatments.mergeVectorLayers(
+                        [curr_layer,prepared_layer],crs,tmp_path,
+                        context=context,feedback=step_feedback)
+                curr_step += 1
+                step_feedback.setCurrentStep(curr_step)
+            # clipped = self.fsModel.paramsModel.clipByExtent(curr_layer,
+                # name='fragm',clip_raster=False,context=context,feedback=feedback)
+            # res = clipped
+            dissolved_path = params.mkTmpLayerPath("fragm_dissolved.gpkg")
+            dissolved = qgsTreatments.dissolveLayer(curr_layer,dissolved_path,
                 context=context,feedback=step_feedback)
+            res = qgsTreatments.multiToSingleGeom(dissolved,res_path,
+                context=context,feedback=step_feedback)
+                
+            # parameters = { self.APPLY_LANDUSE : landuseLayer,
+                           # self.APPLY_FRAGMENTATION : prepared_layers,
+                           # self.APPLY_CRS : crs,
+                           # self.APPLY_OUTPUT : res_path }
+            # res = qgsTreatments.applyProcessingAlg(
+                # "FragScape","applyFragm",parameters,
+                # context=context,feedback=step_feedback)
         else:
             prepared_layers.insert(0,landuseLayer)
             res = qgsTreatments.applyMergeRaster(prepared_layers,res_path,
