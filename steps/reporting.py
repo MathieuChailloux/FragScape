@@ -104,6 +104,8 @@ class ReportingModel(abstract_model.DictModel):
         qgsUtils.removeVectorLayer(results_path)
         qgsUtils.removeVectorLayer(global_results_path)
         if self.fsModel.modeIsVector():
+            if not self.reporting_layer:
+                utils.user_error("No reporting layer")
             parameters1 = { MeffReportV.INPUT : selected,
                            MeffReportV.REPORTING : self.reporting_layer,
                            MeffReportV.CRS : crs,
