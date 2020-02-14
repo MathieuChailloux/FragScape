@@ -138,12 +138,12 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         # Clip input
         if report_layer:
             input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped.tif")
-            # clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
-                # input_clipped_path,crop_cutline=True,nodata=nodata,
-                # data_type=0,context=context, feedback=feedback)
-            clipped = qgsTreatments.clipRasterAllTouched(inputFilename,report_layer,
-                input_crs,out_path=input_clipped_path,nodata=nodata,
-                data_type=0,resolution=x_res,context=context, feedback=feedback)
+            clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
+                input_clipped_path,crop_cutline=True,nodata=nodata,
+                data_type=0,context=context, feedback=feedback)
+            # clipped = qgsTreatments.clipRasterAllTouched(inputFilename,report_layer,
+                # input_crs,out_path=input_clipped_path,nodata=nodata,
+                # data_type=0,resolution=x_res,context=context, feedback=feedback)
         else:
             clipped = inputFilename   
         self.nodata = nodata
@@ -316,26 +316,26 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         step_feedback = feedbacks.ProgressMultiStepFeedback(6,feedback)
         clipped_path = QgsProcessingUtils.generateTempFilename(
             "labeled_clipped" + suffix + ".tif")
-        # clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
-            # clipped_path,crop_cutline=True,nodata=self.nodata,data_type=self.label_out_type,
-            # context=context,feedback=step_feedback)
-        clipped = qgsTreatments.clipRasterAllTouched(self.labeled_path,self.report_layer,
-            self.input_crs,out_path=clipped_path,nodata=self.nodata,
-            data_type=self.label_out_type,resolution=self.resolution,
+        clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
+            clipped_path,crop_cutline=True,nodata=self.nodata,data_type=self.label_out_type,
             context=context,feedback=step_feedback)
+        # clipped = qgsTreatments.clipRasterAllTouched(self.labeled_path,self.report_layer,
+            # self.input_crs,out_path=clipped_path,nodata=self.nodata,
+            # data_type=self.label_out_type,resolution=self.resolution,
+            # context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(1)
         clip_report = qgsTreatments.getRasterUniqueValsReport(clipped,context,step_feedback)
         step_feedback.pushDebugInfo("clip_report = " + str(clip_report))
         step_feedback.setCurrentStep(2)
         input_clipped_path = QgsProcessingUtils.generateTempFilename(
             "input_clipped_clipped" + suffix + ".tif")
-        # input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
-            # input_clipped_path,crop_cutline=True,data_type=0,
-            # context=context,feedback=step_feedback)
-        input_clipped = qgsTreatments.clipRasterAllTouched(self.input_clipped,self.report_layer,
-            self.input_crs,out_path=input_clipped_path,nodata=self.nodata,
-            data_type=0,resolution=self.resolution,
+        input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
+            input_clipped_path,crop_cutline=True,data_type=0,
             context=context,feedback=step_feedback)
+        # input_clipped = qgsTreatments.clipRasterAllTouched(self.input_clipped,self.report_layer,
+            # self.input_crs,out_path=input_clipped_path,nodata=self.nodata,
+            # data_type=0,resolution=self.resolution,
+            # context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(3)
         input_clip_report = qgsTreatments.getRasterUniqueValsReport(
             input_clipped_path,context,step_feedback)
@@ -363,8 +363,11 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         sum_ai_sq_cbc = 0
         for cpt, lbl in enumerate(clip_labels):
             lbl_val = int(lbl)
-            cbc_len = self.patches_len[cpt]
+            cbc_len = self.patches_len[lbl_val - 1]
             patch_len = patches_len2[cpt]
+            if cbc_len < patch_len:
+                utils.internal_error("CBC len " + str(cbc_len)
+                    + " < patch_len " + str(patch_len))
             ai = patch_len * self.pix_area
             ai_cbc = cbc_len * self.pix_area
             sum_ai_sq += ai * ai
