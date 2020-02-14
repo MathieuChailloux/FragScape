@@ -1,5 +1,6 @@
 
 import os
+from pathlib import Path
 import sys
 import math
 
@@ -15,9 +16,10 @@ FS_CBC_ALG_bname = 'meffRasterCBC'
 FS_ALG = FS_NAME + ":" + FS_ALG_bname
 FS_CBC_ALG = FS_NAME + ":" + FS_CBC_ALG_bname
 
-script_path ='D:/Projets/Meff/Tests/Random/random_unit_tests.py'
-print("script_path = " + str(script_path))
-script_dir = os.path.dirname(script_path)
+#script_path ='D:/Projets/Meff/Tests/Random/random_unit_tests.py'
+#print("script_path = " + str(script_path))
+#script_dir = os.path.dirname(script_path)
+script_dir = 'C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/FragScape/tests/Random'
 
 rb_bname = "randomBase.tif"
 rb0_bname = "randomBaseND0.tif"
@@ -96,6 +98,7 @@ def launchTest(alg_name,parameters,expected_res,test_name="NA"):
         res = processing.run(alg_name,parameters,feedback=feedback)['OUTPUT_VAL']
     except Exception as e:
         debug(str(e))
+        raise e
         res = None
     # TODO : fix * 100
     nb_tests_total += 1
@@ -123,30 +126,30 @@ def launchFSCBCAlg(fname,cls,expected_res,test_name="NA"):
 launchFSAlg(rb_fname,0,2900/25,"rbC0")
 launchFSAlg(rb_fname,1,10000/25,"rbC1")
 launchFSAlg(rb_fname,2,1800/25,"rbC2")
-launchFSCBCAlg(rb_fname,0,2100/18,"rbC0CBC")
-launchFSCBCAlg(rb_fname,1,8000/18,"rbC1CBC")
-launchFSCBCAlg(rb_fname,2,1300/18,"rbC2CBC")
+launchFSCBCAlg(rb_fname,0,2400/20,"rbC0CBC")
+launchFSCBCAlg(rb_fname,1,8000/20,"rbC1CBC")
+launchFSCBCAlg(rb_fname,2,1700/20,"rbC2CBC")
 
-launchFSAlg(rb0_fname,0,None,"rb0C0")
+launchFSAlg(rb0_fname,0,0,"rb0C0")
 launchFSAlg(rb0_fname,1,10000/16,"rb0C1")
 launchFSAlg(rb0_fname,2,1800/16,"rb0C2")
-launchFSCBCAlg(rb0_fname,0,None,"rb0C0CBC")
-launchFSCBCAlg(rb0_fname,1,8000/12,"rb0C1CBC")
-launchFSCBCAlg(rb0_fname,2,1300/12,"rb0C2CBC")
+launchFSCBCAlg(rb0_fname,0,0,"rb0C0CBC")
+launchFSCBCAlg(rb0_fname,1,8000/13,"rb0C1CBC")
+launchFSCBCAlg(rb0_fname,2,1700/13,"rb0C2CBC")
 
 launchFSAlg(rb1_fname,0,2900/15,"rb1C0")
-launchFSAlg(rb1_fname,1,None,"rb1C1")
+launchFSAlg(rb1_fname,1,0,"rb1C1")
 launchFSAlg(rb1_fname,2,1800/15,"rb1C2")
-launchFSCBCAlg(rb1_fname,0,2100/10,"rb1C0CBC")
-launchFSCBCAlg(rb1_fname,1,None,"rb1C1CBC")
-launchFSCBCAlg(rb1_fname,2,1300/10,"rb1C2CBC")
+launchFSCBCAlg(rb1_fname,0,2400/12,"rb1C0CBC")
+launchFSCBCAlg(rb1_fname,1,0,"rb1C1CBC")
+launchFSCBCAlg(rb1_fname,2,1700/12,"rb1C2CBC")
 
 launchFSAlg(rb2_fname,0,2900/19,"rb2C0")
 launchFSAlg(rb2_fname,1,10000/19,"rb2C1")
-launchFSAlg(rb2_fname,2,None,"rb2C2")
-launchFSCBCAlg(rb2_fname,0,2100/14,"rb2C0CBC")
-launchFSCBCAlg(rb2_fname,1,8000/14,"rb2C1CBC")
-launchFSCBCAlg(rb2_fname,2,None,"rb2C2CBC")
+launchFSAlg(rb2_fname,2,0,"rb2C2")
+launchFSCBCAlg(rb2_fname,0,2400/15,"rb2C0CBC")
+launchFSCBCAlg(rb2_fname,1,8000/15,"rb2C1CBC")
+launchFSCBCAlg(rb2_fname,2,0,"rb2C2CBC")
 
 print ("Nb tests OK = " + str(nb_tests_ok) + " / " + str(nb_tests_total))
 print ("Tests KO : ")

@@ -66,7 +66,7 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
     def icon(self):
         icon_path = os.path.join(os.path.dirname(__file__), "..", "icons", "vector_grid.png")
         #icon_path = ':/plugins/FragScape/icons/vector_grid.svg'
-        print("icon_path = " + str(icon_path))
+        # print("icon_path = " + str(icon_path))
         return QIcon(icon_path)
         
     def loadAlgorithms(self):

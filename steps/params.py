@@ -29,6 +29,7 @@ from qgis.core import (QgsCoordinateReferenceSystem,
                         QgsProcessingUtils,
                         QgsMapLayerProxyModel)
 from qgis.gui import QgsFileWidget
+from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 
 from ..qgis_lib_mc import utils, qgsUtils, abstract_model
@@ -174,6 +175,21 @@ class ParamsConnector:
         header = self.dlg.paramsView.horizontalHeader()     
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.model.layoutChanged.emit()
+        
+    def tr(self, message):
+        return QCoreApplication.translate('BioDispersal', message)
+        
+    def refreshProjectName(self):
+        fname = self.model.projectFile
+        basename = os.path.basename(fname)
+        if basename:
+            self.dlg.projectName.setText(self.tr("Projet BioDispersal : ") + basename)
+        else:
+            self.dlg.projectName.setText(self.tr("Pas de projet BioDispersal"))
+            
+    def setProjectFile(self,fname):
+        self.model.projectFile = fname
+        self.refreshProjectName()
         
     # Switch between vector and raster modes.
     # Widgets are updated (enable, filters, ...)

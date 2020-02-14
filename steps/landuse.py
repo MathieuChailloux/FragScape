@@ -305,7 +305,11 @@ class LanduseModel(abstract_model.DictModel):
     # Loads field values from CSV file 'fname' into model.
     def fromCSVUpdate(self,fname):
         with open(fname,"r") as f:
-            reader = csv.DictReader(f,fieldnames=self.fields,delimiter=';')
+            try:
+                reader = csv.DictReader(f,fieldnames=self.fields,delimiter=';')
+            except UnicodeDecodeError as e:
+                utils.user_error("Encoding error : " + str(e)
+                    + ", try to save file as UTF-8")
             first_line = next(reader)
             for row in reader:
                 item = self.mkItemFromDict(row)

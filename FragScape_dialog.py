@@ -216,7 +216,7 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     def saveModelAs(self,fname):
         self.recomputeParsers()
         xmlStr = self.fsModel.toXML()
-        self.fsModel.paramsModel.projectFile = fname
+        self.paramsConnector.setProjectFile(fname)
         utils.writeFile(fname,xmlStr)
         utils.info("FragScape model saved into file '" + fname + "'")
         
@@ -236,7 +236,7 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         utils.debug("loadModel " + str(fname))
         utils.checkFileExists(fname)
         config_parsing.setConfigParsers(self.parsers)
-        self.fsModel.paramsModel.projectFile = fname
+        self.paramsConnector.setProjectFile(fname)
         config_parsing.parseConfig(fname)
         utils.info("FragScape model loaded from file '" + fname + "'")
         

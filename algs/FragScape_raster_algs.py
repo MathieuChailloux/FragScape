@@ -46,7 +46,7 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSource)      
 
-from ..qgis_lib_mc import qgsUtils, qgsTreatments, feedbacks
+from ..qgis_lib_mc import utils, qgsUtils, qgsTreatments, feedbacks
 from ..steps import params
 from .FragScape_algs import MeffAlgUtils
 
@@ -122,6 +122,7 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         # output = parameters[self.OUTPUT]
         # Input properties
         input_dpr = input.dataProvider()
+        input_crs = input_dpr.crs()
         nodata = input_dpr.sourceNoDataValue(1)
         inputFilename = input.source()
         x_res = input.rasterUnitsPerPixelX() # Extract The X-Value
@@ -137,38 +138,49 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         # Clip input
         if report_layer:
             input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped.tif")
-            clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
-                input_clipped_path,crop_cutline=False,nodata=nodata,
-                data_type=0,context=context, feedback=feedback)
+            # clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
+                # input_clipped_path,crop_cutline=True,nodata=nodata,
+                # data_type=0,context=context, feedback=feedback)
+            clipped = qgsTreatments.clipRasterAllTouched(inputFilename,report_layer,
+                input_crs,out_path=input_clipped_path,nodata=nodata,
+                data_type=0,resolution=x_res,context=context, feedback=feedback)
         else:
             clipped = inputFilename   
         self.nodata = nodata
         self.cl = cl
         self.pix_area = pix_area
         self.input_clipped = clipped
+        self.input_crs = input_crs
+        self.resolution = x_res
         return (input, output)
         
     def labelAndPatchLen(self,input,feedback):
         feedback.pushDebugInfo("input = " + str(input))
         classes, array = qgsUtils.getRasterValsAndArray(input)
         if self.cl not in classes:
-            raise QgsProcessingException("Input layer has no cells with value " + str(self.cl))
-        new_array = np.copy(array)
-        feedback.pushDebugInfo("new_array1 = " + str(new_array))
-        new_array[new_array!=self.cl] = 0
-        new_array[array==self.cl] = 1
-        feedback.pushDebugInfo("new_array2 = " + str(new_array))
-        # 8-connexity ? TODO : investigate
-        struct = scipy.ndimage.generate_binary_structure(2,2)
-        labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
-        feedback.pushDebugInfo("labeled_array = " + str(labeled_array))
-        feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
-        if nb_patches == 0:
-            feedback.reportError("No patches found",fatalError=True)
-        labels = list(range(1,nb_patches+1))
-        patches_len = scipy.ndimage.labeled_comprehension(new_array,
-            labeled_array,labels,len,int,0)
-        feedback.pushDebugInfo("patches_len = " + str(patches_len))
+            utils.warn("Input layer " + str(input)
+                + " has no cells with value " + str(self.cl))
+            # labeled_array = np.empty
+            labeled_array = np.zeros(array.shape)
+            nb_patches = 0
+            patches_len = []
+        else:
+            new_array = np.copy(array)
+            feedback.pushDebugInfo("new_array1 = " + str(new_array))
+            new_array[new_array!=self.cl] = 0
+            new_array[array==self.cl] = 1
+            feedback.pushDebugInfo("new_array2 = " + str(new_array))
+            # 8-connexity ? TODO : investigate
+            struct = scipy.ndimage.generate_binary_structure(2,2)
+            labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
+            feedback.pushDebugInfo("labeled_array = " + str(labeled_array))
+            feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
+            if nb_patches == 0:
+                feedback.reportError("No patches found",fatalError=True)
+            labels = list(range(1,nb_patches+1))
+            patches_len = scipy.ndimage.labeled_comprehension(new_array,
+                labeled_array,labels,len,int,0)
+            feedback.pushDebugInfo("patches_len = " + str(patches_len))
         nb_pix = len(array[array != self.nodata])
         feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         return (labeled_array, nb_patches, patches_len, nb_pix)
@@ -300,19 +312,29 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
     def initAlgorithm(self,config=None):
         super().initAlgorithm(config=config,report_opt=False)
         
-    def computeFeature(self,parameters,context,feedback):
+    def computeFeature(self,parameters,context,feedback,suffix=""):
         step_feedback = feedbacks.ProgressMultiStepFeedback(6,feedback)
-        clipped_path = QgsProcessingUtils.generateTempFilename("labeled_clipped.tif")
-        clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
-            clipped_path,crop_cutline=False,nodata=self.nodata,data_type=self.label_out_type,
+        clipped_path = QgsProcessingUtils.generateTempFilename(
+            "labeled_clipped" + suffix + ".tif")
+        # clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
+            # clipped_path,crop_cutline=True,nodata=self.nodata,data_type=self.label_out_type,
+            # context=context,feedback=step_feedback)
+        clipped = qgsTreatments.clipRasterAllTouched(self.labeled_path,self.report_layer,
+            self.input_crs,out_path=clipped_path,nodata=self.nodata,
+            data_type=self.label_out_type,resolution=self.resolution,
             context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(1)
         clip_report = qgsTreatments.getRasterUniqueValsReport(clipped,context,step_feedback)
         step_feedback.pushDebugInfo("clip_report = " + str(clip_report))
         step_feedback.setCurrentStep(2)
-        input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped_clipped.tif")
-        input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
-            input_clipped_path,crop_cutline=False,data_type=0,
+        input_clipped_path = QgsProcessingUtils.generateTempFilename(
+            "input_clipped_clipped" + suffix + ".tif")
+        # input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
+            # input_clipped_path,crop_cutline=True,data_type=0,
+            # context=context,feedback=step_feedback)
+        input_clipped = qgsTreatments.clipRasterAllTouched(self.input_clipped,self.report_layer,
+            self.input_crs,out_path=input_clipped_path,nodata=self.nodata,
+            data_type=0,resolution=self.resolution,
             context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(3)
         input_clip_report = qgsTreatments.getRasterUniqueValsReport(
@@ -434,15 +456,16 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             multi_feedback.setCurrentStep(count)
             report_id = report_feat.id()
             init_layer.selectByIds([report_id])
-            select_path = params.mkTmpLayerPath("reportingSelection"
-                + str(report_feat.id()) + ".gpkg")
+            select_path = params.mkTmpLayerPath("reportingFeature"
+                + str(report_id) + ".gpkg")
             qgsTreatments.saveSelectedFeatures(init_layer,select_path,context,multi_feedback)
             report_computed_path = params.mkTmpLayerPath("reportingComputed"
-                + str(report_feat.id()) + ".gpkg")
+                + str(report_id) + ".gpkg")
             params_copy[self.OUTPUT] = report_computed_path
             self.report_layer = qgsUtils.loadVectorLayer(select_path)
+            feedback.pushDebugInfo("report_layer = " + str(self.report_layer.sourceName()))
             report_feat_res_layer, global_val = self.computeFeature(
-                params_copy,context,multi_feedback)
+                params_copy,context,multi_feedback,suffix=str(report_id))
             # parameters = { self.INPUT : input,
                 # self.CLASS : self.cl,
                 # self.REPORTING : select_path,
@@ -460,7 +483,8 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             self.report_layer = qgsUtils.loadVectorLayer(dissolved_path)
             global_out_path = params.mkTmpLayerPath('reportingResultsGlobalCBC.gpkg')
             params_copy[self.OUTPUT] = global_out_path
-            global_layer, global_val = self.computeFeature(params_copy,context,feedback)
+            global_layer, global_val = self.computeFeature(
+                params_copy,context,feedback)
         return {self.OUTPUT : output_layer, self.OUTPUT_VAL : global_val}
 
     

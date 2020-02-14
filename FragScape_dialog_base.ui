@@ -341,6 +341,13 @@
             </widget>
            </item>
            <item row="0" column="4">
+            <widget class="QLabel" name="projectName">
+             <property name="text">
+              <string>No project loaded</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
             <spacer name="horizontalSpacer_7">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -353,7 +360,7 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="5">
+           <item row="0" column="6">
             <widget class="QToolButton" name="langEn">
              <property name="toolTip">
               <string>English</string>
@@ -376,7 +383,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="6">
+           <item row="0" column="7">
             <widget class="QToolButton" name="langFr">
              <property name="toolTip">
               <string>Français</string>
@@ -399,7 +406,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0" colspan="7">
+           <item row="1" column="0" colspan="8">
             <widget class="QTabWidget" name="mTabWidget">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
