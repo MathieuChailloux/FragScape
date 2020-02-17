@@ -541,6 +541,108 @@ class MeffAlgUtils:
         return self.ALG_NAME
 
 
+class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
+
+    ALG_NAME = 'diffResults'
+    
+    LAYER_A = "LAYER_A"
+    LAYER_B = "LAYER_B"
+    
+    PREFIX = "B_"
+
+    def createInstance(self):
+        return ResultsDiffAlgorithm()
+        
+    def name(self):
+        return self.ALG_NAME
+        
+    def displayName(self):
+        return self.tr('Compare results layer')
+        
+    def shortHelpString(self):
+        msg = "Compare 2 results layers produced by FragScape (step 4)"
+        msg += " by applying difference between indicators values (layer_b - layer_a)"
+        return self.tr(msg)
+        
+    def initAlgorithm(self, config=None):
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.LAYER_A,
+                self.tr("Layer A"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.LAYER_B,
+                self.tr("Layer B"),
+                [QgsProcessing.TypeVectorPolygon]))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer")))
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        layer_a = self.parameterAsVectorLayer(parameters,self.LAYER_A,context)
+        layer_b = self.parameterAsVectorLayer(parameters,self.LAYER_B,context)
+        if layer_a is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.LAYER_A))
+        if layer_b is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.LAYER_B))
+        a_crs, b_crs = layer_a.sourceCrs(), layer_b.sourceCrs()
+        if a_crs.authid() != b_crs.authid():
+            raise QgsProcessingException("Different CRS for layers (" +
+                str(a_crs) + " vs " + str(b_crs))
+        nb_feats_a, nb_feats_b = layer_a.featureCount(), layer_b.featureCount()
+        if nb_feats_a != nb_feats_b:
+            raise QgsProcessingException("Layers do not have same number of features ("
+                + str(nb_feats_a) + " vs " + str(nb_feats_b))
+        a_fields = layer_a.fields().names()
+        include_cbc = self.CBC_MESH_SIZE in a_fields
+        # Fields
+        fields = [self.ID, self.MESH_SIZE, self.NB_PATCHES,
+            self.REPORT_AREA, self.INTERSECTING_AREA,self.DIVI,self.SPLITTING_INDEX,
+            self.COHERENCE,self.SPLITTING_DENSITY,self.NET_PRODUCT]
+        diff_fields = [self.MESH_SIZE, self.INTERSECTING_AREA, self.NB_PATCHES,
+            self.DIVI,self.SPLITTING_INDEX,self.COHERENCE,self.SPLITTING_DENSITY,
+            self.NET_PRODUCT]
+        same_fields = [self.ID, self.REPORT_AREA]
+        if include_cbc:
+            fields.insert(1,self.CBC_MESH_SIZE)
+            fields.append(self.CBC_NET_PRODUCT)
+            diff_fields.insert(1,self.CBC_MESH_SIZE)
+            diff_fields.append(self.CBC_NET_PRODUCT)
+        # Join layers A and B
+        predicates = [2] # 2 <=> join on equal geometries
+        joined_path = QgsProcessingUtils.generateTempFilename("joined.gpkg")
+        joined = qgsTreatments.joinByLoc(layer_a,layer_b,predicates=predicates,
+            out_path=joined_path,fields=fields,prefix=self.PREFIX,
+            context=context,feedback=feedback)
+        joined_layer = qgsUtils.loadVectorLayer(joined_path)
+        if nb_feats_a != joined_layer.featureCount():
+            raise QgsProcessingException("Join by location failed, geometries do not match exactly")
+        # Output computation
+        wkb_type = layer_a.wkbType()
+        sink, dest_id = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            QgsFields(fields),
+            wkb_type,
+            a_crs)
+        diff_fields = [self.MESH_SIZE, self.INTERSECTING_AREA, self.NB_PATCHES,
+            self.DIVI,self.SPLITTING_INDEX,self.COHERENCE,self.SPLITTING_DENSITY,
+            self.NET_PRODUCT]
+        same_fields = [self.ID, self.REPORT_AREA]
+        for feat in joined_layer.getFeatures():
+            new_feat = QgsFeature(fields)
+            new_feat.setGeometry(feat.geometry())
+            for fname in same_fields:
+                new_feat[fname] = feat[fname]
+            for fname in diff_fields:
+                new_feat[fname] = feat[self.PREFIX + fname] - feat[fname]
+            sink.addFeature(new_feat)
+        return { self.OUTPUT : dest_id }
+        
+                
 class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
     
     def initAlgorithm(self, config=None):
@@ -694,7 +796,7 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         return MeffVectorReport()
         
     def displayName(self):
-        return self.tr("Vector Effective Mesh Size (Reporting)")
+        return self.tr("Vector Effective Mesh Size per feature")
         
     def shortHelpString(self):
         return self.tr("Computes effective mesh size from patch layer for each feature of reporting layer.")

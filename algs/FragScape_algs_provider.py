@@ -28,6 +28,7 @@ from PyQt5.QtGui import QIcon
 from qgis.core import QgsApplication, QgsProcessingProvider
 
 from .FragScape_algs import (RasterizeFixAllTouch,
+                             ResultsDiffAlgorithm,
                              PrepareLanduseAlgorithm,
                              PrepareFragmentationAlgorithm,
                              ApplyFragmentationAlgorithm,
@@ -39,6 +40,7 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
 
     def __init__(self):
         self.alglist = [RasterizeFixAllTouch(),
+                        ResultsDiffAlgorithm(),
                         PrepareLanduseAlgorithm(),
                         PrepareFragmentationAlgorithm(),
                         ApplyFragmentationAlgorithm(),
