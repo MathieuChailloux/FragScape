@@ -198,6 +198,11 @@ class LanduseModel(abstract_model.DictModel):
         step_feedback.setCurrentStep(1)
         input_vector = clipped_type == 'Vector'
         vector_mode = self.fsModel.paramsModel.modeIsVector()
+        crs, extent, resolution = self.fsModel.getRasterParams()
+        if input_vector:
+            reproj_path = params.mkTmpLayerPath("landuseReproject.gpkg")
+            clipped_layer = qgsTreatments.applyReprojectLayer(clipped_layer,crs,
+                reproj_path,context=context,feedback=feedback)
         if vector_mode:
             output = self.getDissolveLayer()
             qgsUtils.removeVectorLayer(output)
@@ -213,8 +218,9 @@ class LanduseModel(abstract_model.DictModel):
                 context=context,feedback=step_feedback)
         elif input_vector and not vector_mode:
             expr = self.getSelectionExpr()
-            crs, extent, resolution = self.fsModel.getRasterParams()
+            # crs, extent, resolution = self.fsModel.getRasterParams()
             self.fsModel.checkExtentInit()
+            self.fsModel.checkResolutionInit()
             selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
             qgsTreatments.classifByExpr(clipped_layer,expr,selected_path,'landuseSelection')
             res = qgsTreatments.applyRasterization(selected_path,output,
@@ -243,8 +249,9 @@ class LanduseModel(abstract_model.DictModel):
             if vector_mode:
                 raise QgsProcessingException("Raster mode with vector input not yet implemented")
             else:
-                crs, extent, resolution = self.fsModel.getRasterParams()
+                # crs, extent, resolution = self.fsModel.getRasterParams()
                 self.fsModel.checkExtentInit()
+                self.fsModel.checkResolutionInit()
                 res = qgsTreatments.applyWarpReproject(selected_path,output,
                     resampling_mode='mode',dst_crs=crs,
                     extent=extent,extent_crs=crs,resolution=resolution,
