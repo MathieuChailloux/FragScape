@@ -54,6 +54,7 @@ from .FragScape_algs import MeffAlgUtils
 class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
     
     def __init__(self):
+        self.curr_suffix = ""
         QgsProcessingAlgorithm.__init__(self)
             
     def createInstance(self):
@@ -137,14 +138,17 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
             nodata = qgsUtils.getNDCandidate(input_type,unique_vals)
         # Clip input
         if report_layer:
-            input_clipped_path = QgsProcessingUtils.generateTempFilename("input_clipped.tif")
+            input_clipped_path = QgsProcessingUtils.generateTempFilename(
+                "input_clipped" + self.curr_suffix + ".tif")
             clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
                 input_clipped_path,crop_cutline=True,nodata=nodata,
                 data_type=0,context=context, feedback=feedback)
+            clipped = input_clipped_path
             # clipped = qgsTreatments.clipRasterAllTouched(inputFilename,report_layer,
                 # input_crs,out_path=input_clipped_path,nodata=nodata,
                 # data_type=0,resolution=x_res,context=context, feedback=feedback)
         else:
+            assert(False)
             clipped = inputFilename   
         self.nodata = nodata
         self.cl = cl
@@ -279,11 +283,11 @@ class MeffRasterReport(FragScapeRasterAlgorithm):
             report_id = report_feat.id()
             self.report_layer.selectByIds([report_id])
             select_path = params.mkTmpLayerPath("reportingSelection"
-                + str(report_feat.id()) + ".gpkg")
+                + str(report_id) + ".gpkg")
             qgsTreatments.saveSelectedFeatures(self.report_layer,select_path,context,multi_feedback)
             report_computed_path = params.mkTmpLayerPath("reportingComputed"
-                + str(report_feat.id()) + ".gpkg")
-            parameters = { self.INPUT : input,
+                + str(report_id) + ".gpkg")
+            parameters = { self.INPUT : self.input_clipped,
                 self.CLASS : self.cl,
                 self.REPORTING : select_path,
                 self.UNIT : parameters[self.UNIT],
@@ -312,10 +316,10 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
     def initAlgorithm(self,config=None):
         super().initAlgorithm(config=config,report_opt=False)
         
-    def computeFeature(self,parameters,context,feedback,suffix="",clip_flag=True):
+    def computeFeature(self,parameters,context,feedback,clip_flag=True):
         step_feedback = feedbacks.ProgressMultiStepFeedback(6,feedback)
         clipped_path = QgsProcessingUtils.generateTempFilename(
-            "labeled_clipped" + suffix + ".tif")
+            "labeled_clipped" + self.curr_suffix + ".tif")
         clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
             clipped_path,crop_cutline=True,nodata=self.nodata,data_type=self.label_out_type,
             context=context,feedback=step_feedback)
@@ -329,9 +333,9 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         step_feedback.setCurrentStep(2)
         if clip_flag:
             input_clipped_path = QgsProcessingUtils.generateTempFilename(
-                "input_clipped_clipped" + suffix + ".tif")
+                "input_clipped_clipped" + self.curr_suffix + ".tif")
             input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
-                input_clipped_path,crop_cutline=True,data_type=0,
+                input_clipped_path,crop_cutline=True,data_type=0,nodata=255,
                 context=context,feedback=step_feedback)
         else:
             input_clipped_path = self.input_clipped
@@ -419,7 +423,8 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         # Processing
         input_dpr = input.dataProvider()
         nodata = self.nodata
-        inputFilename = input.source()
+        # inputFilename = input.source()
+        inputFilename = self.input_clipped
         pix_area = self.pix_area
         feedback.pushDebugInfo("nodata = " + str(nodata))
         # Export label
@@ -458,17 +463,6 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         multi_feedback = feedbacks.ProgressMultiStepFeedback(nb_feats + 1, feedback)
         report_layers = []
         params_copy = dict(parameters)
-        # Global
-        dissolved_path = params.mkTmpLayerPath('reportingDissolved.gpkg')
-        qgsTreatments.dissolveLayer(init_layer,dissolved_path,context,feedback)
-        self.report_layer = qgsUtils.loadVectorLayer(dissolved_path)
-        if nb_feats == 1:
-            params_copy[self.OUTPUT] = output_layer
-        else:
-            global_out_path = params.mkTmpLayerPath('reportingResultsGlobalCBC.gpkg')
-            params_copy[self.OUTPUT] = global_out_path
-        global_layer, global_val = self.computeFeature(
-            params_copy,context,feedback,clip_flag=False)
         # Feats
         if nb_feats > 1:
             for count, report_feat in enumerate(self.report_layer.getFeatures()):
@@ -483,8 +477,10 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
                 params_copy[self.OUTPUT] = report_computed_path
                 self.report_layer = qgsUtils.loadVectorLayer(select_path)
                 feedback.pushDebugInfo("report_layer = " + str(self.report_layer.sourceName()))
+                self.curr_suffix = str(report_id)
                 report_feat_res_layer, global_val = self.computeFeature(
-                    params_copy,context,multi_feedback,suffix=str(report_id))
+                    params_copy,context,multi_feedback)
+                self.curr_suffix = ""
                 # parameters = { self.INPUT : input,
                     # self.CLASS : self.cl,
                     # self.REPORTING : select_path,
@@ -495,6 +491,17 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
                 report_layers.append(report_feat_res_layer)
             feedback.pushDebugInfo("report_layers = " + str(report_layers))
             qgsTreatments.mergeVectorLayers(report_layers,crs,output_layer)
+        # Global
+        dissolved_path = params.mkTmpLayerPath('reportingDissolved.gpkg')
+        qgsTreatments.dissolveLayer(init_layer,dissolved_path,context,feedback)
+        self.report_layer = qgsUtils.loadVectorLayer(dissolved_path)
+        if nb_feats == 1:
+            params_copy[self.OUTPUT] = output_layer
+        else:
+            global_out_path = params.mkTmpLayerPath('reportingResultsGlobalCBC.gpkg')
+            params_copy[self.OUTPUT] = global_out_path
+        global_layer, global_val = self.computeFeature(
+            params_copy,context,feedback,clip_flag=False)
         
         # if nb_feats > 1:
             # out_layer = output_layer

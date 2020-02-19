@@ -601,6 +601,8 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         include_cbc_a = self.CBC_MESH_SIZE in a_fields
         include_cbc_b = self.CBC_MESH_SIZE in b_fields
         include_cbc = include_cbc_a and include_cbc_b
+        if include_cbc_a != include_cbc_b:
+            raise QgsProcessingException("Do not compare results produced in CBC (Cross-Boundary Connection) mode with results produced in CUT mode (default)")
         # Fields
         if self.DIVISOR not in a_fields or self.DIVISOR not in b_fields:
             raise QgsProcessingException("Missing field 'divisor'")
