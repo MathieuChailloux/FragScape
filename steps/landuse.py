@@ -155,12 +155,17 @@ class LanduseModel(abstract_model.DictModel):
         feedback.pushDebugInfo("input_vals = " + str(input_vals))
         input_vals_str = [str(v) for v in input_vals]
         existing_vals = [v for v in values if v in input_vals_str]
+        nb_vals = len(existing_vals)
         if not existing_vals:
             utils.user_error("No existing values selected for landuse layer")
-        form = "logical_or(A==" + str(existing_vals[0])
-        for v in existing_vals[1:]:
-            form += ", A==" + str(v)
-        form += ")"
+        # form = "logical_or(A==" + str(existing_vals[0])
+        # for v in existing_vals[1:]:
+            # form += ",A==" + str(v)
+        # form += ")"
+        form = ""
+        for v in existing_vals[:-1]:
+            form += "logical_or(A==" + str(v) + ","
+        form += "A==" + str(existing_vals[-1]) + (")" * (nb_vals - 1))
         return form
 
     def mkSelectionExpr(self):
@@ -188,7 +193,7 @@ class LanduseModel(abstract_model.DictModel):
         return expr
         
     def applyItemsWithContext(self,context,feedback,indexes):
-        feedbacks.progressFeedback.beginSection("Landuse classification")
+        feedbacks.beginSection("Landuse classification")
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
         step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
@@ -258,7 +263,7 @@ class LanduseModel(abstract_model.DictModel):
                     nodata_val=255,context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(3)
         qgsUtils.loadLayer(res,loadProject=True)
-        feedbacks.progressFeedback.endSection()
+        feedbacks.endSection()
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
@@ -419,6 +424,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
     # Load field values from input layer
     def loadFields(self,fieldname):
         utils.debug("loadField")
+        feedbacks.beginSection("Field values load")
         curr_layer = self.model.landuseLayer
         if not curr_layer:
             utils.user_error("No layer selected in landuse tab")
@@ -429,6 +435,7 @@ class LanduseConnector(abstract_model.AbstractConnector):
             new_items = self.loadRasterFields(loaded_layer)
         self.model.items = new_items
         self.model.layoutChanged.emit()
+        feedbacks.endSection()
         
     def importFields(self):
         fname = qgsUtils.openFileDialog(parent=self.dlg,msg="Open field values CSV file",filter="*.csv")

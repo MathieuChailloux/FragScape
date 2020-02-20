@@ -216,8 +216,8 @@ class FragmModel(abstract_model.DictModel):
         return res
             
     def applyItemsWithContext(self,context,feedback,indexes=None):
-        fragmMsg = "Application of fragmentation data to landuse"
-        feedbacks.progressFeedback.beginSection(fragmMsg)
+        fragmMsg = "Additional data"
+        feedbacks.beginSection(fragmMsg)
         # Out layer
         vector_mode = self.fsModel.modeIsVector()
         res_path = self.getFinalLayer()
@@ -292,7 +292,7 @@ class FragmModel(abstract_model.DictModel):
         # res = self.fsModel.paramsModel.clipByExtent(tmp_path,
             # out_path=res_path,context=context,feedback=step_feedback)
         qgsUtils.loadLayer(res,loadProject=True)
-        feedbacks.progressFeedback.endSection()
+        feedbacks.endSection()
         return res
             
         

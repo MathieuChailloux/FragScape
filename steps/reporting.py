@@ -91,7 +91,7 @@ class ReportingModel(abstract_model.DictModel):
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
         feedback.pushDebugInfo("unit = " + str(self.unit))
-        feedbacks.progressFeedback.beginSection(reportingMsg)
+        feedbacks.beginSection(reportingMsg)
         vector_mode = self.fsModel.modeIsVector()
         nb_steps = 2 if vector_mode or self.reporting_layer else 1
         step_feedback = feedbacks.ProgressMultiStepFeedback(nb_steps,feedback)
@@ -113,7 +113,7 @@ class ReportingModel(abstract_model.DictModel):
                            MeffReportV.INCLUDE_CBC : self.includeCBC,
                            MeffReportV.UNIT : self.unit,
                            MeffReportV.OUTPUT : results_path }
-            feedbacks.progressFeedback.setSubText("Report per feature")
+            feedbacks.setSubText("Report per feature")
             res1 = qgsTreatments.applyProcessingAlg('FragScape',
                 MeffReportV.ALG_NAME,parameters1,
                 context=context,feedback=step_feedback,onlyOutput=False)
@@ -124,7 +124,7 @@ class ReportingModel(abstract_model.DictModel):
                            MeffGlobalV.INCLUDE_CBC : self.includeCBC,
                            MeffGlobalV.UNIT : self.unit,
                            MeffGlobalV.OUTPUT : global_results_path }
-            feedbacks.progressFeedback.setSubText("Report global")
+            feedbacks.setSubText("Report global")
             res2 = qgsTreatments.applyProcessingAlg('FragScape',
                 MeffGlobalV.ALG_NAME,parameters2,
                 context=context,feedback=step_feedback,onlyOutput=False)
@@ -147,7 +147,7 @@ class ReportingModel(abstract_model.DictModel):
                     raise QgsProcessingException("Reporting layer needed in CBC mode")
                 parameters[MeffAlgUtils.OUTPUT] = results_path
                 parameters[MeffAlgUtils.REPORTING] = self.reporting_layer
-                feedbacks.progressFeedback.setSubText("Report CBC")
+                feedbacks.setSubText("Report CBC")
                 res = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRCBC.ALG_NAME,parameters,
                     context=context,feedback=step_feedback,onlyOutput=False)
@@ -155,7 +155,7 @@ class ReportingModel(abstract_model.DictModel):
                 res_val = res[MeffAlgUtils.OUTPUT_VAL]
             elif self.reporting_layer:
                 parameters[MeffAlgUtils.OUTPUT] = results_path
-                feedbacks.progressFeedback.setSubText("Report per feature")
+                feedbacks.setSubText("Report per feature")
                 res1 = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffRasterReport.ALG_NAME,parameters,
                     context=context,feedback=step_feedback,onlyOutput=False)
@@ -165,20 +165,20 @@ class ReportingModel(abstract_model.DictModel):
                 qgsTreatments.dissolveLayer(self.reporting_layer,dissolved_path,context,step_feedback)
                 parameters[MeffAlgUtils.REPORTING] = dissolved_path
                 parameters[MeffAlgUtils.OUTPUT] = global_results_path
-                feedbacks.progressFeedback.setSubText("Report global")
+                feedbacks.setSubText("Report global")
                 res2 = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffR.ALG_NAME,parameters,
                     context=context,feedback=step_feedback,onlyOutput=False)
                 res_val = res2[MeffAlgUtils.OUTPUT_VAL]
             else:
-                feedbacks.progressFeedback.setSubText("Report global")
+                feedbacks.setSubText("Report global")
                 res = qgsTreatments.applyProcessingAlg('FragScape',
                     MeffR.ALG_NAME,parameters,
                     context=context,feedback=step_feedback,onlyOutput=False)
                 res_layer = res[MeffAlgUtils.OUTPUT]
                 res_val = res[MeffAlgUtils.OUTPUT_VAL]
         step_feedback.setCurrentStep(nb_steps)
-        feedbacks.progressFeedback.endSection()
+        feedbacks.endSection()
         return (res_layer,res_val)
                 
     def toXML(self,indent=" "):
