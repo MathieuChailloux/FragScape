@@ -24,7 +24,7 @@
 
 import os.path
 
-from qgis.core import QgsMapLayerProxyModel, QgsProcessingException
+from qgis.core import QgsMapLayerProxyModel, QgsProcessingException, QgsVectorFileWriter
 from qgis.gui import QgsFileWidget
 
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments, styles
@@ -74,6 +74,7 @@ class ReportingModel(abstract_model.DictModel):
         return self.input_layer
                 
     def setOutLayer(self,layer_path):
+        utils.debug("layer_path = " + str(layer_path))
         self.out_layer = layer_path
         
     def getOutLayer(self):
@@ -217,8 +218,8 @@ class ReportingModel(abstract_model.DictModel):
     def fromXMLRoot(self,root):
         self.fromXMLAttribs(root.attrib)
         
+        
 class ReportingConnector:
-
     
     def __init__(self,dlg,reportingModel):
         self.dlg = dlg
@@ -230,7 +231,9 @@ class ReportingConnector:
         self.dlg.resultsReportingLayer.setStorageMode(QgsFileWidget.GetFile)
         self.dlg.resultsReportingLayer.setFilter(qgsUtils.getVectorFilters())
         self.dlg.resultsOutLayer.setStorageMode(QgsFileWidget.SaveFile)
-        self.dlg.resultsOutLayer.setFilter(qgsUtils.getVectorFilters())
+        filters = qgsUtils.getVectorFilters()
+        self.dlg.resultsOutLayer.setFilter(filters)
+        self.dlg.resultsOutLayer.setSelectedFilter("GeoPackage (*.gpkg *.GPKG)")
         
     def connectComponents(self):
         self.dlg.resultsInputLayer.layerChanged.connect(self.setInputLayer)
