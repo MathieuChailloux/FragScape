@@ -148,7 +148,6 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
                 # input_crs,out_path=input_clipped_path,nodata=nodata,
                 # data_type=0,resolution=x_res,context=context, feedback=feedback)
         else:
-            assert(False)
             clipped = inputFilename   
         self.nodata = nodata
         self.cl = cl
@@ -175,7 +174,8 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
             new_array[array==self.cl] = 1
             feedback.pushDebugInfo("new_array2 = " + str(new_array))
             # 8-connexity ? TODO : investigate
-            struct = scipy.ndimage.generate_binary_structure(2,2)
+            # struct = scipy.ndimage.generate_binary_structure(2,2)
+            struct = scipy.ndimage.generate_binary_structure(2,1)
             labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
             feedback.pushDebugInfo("labeled_array = " + str(labeled_array))
             feedback.pushDebugInfo("nb_patches = " + str(nb_patches))

@@ -552,6 +552,7 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
     LAYER_B = "LAYER_B"
     
     PREFIX = "B_"
+    VARIATION = 'variation'
 
     def createInstance(self):
         return ResultsDiffAlgorithm()
@@ -607,9 +608,12 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         if self.DIVISOR not in a_fields or self.DIVISOR not in b_fields:
             raise QgsProcessingException("Missing field 'divisor'")
         qgs_fields = self.mkReportFields(include_cbc=include_cbc)
-        fields_names = [f.name() for f in qgs_fields]
-        diff_fields = [self.NB_PATCHES, self.DIVI,
-            self.SPLITTING_INDEX,self.COHERENCE,self.SPLITTING_DENSITY]
+        qgs_fields.remove(5)
+        qgs_fields.remove(5)
+        qgs_fields.remove(5)
+        qgs_fields.remove(5)
+        diff_fields = [self.NB_PATCHES]
+            # , self.DIVI,self.SPLITTING_INDEX,self.COHERENCE,self.SPLITTING_DENSITY]
         diff_fields_divisor = [self.MESH_SIZE, self.REPORT_AREA, 
             self.INTERSECTING_AREA, self.NET_PRODUCT]
         diff_fields_divisor_sq = [self.NET_PRODUCT]
@@ -617,6 +621,10 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         if include_cbc:
             diff_fields_divisor.append(self.CBC_MESH_SIZE)
             diff_fields_divisor_sq.append(self.CBC_NET_PRODUCT)
+            mesh_size_field = self.CBC_MESH_SIZE
+        else:
+            mesh_size_field = self.MESH_SIZE
+        fields_names = [f.name() for f in qgs_fields]
         # Join layers A and B
         predicates = [2] # 2 <=> join on equal geometries
         joined_path = QgsProcessingUtils.generateTempFilename("joined.gpkg")
@@ -627,6 +635,7 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         if nb_feats_a != joined_layer.featureCount():
             raise QgsProcessingException("Join by location failed, geometries do not match exactly")
         # Output computation
+        qgs_fields.append(QgsField(self.VARIATION,QVariant.Double))
         wkb_type = layer_a.wkbType()
         sink, dest_id = self.parameterAsSink(
             parameters,
@@ -644,35 +653,60 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
             for fname in diff_fields:
                 a_val, b_val = feat[fname], feat[self.PREFIX + fname]
                 new_feat[fname] = b_val - a_val
+            # Divisor
+            if self.DIVISOR in a_fields and self.DIVISOR in b_fields:
+                a_divi = feat[self.DIVISOR]
+                b_divi = feat[self.PREFIX + self.DIVISOR]
+            else:
+                a_divi = 1
+                b_divi = 1
+            # factor = a_divi / b_divi
+            # feedback.pushDebugInfo("factor = " + str(factor))
+            # factor_sq = factor * factor
             for fname in diff_fields_divisor + diff_fields_divisor_sq:
-                if self.DIVISOR in a_fields and self.DIVISOR in b_fields:
-                    a_divi = feat[self.DIVISOR]
-                    b_divi = feat[self.PREFIX + self.DIVISOR]
-                else:
-                    a_divi = 1
-                    b_divi = 1
+                feedback.pushDebugInfo("fname = " + str(fname))
                 a_val, b_val = feat[fname], feat[self.PREFIX + fname]
-                # a_divi_sq, b_divi_sq = a_divi * a_divi, b_divi * b_divi
-                factor = a_divi / b_divi
-                if fname in diff_fields_divisor_sq:
-                    factor = factor * factor
-                factor_sq = factor * factor
+                # factor = float(a_divi / b_divi)
+                # if fname in diff_fields_divisor_sq:
+                    # curr_factor = factor
+                # else:
+                    # curr_factor = factor_sq
                 if a_divi == b_divi:
                     feedback.pushDebugInfo("a_divi == b_divi")
-                    new_feat[fname] = b_val - a_val
-                    new_feat[self.DIVISOR] = a_divi
+                    a_factor, b_factor, divi = 1, 1, a_divi
+                    # new_feat[fname] = b_val - a_val
+                    # new_feat[self.DIVISOR] = a_divi
                 elif a_divi < b_divi:
+                    # factor = (b_divi / a_divi)
                     # a_val_round = round(a_val / (b_divi / a_divi), self.NB_DIGITS)
-                    a_val_round = round(a_val * factor, self.NB_DIGITS)
-                    feedback.pushDebugInfo("a_val_round = " + str(a_val_round))
-                    new_feat[fname] = b_val - a_val_round
-                    new_feat[self.DIVISOR] = b_divi
+                    # feedback.pushDebugInfo("a_val = " + str(a_val))
+                    # feedback.pushDebugInfo("a_val_round = " + str(a_val_round))
+                    # a_val2, b_val2, divi = a_val_round, b_val, b_divi
+                    a_factor, b_factor, divi = (b_divi / a_divi), 1, b_divi
+                    # new_feat[fname] = b_val - a_val_round
+                    # new_feat[self.DIVISOR] = b_divi
                 else:
                     # b_val_round = round(b_val / (a_divi / b_divi), self.NB_DIGITS)
-                    b_val_round = round(b_val / factor, self.NB_DIGITS)
-                    feedback.pushDebugInfo("b_val_round = " + str(b_val_round))
-                    new_feat[fname] = b_val_round - a_val
-                    new_feat[self.DIVISOR] = a_divi
+                    # feedback.pushDebugInfo("b_val_round = " + str(b_val_round))
+                    # a_val2, b_val2, divi = a_val, b_val_round, a_divi
+                    a_factor, b_factor, divi = 1, (a_divi / b_divi), a_divi
+                    # new_feat[fname] = b_val_round - a_val
+                    # new_feat[self.DIVISOR] = a_divi
+                if fname in diff_fields_divisor_sq:
+                    a_factor = a_factor * a_factor
+                    b_factor = b_factor * b_factor
+                a_val_round = round(a_val / a_factor, self.NB_DIGITS)
+                b_val_round = round(b_val / b_factor, self.NB_DIGITS)
+                feedback.pushDebugInfo("a_factor = " + str(a_factor))
+                feedback.pushDebugInfo("b_factor = " + str(b_factor))
+                feedback.pushDebugInfo("a_val_round = " + str(a_val_round))
+                feedback.pushDebugInfo("b_val_round = " + str(b_val_round))
+                new_feat[fname] = b_val_round - a_val_round
+                new_feat[self.DIVISOR] = divi
+                if fname == mesh_size_field:
+                    mesh_size_sum = b_val_round + a_val_round
+                    var_val = abs(b_val_round - a_val_round) / mesh_size_sum if mesh_size_sum != 0 else 0
+                    new_feat[self.VARIATION] = round(var_val, self.NB_DIGITS)
             sink.addFeature(new_feat)
         return { self.OUTPUT : dest_id }
         
