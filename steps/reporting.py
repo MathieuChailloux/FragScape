@@ -208,7 +208,7 @@ class ReportingModel(abstract_model.DictModel):
             method = int(attribs[self.METHOD])
             self.includeCBC = (method > 0)
         if self.INCLUDE_CBC in attribs:
-            self.includeCBC = bool(attribs[self.INCLUDE_CBC])
+            self.includeCBC = attribs[self.INCLUDE_CBC] == "True"
         if self.UNIT in attribs:
             self.unit = int(attribs[self.UNIT])
         if self.OUTPUT in attribs:
@@ -295,6 +295,8 @@ class ReportingConnector:
             self.dlg.resultsReportingLayer.setFilePath(self.model.reporting_layer)
         if self.model.includeCBC:
             self.dlg.resultsCBC.setChecked(True)
+        else:
+            self.dlg.resultsCBC.setChecked(False)
         if self.model.unit:
             self.dlg.resultsUnit.setCurrentIndex(int(self.model.unit))
         if self.model.out_layer:

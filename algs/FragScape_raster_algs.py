@@ -117,6 +117,7 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         feedback.pushDebugInfo("unit = " + str(unit))
         self.unit_divisor = self.UNIT_DIVISOR[unit]
         feedback.pushDebugInfo("unit_divisor = " + str(self.unit_divisor))
+        suffix = parameters[self.SUFFIX] if self.SUFFIX in parameters else ""
         output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
         if not output:
             raise QgsProcessingException("No output layer given")
@@ -139,7 +140,7 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
         # Clip input
         if report_layer:
             input_clipped_path = QgsProcessingUtils.generateTempFilename(
-                "input_clipped" + self.curr_suffix + ".tif")
+                "input_clipped" + suffix + ".tif")
             clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
                 input_clipped_path,crop_cutline=True,nodata=nodata,
                 data_type=0,context=context, feedback=feedback)
@@ -291,7 +292,8 @@ class MeffRasterReport(FragScapeRasterAlgorithm):
                 self.CLASS : self.cl,
                 self.REPORTING : select_path,
                 self.UNIT : parameters[self.UNIT],
-                self.OUTPUT : report_computed_path }
+                self.OUTPUT : report_computed_path,
+                self.SUFFIX : str(report_id) }
             qgsTreatments.applyProcessingAlg('FragScape','meffRaster',
                 parameters, context,multi_feedback)
             report_layers.append(report_computed_path)
@@ -459,7 +461,6 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
         if nb_feats == 0:
             raise QgsProcessingException("Empty reporting layer")
-        progress_step = 100.0 / nb_feats
         multi_feedback = feedbacks.ProgressMultiStepFeedback(nb_feats + 1, feedback)
         report_layers = []
         params_copy = dict(parameters)

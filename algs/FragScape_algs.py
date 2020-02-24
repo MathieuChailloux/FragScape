@@ -398,6 +398,8 @@ class MeffAlgUtils:
     SUM_AI_SQ = "sum_ai_sq"
     SUM_AI_SQ_CBC = "sum_ai_sq_cbc"
     DIVISOR = "divisor"
+    
+    SUFFIX = "suffix"
 
     # Output layer fields
     ID = "fid"
@@ -744,18 +746,58 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
                 self.tr("Output layer")))
                 
     def prepareInputs(self,parameters,context,feedback):
+        feedbacks.setSubText("Prepare inputs")
         input = self.parameterAsVectorLayer(parameters, self.INPUT, context)
-        report_layer = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
         if input is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
         reporting = self.parameterAsVectorLayer(parameters,self.REPORTING,context)
         if reporting is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.REPORTING))
-        self.report_layer = reporting
         self.crs = self.parameterAsCrs(parameters,self.CRS,context)
         unit = self.parameterAsEnum(parameters,self.UNIT,context)
         self.include_cbc = self.parameterAsBool(parameters,self.INCLUDE_CBC,context)
         self.unit_divisor = self.UNIT_DIVISOR[unit]
+        suffix = parameters[self.SUFFIX] if self.SUFFIX in parameters else ""
+        # CRS reprojection
+        source_crs = input.crs().authid()
+        reporting_crs = reporting.crs().authid()
+        feedback = feedbacks.ProgressMultiStepFeedback(4,feedback)
+        feedback.pushDebugInfo("source_crs = " + str(source_crs))
+        feedback.pushDebugInfo("boundary_crs = " + str(reporting_crs))
+        feedback.pushDebugInfo("crs = " + str(self.crs.authid()))
+        source_name = input.sourceName()
+        if source_crs != self.crs.authid():
+            source_path = params.mkTmpLayerPath(source_name
+                + "_input_reproj" + suffix + ".gpkg")
+            qgsTreatments.applyReprojectLayer(input,self.crs,source_path,context,feedback)
+            input = qgsUtils.loadVectorLayer(source_path)
+            feedback.setCurrentStep(1)
+        if reporting_crs != self.crs.authid():
+            reporting_path = params.mkTmpLayerPath(source_name
+                + "_reporting_reproj" + suffix + ".gpkg")
+            qgsTreatments.applyReprojectLayer(reporting,self.crs,reporting_path,context,feedback)
+            reporting = qgsUtils.loadVectorLayer(reporting_path)
+            feedback.setCurrentStep(2)
+        # Dissolve
+        if isinstance(self,MeffVectorGlobal) and reporting.featureCount() > 1:
+            reporting_path = params.mkTmpLayerPath(source_name + "_reporting_dissolved.gpkg")
+            qgsTreatments.dissolveLayer(reporting,reporting_path,context,feedback)
+            reporting = qgsUtils.loadVectorLayer(reporting_path)
+            feedback.setCurrentStep(3)
+        self.report_layer = reporting
+        # Clip by boundary
+        out_path = params.mkTmpLayerPath(source_name
+            + "_prepared" + suffix + ".gpkg")
+        if self.include_cbc:
+            qgsTreatments.selectIntersection(input,reporting,context,feedback)
+            qgsTreatments.saveSelectedFeatures(input,out_path,context,feedback)
+        else:
+            clipped_path = params.mkTmpLayerPath(source_name
+                + "_clipped" + suffix + ".gpkg")
+            qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
+            qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
+        feedback.setCurrentStep(4)
+        input = qgsUtils.loadVectorLayer(out_path)
         return (input, reporting)
 
 
@@ -779,43 +821,42 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         # Parameters
         source, boundary = self.prepareInputs(parameters, context, feedback)
         # CRS reprojection
-        source_crs = source.crs().authid()
-        boundary_crs = boundary.crs().authid()
-        feedback.pushDebugInfo("source_crs = " + str(source_crs))
-        feedback.pushDebugInfo("boundary_crs = " + str(boundary_crs))
-        feedback.pushDebugInfo("crs = " + str(self.crs.authid()))
-        source_name = boundary.sourceName()
-        if source_crs != self.crs.authid():
-            source_path = params.mkTmpLayerPath(source_name + "_source_reproject.gpkg")
-            qgsTreatments.applyReprojectLayer(source,self.crs,source_path,context,feedback)
-            source = qgsUtils.loadVectorLayer(source_path)
-        if boundary_crs != self.crs.authid():
-            boundary_path = params.mkTmpLayerPath(source_name + "_boundary_reproject.gpkg")
-            qgsTreatments.applyReprojectLayer(boundary,self.crs,boundary_path,context,feedback)
-            boundary = qgsUtils.loadVectorLayer(boundary_path)
+        # source_crs = source.crs().authid()
+        # boundary_crs = boundary.crs().authid()
+        # feedback.pushDebugInfo("source_crs = " + str(source_crs))
+        # feedback.pushDebugInfo("boundary_crs = " + str(boundary_crs))
+        # feedback.pushDebugInfo("crs = " + str(self.crs.authid()))
+        # source_name = boundary.sourceName()
+        # if source_crs != self.crs.authid():
+            # source_path = params.mkTmpLayerPath(source_name + "_source_reproject.gpkg")
+            # qgsTreatments.applyReprojectLayer(source,self.crs,source_path,context,feedback)
+            # source = qgsUtils.loadVectorLayer(source_path)
+        # if boundary_crs != self.crs.authid():
+            # boundary_path = params.mkTmpLayerPath(source_name + "_boundary_reproject.gpkg")
+            # qgsTreatments.applyReprojectLayer(boundary,self.crs,boundary_path,context,feedback)
+            # boundary = qgsUtils.loadVectorLayer(boundary_path)
         # Clip by boundary
-        intersected_path = params.mkTmpLayerPath(source_name + "_source_intersected.gpkg")
-        qgsTreatments.selectIntersection(source,boundary,context,feedback)
-        qgsTreatments.saveSelectedFeatures(source,intersected_path,context,feedback)
-        selected_path = intersected_path
-        source = qgsUtils.loadVectorLayer(selected_path)
+        # intersected_path = params.mkTmpLayerPath(source_name + "_source_intersected.gpkg")
+        # if self.include_cbc:
+            # qgsTreatments.selectIntersection(source,boundary,context,feedback)
+            # qgsTreatments.saveSelectedFeatures(source,intersected_path,context,feedback)
+        # selected_path = intersected_path
+        # source = qgsUtils.loadVectorLayer(selected_path)
         # Dissolve
-        if boundary.featureCount() > 1:
-            dissolved_path = params.mkTmpLayerPath(source_name + "_boundary_dissolved.gpkg")
-            qgsTreatments.dissolveLayer(boundary,dissolved_path,context,feedback)
-            boundary = qgsUtils.loadVectorLayer(dissolved_path)
-            self.report_layer = boundary
+        # if boundary.featureCount() > 1:
+            # dissolved_path = params.mkTmpLayerPath(source_name + "_boundary_dissolved.gpkg")
+            # qgsTreatments.dissolveLayer(boundary,dissolved_path,context,feedback)
+            # boundary = qgsUtils.loadVectorLayer(dissolved_path)
+            # self.report_layer = boundary
         # Algorithm
         # progress step
         nb_feats = source.featureCount()
+        feedbacks.setSubText("Iterating on features")
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
         if nb_feats == 0:
             utils.warn("Empty input layer : " + qgsUtils.pathOfLayer(source))
-            progress_step = 100.0
-            #raise QgsProcessingException("Empty layer : " + qgsUtils.pathOfLayer(source))
         else:
-            progress_step = 100.0 / nb_feats
-        curr_step = 0
+            feedback = feedbacks.ProgressMultiStepFeedback(nb_feats,feedback)
         # Reporting area
         for report_feat in boundary.getFeatures():
             report_geom = report_feat.geometry()
@@ -829,7 +870,7 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         net_product = 0
         cbc_net_product = 0
         intersecting_area = 0
-        for f in source.getFeatures():
+        for cpt, f in enumerate(source.getFeatures()):
             f_geom = f.geometry()
             f_area = f_geom.area()
             sum_ai += f_area
@@ -838,9 +879,7 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
             intersecting_area += intersection_area
             net_product += intersection_area * intersection_area
             cbc_net_product += f_area * intersection_area
-            # Progress update
-            curr_step += 1
-            feedback.setProgress(int(curr_step * progress_step))
+            feedback.setProgress(cpt)
         report_area_sq = report_area * report_area
         # Outputs
         res_dict = { self.REPORT_AREA : report_area,
@@ -878,8 +917,6 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         feedback.pushDebugInfo("nb_feats = " + str(nb_feats))
         if nb_feats == 0:
             raise QgsProcessingException("Empty layer")
-        curr_step = 0
-        # gna gna
         multi_feedback = feedbacks.ProgressMultiStepFeedback(nb_feats, feedback)
         report_layers = []
         for count, report_feat in enumerate(reporting.getFeatures()):
@@ -894,7 +931,8 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
                            MeffVectorGlobal.CRS : self.crs,
                            MeffVectorGlobal.INCLUDE_CBC : self.include_cbc,
                            MeffVectorGlobal.UNIT : parameters[self.UNIT],
-                           MeffVectorGlobal.OUTPUT : report_computed_path }
+                           MeffVectorGlobal.OUTPUT : report_computed_path,
+                           self.SUFFIX : str(report_id) }
             qgsTreatments.applyProcessingAlg('FragScape',
                                              MeffVectorGlobal.ALG_NAME,
                                              parameters,context,multi_feedback)
