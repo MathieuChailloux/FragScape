@@ -400,6 +400,7 @@ class MeffAlgUtils:
     DIVISOR = "divisor"
     
     SUFFIX = "suffix"
+    CLIP_FLAG = "clip_flag"
 
     # Output layer fields
     ID = "fid"
@@ -527,9 +528,9 @@ class MeffAlgUtils:
             dest_id = self.mkResSink(parameters,res_feat,context,include_cbc)
             res_layer = dest_id
             if include_cbc:
-                res_val = res_feat[self.CBC_MESH_SIZE] / res_dict[self.DIVISOR]
+                res_val = res_feat[self.CBC_MESH_SIZE]# / res_dict[self.DIVISOR]
             else:
-                res_val = res_feat[self.MESH_SIZE] / res_dict[self.DIVISOR]
+                res_val = res_feat[self.MESH_SIZE]# / res_dict[self.DIVISOR]
         else:
             res_layer = None
             if res_dict[self.REPORT_AREA] > 0:
@@ -918,25 +919,45 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         if nb_feats == 0:
             raise QgsProcessingException("Empty layer")
         multi_feedback = feedbacks.ProgressMultiStepFeedback(nb_feats, feedback)
+        # Global
+        # dissolved_path = params.mkTmpLayerPath('reportingDissolved.gpkg')
+        # qgsTreatments.dissolveLayer(reporting,dissolved_path,context,feedback)
+        # if nb_feats == 1:
+            # out_path = output
+        # elif self.include_cbc:
+            # out_path = params.mkTmpLayerPath("reportingComputedGlobalCBC"".gpkg")
+        # else:
+            # out_path = params.mkTmpLayerPath("reportingComputedGlobalCUT"".gpkg")
+        # parameters = { MeffVectorGlobal.INPUT : source,
+                   # MeffVectorGlobal.REPORTING : dissolved_path,
+                   # MeffVectorGlobal.CRS : self.crs,
+                   # MeffVectorGlobal.INCLUDE_CBC : self.include_cbc,
+                   # MeffVectorGlobal.UNIT : parameters[self.UNIT],
+                   # MeffVectorGlobal.OUTPUT : out_path,
+                   # self.SUFFIX : "Global" }
+        # global_res = qgsTreatments.applyProcessingAlg('FragScape', 
+            # MeffVectorGlobal.ALG_NAME,parameters, context, multi_feedback,
+            # onlyOutput=False)
+        # multi_feedback.setCurrentStep(1)
+        # Iterate on features
         report_layers = []
-        for count, report_feat in enumerate(reporting.getFeatures()):
-            multi_feedback.setCurrentStep(count)
-            report_id = report_feat.id()
-            reporting.selectByIds([report_id])
-            select_path = params.mkTmpLayerPath("reportingSelection" + str(report_feat.id()) + ".gpkg")
-            qgsTreatments.saveSelectedFeatures(reporting,select_path,context,multi_feedback)
-            report_computed_path = params.mkTmpLayerPath("reportingComputed" + str(report_feat.id()) + ".gpkg")
-            parameters = { MeffVectorGlobal.INPUT : source,
-                           MeffVectorGlobal.REPORTING : select_path,
-                           MeffVectorGlobal.CRS : self.crs,
-                           MeffVectorGlobal.INCLUDE_CBC : self.include_cbc,
-                           MeffVectorGlobal.UNIT : parameters[self.UNIT],
-                           MeffVectorGlobal.OUTPUT : report_computed_path,
-                           self.SUFFIX : str(report_id) }
-            qgsTreatments.applyProcessingAlg('FragScape',
-                                             MeffVectorGlobal.ALG_NAME,
-                                             parameters,context,multi_feedback)
-            report_layers.append(report_computed_path)
-        qgsTreatments.mergeVectorLayers(report_layers,self.crs,output)
-        return {self.OUTPUT: output}
+        if nb_feats >= 1:
+            for count, report_feat in enumerate(reporting.getFeatures(),start=2):
+                report_id = report_feat.id()
+                reporting.selectByIds([report_id])
+                select_path = params.mkTmpLayerPath("reportingSelection"
+                    + str(report_feat.id()) + ".gpkg")
+                qgsTreatments.saveSelectedFeatures(reporting,select_path,context,multi_feedback)
+                report_computed_path = params.mkTmpLayerPath("reportingComputed"
+                    + str(report_feat.id()) + ".gpkg")
+                parameters[MeffVectorGlobal.REPORTING] = select_path
+                parameters[MeffVectorGlobal.OUTPUT] = report_computed_path
+                parameters[self.SUFFIX] = str(report_id)
+                qgsTreatments.applyProcessingAlg('FragScape',
+                                                 MeffVectorGlobal.ALG_NAME,
+                                                 parameters,context,multi_feedback)
+                report_layers.append(report_computed_path)
+                multi_feedback.setCurrentStep(count)
+            qgsTreatments.mergeVectorLayers(report_layers,self.crs,output)
+        return {self.OUTPUT: output}#, self.OUTPUT_VAL : global_res[self.OUTPUT_VAL] }
 

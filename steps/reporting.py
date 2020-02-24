@@ -107,7 +107,7 @@ class ReportingModel(abstract_model.DictModel):
         if self.fsModel.modeIsVector():
             if not self.reporting_layer:
                 utils.user_error("No reporting layer")
-            parameters1 = { MeffReportV.INPUT : selected,
+            parameters = { MeffReportV.INPUT : selected,
                            MeffReportV.REPORTING : self.reporting_layer,
                            MeffReportV.CRS : crs,
                            MeffReportV.INCLUDE_CBC : self.includeCBC,
@@ -115,19 +115,15 @@ class ReportingModel(abstract_model.DictModel):
                            MeffReportV.OUTPUT : results_path }
             feedbacks.setSubText("Report per feature")
             res1 = qgsTreatments.applyProcessingAlg('FragScape',
-                MeffReportV.ALG_NAME,parameters1,
+                MeffReportV.ALG_NAME,parameters,
                 context=context,feedback=step_feedback,onlyOutput=False)
             step_feedback.setCurrentStep(1)
-            parameters2 = { MeffGlobalV.INPUT : selected,
-                           MeffGlobalV.REPORTING : self.reporting_layer,
-                           MeffGlobalV.CRS : crs,
-                           MeffGlobalV.INCLUDE_CBC : self.includeCBC,
-                           MeffGlobalV.UNIT : self.unit,
-                           MeffGlobalV.OUTPUT : global_results_path }
+            parameters[MeffGlobalV.OUTPUT] = global_results_path
             feedbacks.setSubText("Report global")
             res2 = qgsTreatments.applyProcessingAlg('FragScape',
-                MeffGlobalV.ALG_NAME,parameters2,
+                MeffGlobalV.ALG_NAME,parameters,
                 context=context,feedback=step_feedback,onlyOutput=False)
+            utils.warn("res2 = " + str(res2))
             res_layer = res1[MeffReportV.OUTPUT]
             res_val = res2[MeffReportV.OUTPUT_VAL]
         else:
