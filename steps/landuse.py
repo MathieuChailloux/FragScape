@@ -362,6 +362,9 @@ class LanduseConnector(abstract_model.AbstractConnector):
         self.dlg.landuseOpenTable.clicked.connect(self.importFields)
         self.dlg.landuseSaveTable.clicked.connect(self.saveFields)
         
+    def applyItems(self):
+        super().applyItems()
+        
     def setLayerUI(self,layer):
         utils.debug("setlayerUI")
         self.dlg.landuseSelectField.setLayer(layer)
