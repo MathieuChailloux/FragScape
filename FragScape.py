@@ -27,7 +27,6 @@ import sys
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
-from qgis.core import QgsApplication
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -35,6 +34,7 @@ from .resources import *
 from .FragScape_dialog import FragScapeDialog
 from .qgis_lib_mc import utils, qgsTreatments
 
+from qgis.core import QgsApplication
 from qgis.utils import qgis_excepthook
 
 

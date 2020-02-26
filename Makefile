@@ -28,7 +28,7 @@ version-file:
 	echo "\nqgis_lib_mc commit number "  >> $(COMMIT_FILE)
 	echo $(LIB_COMMIT) >> $(COMMIT_FILE)
 
-archive: version-file
+archive:
 	echo "Building delivery archive $(ARCHIVE_DIR)"
 	rm -rf $(ARCHIVE_DIR)
 	rm -f $(ARCHIVE_NAME)
