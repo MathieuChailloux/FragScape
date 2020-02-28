@@ -123,32 +123,39 @@ def launchFSCBCAlg(fname,cls,expected_res,test_name="NA"):
     launchTest(FS_CBC_ALG,parameters,expected_res,test_name)
 
     
-launchFSAlg(rb_fname,0,2900/25,"rbC0")
-launchFSAlg(rb_fname,1,10000/25,"rbC1")
-launchFSAlg(rb_fname,2,1800/25,"rbC2")
-launchFSCBCAlg(rb_fname,0,2100/18,"rbC0CBC")
-launchFSCBCAlg(rb_fname,1,8000/18,"rbC1CBC")
-launchFSCBCAlg(rb_fname,2,1300/18,"rbC2CBC")
+sum_a0 = 1500
+sum_a0_cbc = 800
+sum_a1 = 5200
+sum_a1_cbc = 5000
+sum_a2 = 1800
+sum_2_cbc = 1000
+    
+launchFSAlg(rb_fname,0,sum_a0/25,"rbC0")
+launchFSAlg(rb_fname,1,sum_a1/25,"rbC1")
+launchFSAlg(rb_fname,2,sum_a2/25,"rbC2")
+launchFSCBCAlg(rb_fname,0,sum_a0_cbc/18,"rbC0CBC")
+launchFSCBCAlg(rb_fname,1,sum_a1_cbc/18,"rbC1CBC")
+launchFSCBCAlg(rb_fname,2,sum_2_cbc/18,"rbC2CBC")
 
 launchFSAlg(rb0_fname,0,0,"rb0C0")
-launchFSAlg(rb0_fname,1,10000/16,"rb0C1")
-launchFSAlg(rb0_fname,2,1800/16,"rb0C2")
+launchFSAlg(rb0_fname,1,sum_a1/16,"rb0C1")
+launchFSAlg(rb0_fname,2,sum_a2/16,"rb0C2")
 launchFSCBCAlg(rb0_fname,0,0,"rb0C0CBC")
-launchFSCBCAlg(rb0_fname,1,8000/12,"rb0C1CBC")
-launchFSCBCAlg(rb0_fname,2,1300/12,"rb0C2CBC")
+launchFSCBCAlg(rb0_fname,1,sum_a1_cbc/12,"rb0C1CBC")
+launchFSCBCAlg(rb0_fname,2,sum_2_cbc/12,"rb0C2CBC")
 
-launchFSAlg(rb1_fname,0,2900/15,"rb1C0")
+launchFSAlg(rb1_fname,0,sum_a0/15,"rb1C0")
 launchFSAlg(rb1_fname,1,0,"rb1C1")
-launchFSAlg(rb1_fname,2,1800/15,"rb1C2")
-launchFSCBCAlg(rb1_fname,0,2100/10,"rb1C0CBC")
+launchFSAlg(rb1_fname,2,sum_a2/15,"rb1C2")
+launchFSCBCAlg(rb1_fname,0,sum_a0_cbc/10,"rb1C0CBC")
 launchFSCBCAlg(rb1_fname,1,0,"rb1C1CBC")
-launchFSCBCAlg(rb1_fname,2,1300/10,"rb1C2CBC")
+launchFSCBCAlg(rb1_fname,2,sum_2_cbc/10,"rb1C2CBC")
 
-launchFSAlg(rb2_fname,0,2900/19,"rb2C0")
-launchFSAlg(rb2_fname,1,10000/19,"rb2C1")
+launchFSAlg(rb2_fname,0,sum_a0/19,"rb2C0")
+launchFSAlg(rb2_fname,1,sum_a1/19,"rb2C1")
 launchFSAlg(rb2_fname,2,0,"rb2C2")
-launchFSCBCAlg(rb2_fname,0,2100/14,"rb2C0CBC")
-launchFSCBCAlg(rb2_fname,1,8000/14,"rb2C1CBC")
+launchFSCBCAlg(rb2_fname,0,sum_a0_cbc/14,"rb2C0CBC")
+launchFSCBCAlg(rb2_fname,1,sum_a1_cbc/14,"rb2C1CBC")
 launchFSCBCAlg(rb2_fname,2,0,"rb2C2CBC")
 
 print ("Nb tests OK = " + str(nb_tests_ok) + " / " + str(nb_tests_total))
