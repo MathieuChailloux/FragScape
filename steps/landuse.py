@@ -197,23 +197,23 @@ class LanduseModel(abstract_model.DictModel):
         self.fsModel.checkWorkspaceInit()
         self.checkLayerSelected()
         step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
-        clipped_path = self.fsModel.paramsModel.clipByExtent(self.landuseLayer,
-            name="landuse",clip_raster=False,context=context,feedback=step_feedback)
-        clipped_layer, clipped_type = qgsUtils.loadLayerGetType(clipped_path)
-        step_feedback.setCurrentStep(1)
-        input_vector = clipped_type == 'Vector'
         vector_mode = self.fsModel.paramsModel.modeIsVector()
-        crs, extent, resolution = self.fsModel.getRasterParams()
-        if input_vector:
-            reproj_path = params.mkTmpLayerPath("landuseReproject.gpkg")
-            clipped_layer = qgsTreatments.applyReprojectLayer(clipped_layer,crs,
-                reproj_path,context=context,feedback=feedback)
         if vector_mode:
             output = self.getDissolveLayer()
             qgsUtils.removeVectorLayer(output)
         else:
             output = self.getOutputRaster()
             qgsUtils.removeRaster(output)
+        clipped_path = self.fsModel.paramsModel.clipByExtent(self.landuseLayer,
+            name="landuse",clip_raster=False,context=context,feedback=step_feedback)
+        clipped_layer, clipped_type = qgsUtils.loadLayerGetType(clipped_path)
+        step_feedback.setCurrentStep(1)
+        input_vector = clipped_type == 'Vector'
+        crs, extent, resolution = self.fsModel.getRasterParams()
+        if input_vector:
+            reproj_path = params.mkTmpLayerPath("landuseReproject.gpkg")
+            clipped_layer = qgsTreatments.applyReprojectLayer(clipped_layer,crs,
+                reproj_path,context=context,feedback=feedback)
         if input_vector and vector_mode:
             expr = self.getSelectionExpr()
             selected_path = params.mkTmpLayerPath('landuseSelection.gpkg')
@@ -410,13 +410,13 @@ class LanduseConnector(abstract_model.AbstractConnector):
             keepDescr = True
             fieldVals = qgsUtils.getLayerFieldUniqueValues(layer,self.model.select_field)
             new_items = [LanduseFieldItem(v) for v in fieldVals]
-        for new_item in new_items:
-            old_item = self.model.getMatchingItem(new_item)
-            if old_item:
-                new_item.dict[LanduseFieldItem.TO_SELECT_FIELD] = old_item.dict[LanduseFieldItem.TO_SELECT_FIELD]
-                if keepDescr:
-                   new_item.dict[LanduseFieldItem.DESCR_FIELD] = old_item.dict[LanduseFieldItem.DESCR_FIELD]
-        return new_items
+        # for new_item in new_items:
+            # old_item = self.model.getMatchingItem(new_item)
+            # if old_item:
+                # new_item.dict[LanduseFieldItem.TO_SELECT_FIELD] = old_item.dict[LanduseFieldItem.TO_SELECT_FIELD]
+                # if keepDescr:
+                   # new_item.dict[LanduseFieldItem.DESCR_FIELD] = old_item.dict[LanduseFieldItem.DESCR_FIELD]
+        return (new_items, keepDescr)
         
     def loadRasterFields(self,layer):
         feedback = feedbacks.progressFeedback
@@ -433,9 +433,18 @@ class LanduseConnector(abstract_model.AbstractConnector):
             utils.user_error("No layer selected in landuse tab")
         loaded_layer, layer_type = qgsUtils.loadLayerGetType(curr_layer)
         if layer_type == 'Vector':
-            new_items = self.loadVectorFields(loaded_layer)
+            new_items, keepDescr = self.loadVectorFields(loaded_layer)
         else:
             new_items = self.loadRasterFields(loaded_layer)
+            keepDescr = True
+        # Update items from old ones
+        for new_item in new_items:
+            old_item = self.model.getMatchingItem(new_item)
+            if old_item:
+                new_item.dict[LanduseFieldItem.TO_SELECT_FIELD] = old_item.dict[LanduseFieldItem.TO_SELECT_FIELD]
+                if keepDescr:
+                   new_item.dict[LanduseFieldItem.DESCR_FIELD] = old_item.dict[LanduseFieldItem.DESCR_FIELD]
+        # Update model
         self.model.items = new_items
         self.model.layoutChanged.emit()
         feedbacks.endSection()
