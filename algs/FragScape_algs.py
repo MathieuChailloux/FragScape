@@ -709,7 +709,7 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
             diff_meff_val, sum_vals, divi = self.mkDiff(
                 a_meff_val,b_meff_val,a_divi,b_divi,feedback)
             new_feat[self.MESH_SIZE] = diff_meff_val
-            var_val = abs(diff_meff_val) / sum_vals if sum_vals != 0 else 0
+            var_val = diff_meff_val / sum_vals if sum_vals != 0 else 0
             new_feat[self.VARIATION] = round(var_val, self.NB_DIGITS)
             sink.addFeature(new_feat)
         return { self.OUTPUT : dest_id }
