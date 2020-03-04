@@ -9,7 +9,7 @@ Cet outil permet de calculer les indicateurs de fragmentation du paysage défini
 
 *FragScape* définit une procédure en 4 étapes depuis les données brutes jusqu’au calcul des indicateurs et permet de sauvegarder la configuration de l’outil afin de pouvoir reproduire les résultats.
 
-*FragScape* a été développé par *Mathieu Chailloux* au sein d'[*IRSTEA*](http://www.irstea.fr), pour le [*centre de ressources Trame Verte et Bleue*](http://www.trameverteetbleue.fr/) 
+*FragScape* a été développé par *Mathieu Chailloux* au sein d'[*INRAE*](http://www.inrae.fr), pour le [*centre de ressources Trame Verte et Bleue*](http://www.trameverteetbleue.fr/) 
 (piloté par le [*Ministère de la Transition Écologique et Solidaire*](https://www.ecologique-solidaire.gouv.fr/)).
 
 # Installation
@@ -20,7 +20,8 @@ Aller dans le menu *Extension*, *Installer/Gérer les extensions*, activer les o
 # Documentation
 
 Documentation disponible:
- - [Notice d'utilisation de FragScape](https://drive.google.com/open?id=1OaOkH5cwcagcuvIPy10o6EhDiug8fAWG)
+ - [Notice d'utilisation de FragScape](https://github.com/MathieuChailloux/FragScape/blob/master/docs/FragScape_UserGuide_fr.pdf)
+ - Tutoriels vidéo en cours de production
 
 # Exemple
 
