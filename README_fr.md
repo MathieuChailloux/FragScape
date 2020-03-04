@@ -1,5 +1,7 @@
 
-
+Nouveautés FragScape 2.0 :
+ - mode Raster
+ - algorithme pour comparer 2 couches résultat
 
 # Aperçu
 
@@ -29,11 +31,11 @@ Des données d'exemple sont fournies avec le plugin ([lien](https://github.com/M
 
 Résultats avec la méthode CUT :
 
-![CUT_GIF](/docs/CUT.gif)
+<img src="https://github.com/MathieuChailloux/FragScape/blob/master/docs/gifs/CUT.gif?raw=True" width="500"/>
 
 Résultats avec la méthode CBC :
 
-![CBC_GIF](/docs/CBC.gif)
+<img src="https://github.com/MathieuChailloux/FragScape/blob/master/docs/gifs/CBC.gif?raw=True" width="500"/>
 
 Pour reproduire les résultats, cf section "Exemple" de la notice d'utilisation.
  
@@ -42,10 +44,18 @@ Pour reproduire les résultats, cf section "Exemple" de la notice d'utilisation.
 *FragScape* définit une procédure en 4 étapes :
  1. Définition des paramètres généraux
  2. Sélection des éléments d'occupation du sol
- 3. Sélection des éléments fragmentants
+ 3. Sélection des données complémentaires
  4. Calcul des indicateurs
     
 Chaque étape est détaillé dans le panneau d'aide du plugin.
+
+# Contact
+
+Mathieu Chailloux (INRAE/UMR TETIS)- *mathieu.chailloux@inrae.fr*
+
+Jennifer Amsallem(INRAE/UMR TETIS) - *jennifer.amsallem@inrae.fr*
+
+Jean-Pierre Chéry (AgroParisTech/UMR TETIS) - *jean-pierre.chery@teledection.fr*
 
 # Citation
 
@@ -53,7 +63,7 @@ Chaque étape est détaillé dans le panneau d'aide du plugin.
     
 # Liens
  - [Répertoire git de FragScape](https://github.com/MathieuChailloux/FragScape)
- - [IRSTEA](http://www.irstea.fr)
+ - [INRAE](http://www.inrae.fr)
  - [AgroParisTech](http://www2.agroparistech.fr/)
  - [UMR TETIS](https://www.umr-tetis.fr)
  - [Centre de ressources Trame Verte et Bleue](http://www.trameverteetbleue.fr/)
