@@ -1,5 +1,7 @@
 
-
+New in *FragScape 2.0* :
+ - Raster mode
+ - Algorithm to compare 2 results layers
 
 # Overview
 
@@ -10,7 +12,7 @@ Its purpose is to compute landscape fragmentation metrics defined by Jaeger (Jae
 
 *FragScape* defines a 4 steps process from raw data to computed metrics and allow user to save configuration so that results can be reproduced with same context.
 
-It has been developped by *Mathieu Chailloux* at [*IRSTEA*](http://www.irstea.fr), for the [*French ecological network resource center*](http://www.trameverteetbleue.fr/) 
+It has been developped by *Mathieu Chailloux* at [*INRAE*](http://www.inrae.fr), for the [*French ecological network resource center*](http://www.trameverteetbleue.fr/) 
 (driven by [*French ministry of ecology*](https://www.ecologique-solidaire.gouv.fr/)).
 
 # Installation
@@ -22,7 +24,7 @@ Install it and a grid icon should appear. Otherwise, it is available in plugins 
 # Documentation
 
 Available documentation:
- - [FragScape User Guide](https://drive.google.com/open?id=1VxrRMjfpa1Kdf0ahqw9kWqvzhSLmAYDI)
+ - [FragScape User Guide](https://github.com/MathieuChailloux/FragScape/blob/master/docs/FragScape_UserGuide_en.pdf)
 
 # Example
 
@@ -30,11 +32,11 @@ Sample data is provided with plugin [here](https://github.com/MathieuChailloux/F
 
 Results with CUT method :
 
-![CUT_GIF](/docs/CUT.gif)
+<img src="https://github.com/MathieuChailloux/FragScape/blob/master/docs/gifs/CUT.gif?raw=True" width="500"/>
 
 Results with Cross-Boundary Connection method :
 
-![CBC_GIF](/docs/CBC.gif)
+<img src="https://github.com/MathieuChailloux/FragScape/blob/master/docs/gifs/CBC.gif?raw=True" width="500"/>
 
 To reproduce above results, see "Example" section of User Guide.
  
@@ -43,10 +45,18 @@ To reproduce above results, see "Example" section of User Guide.
 FragScape is a **4 steps** plugin :
  1. Parameters setting
  2. Land cover elements selection and preprocessing
- 3. Fragmentation elements selection and preprocessing
+ 3. Additional data selection and preprocessing
  4. Metrics computation
     
 Each step is detailed in plugin help panel.
+
+# Contact
+
+Mathieu Chailloux (INRAE/UMR TETIS)- *mathieu.chailloux@inrae.fr*
+
+Jennifer Amsallem(INRAE/UMR TETIS) - *jennifer.amsallem@inrae.fr*
+
+Jean-Pierre Chéry (AgroParisTech/UMR TETIS) - *jean-pierre.chery@teledection.fr*
 
 # Quotation
 
@@ -54,7 +64,7 @@ Each step is detailed in plugin help panel.
     
 # Links
  - [FragScape git repository](https://github.com/MathieuChailloux/FragScape)
- - [IRSTEA](http://www.irstea.fr)
+ - [INRAE](http://www.inrae.fr)
  - [AgroParisTech](http://www2.agroparistech.fr/)
  - [UMR TETIS](https://www.umr-tetis.fr)
  - [French ecological network resource center](http://www.trameverteetbleue.fr/)
