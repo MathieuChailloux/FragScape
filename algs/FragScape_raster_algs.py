@@ -23,8 +23,11 @@
 """
 
 import math
-import scipy
-import numpy as np
+try:
+    import scipy
+    import numpy as np
+except ModuleNotFoundError:
+    pass
 
 import time, sys
 
