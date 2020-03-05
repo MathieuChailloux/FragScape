@@ -1,5 +1,5 @@
 <FragScapeModel>
- <Params workspace="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/FragScape/sample_data/EPCI_Clermontais_2012/OSO_CBC" resolution="10.0" extentLayer="../Source/OSO/OSO_2018_DPT_34.tif" crs="epsg:2154" mode="1"/>
+ <Params workspace="/home/mtd/Projets/FragScape/FragScape/sample_data/EPCI_Clermontais_2012/OSO_CBC" resolution="10.0" extentLayer="../Source/OSO/OSO_2018.tif" crs="epsg:2154" mode="1"/>
  <Landuse in_layer="../Source/OSO/OSO_2018.tif">
   <LanduseFieldItem   value="1"   description="batis denses"   toSelect="False"/>
   <LanduseFieldItem   value="2"   description="batis diffus"   toSelect="False"/>
