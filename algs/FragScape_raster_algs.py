@@ -24,7 +24,7 @@
 
 import math
 try:
-    import scipy
+    from scipy import ndimage
     import numpy as np
 except ModuleNotFoundError:
     pass
@@ -179,15 +179,15 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
             new_array[array==self.cl] = 1
             feedback.pushDebugInfo("new_array2 = " + str(new_array))
             # 8-connexity ? TODO : investigate
-            # struct = scipy.ndimage.generate_binary_structure(2,2)
-            struct = scipy.ndimage.generate_binary_structure(2,1)
-            labeled_array, nb_patches = scipy.ndimage.label(new_array,struct)
+            # struct = ndimage.generate_binary_structure(2,2)
+            struct = ndimage.generate_binary_structure(2,1)
+            labeled_array, nb_patches = ndimage.label(new_array,struct)
             feedback.pushDebugInfo("labeled_array = " + str(labeled_array))
             feedback.pushDebugInfo("nb_patches = " + str(nb_patches))
             if nb_patches == 0:
                 feedback.reportError("No patches found",fatalError=True)
             labels = list(range(1,nb_patches+1))
-            patches_len = scipy.ndimage.labeled_comprehension(new_array,
+            patches_len = ndimage.labeled_comprehension(new_array,
                 labeled_array,labels,len,int,0)
             feedback.pushDebugInfo("patches_len = " + str(patches_len))
         nb_pix = len(array[array != self.nodata])
@@ -376,7 +376,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         
         # Patches length
         if clip_labels:
-            patches_len2 = scipy.ndimage.labeled_comprehension(
+            patches_len2 = ndimage.labeled_comprehension(
                 clip_array,clip_array,clip_labels,len,int,0)
             step_feedback.pushDebugInfo("patches_len2 = " + str(patches_len2))
             step_feedback.pushDebugInfo("nb patches_len2 = " + str(len(patches_len2)))
