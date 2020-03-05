@@ -169,6 +169,7 @@ class LanduseModel(abstract_model.DictModel):
         return form
 
     def mkSelectionExpr(self):
+        self.checkFieldSelected()
         expr = ""
         for item in self.items:
             if item.dict[LanduseFieldItem.TO_SELECT_FIELD]:

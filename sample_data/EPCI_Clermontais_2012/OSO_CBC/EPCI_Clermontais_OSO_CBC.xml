@@ -1,0 +1,35 @@
+<FragScapeModel>
+ <Params workspace="C:/Users/mathieu.chailloux/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/FragScape/sample_data/EPCI_Clermontais_2012/OSO_CBC" resolution="10.0" extentLayer="../Source/OSO/OSO_2018_DPT_34.tif" crs="epsg:2154" mode="1"/>
+ <Landuse in_layer="../Source/OSO/OSO_2018.tif">
+  <LanduseFieldItem   value="1"   description="batis denses"   toSelect="False"/>
+  <LanduseFieldItem   value="2"   description="batis diffus"   toSelect="False"/>
+  <LanduseFieldItem   value="3"   description="zones ind et com"   toSelect="False"/>
+  <LanduseFieldItem   value="4"   description="surfaces routes"   toSelect="False"/>
+  <LanduseFieldItem   value="5"   description="colza"   toSelect="False"/>
+  <LanduseFieldItem   value="6"   description="cereales à pailles"   toSelect="False"/>
+  <LanduseFieldItem   value="7"   description="protéagineux"   toSelect="False"/>
+  <LanduseFieldItem   value="8"   description="soja"   toSelect="False"/>
+  <LanduseFieldItem   value="9"   description="tournesol"   toSelect="False"/>
+  <LanduseFieldItem   value="10"   description="maïs"   toSelect="False"/>
+  <LanduseFieldItem   value="11"   description="riz"   toSelect="False"/>
+  <LanduseFieldItem   value="12"   description="tubercules/racines"   toSelect="False"/>
+  <LanduseFieldItem   value="13"   description="prairies"   toSelect="True"/>
+  <LanduseFieldItem   value="14"   description="vergers"   toSelect="False"/>
+  <LanduseFieldItem   value="15"   description="vignes"   toSelect="False"/>
+  <LanduseFieldItem   value="16"   description="forets de feuillus"   toSelect="True"/>
+  <LanduseFieldItem   value="17"   description="forets de coniferes"   toSelect="True"/>
+  <LanduseFieldItem   value="18"   description="pelouses"   toSelect="True"/>
+  <LanduseFieldItem   value="19"   description="landes ligneuses"   toSelect="True"/>
+  <LanduseFieldItem   value="20"   description="surfaces  minérales"   toSelect="True"/>
+  <LanduseFieldItem   value="21"   description="plages et dunes"   toSelect="True"/>
+  <LanduseFieldItem   value="23"   description="eau"   toSelect="False"/>
+ </Landuse>
+ <FragmModel>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison locale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="7.5"   NAME="road1"   FRAGM="True"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison régionale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="15"   NAME="road2"   FRAGM="True"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Liaison principale' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="22.5"   NAME="road3"   FRAGM="True"/>
+  <FragmItem   INPUT="../Source/BDROUTE/bdroute_troncon_route_20121123_herault_clipped.gpkg"   SELECT_EXPR=" &quot;VOCATION&quot;  =  'Type autoroutier' AND&quot;ETAT&quot;  =  'Revêtu' "   BUFFER_EXPR="30"   NAME="road4"   FRAGM="True"/>
+ </FragmModel>
+ <Reporting input_layer="outputs/landuseFragm.tif" include_cbc="True" reporting_layer="../Source/ZoneEtude/EPCIClermontaisCommunes.shp" output="resultsOSO_CBC.gpkg">
+ </Reporting>
+</FragScapeModel>
