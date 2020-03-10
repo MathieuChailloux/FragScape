@@ -263,8 +263,9 @@ class LanduseModel(abstract_model.DictModel):
                     extent=extent,extent_crs=crs,resolution=resolution,
                     nodata_val=255,context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(3)
-        qgsUtils.loadLayer(res,loadProject=True)
+        res_layer = qgsUtils.loadLayer(res,loadProject=True)
         feedbacks.endSection()
+        return res_layer
         
     def toXML(self,indent=" "):
         if not self.landuseLayer:
@@ -365,6 +366,8 @@ class LanduseConnector(abstract_model.AbstractConnector):
         
     def applyItems(self):
         super().applyItems()
+        res_layer = qgsUtils.loadLayer(self.model.getOutputLayer())
+        self.dlg.fragmInputLayerCombo.setLayer(res_layer)
         
     def setLayerUI(self,layer):
         utils.debug("setlayerUI")
