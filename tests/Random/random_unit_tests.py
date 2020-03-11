@@ -124,11 +124,11 @@ def launchFSCBCAlg(fname,cls,expected_res,test_name="NA"):
 
     
 sum_a0 = 1500
-sum_a0_cbc = 800
+sum_a0_cbc = 1000
 sum_a1 = 5200
 sum_a1_cbc = 5000
 sum_a2 = 1800
-sum_2_cbc = 1000
+sum_2_cbc = 1300
     
 launchFSAlg(rb_fname,0,sum_a0/25,"rbC0")
 launchFSAlg(rb_fname,1,sum_a1/25,"rbC1")

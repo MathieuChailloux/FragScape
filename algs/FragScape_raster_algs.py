@@ -408,12 +408,18 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         nb_pix2 = input_clip_report['TOTAL_PIXEL_COUNT']
         nb_pix_nodata2 = input_clip_report['NODATA_PIXEL_COUNT']
         nb_pix = nb_pix2 - nb_pix_nodata2
+        nb_pix3 = clip_report['TOTAL_PIXEL_COUNT']
+        nb_pix_nodata3 = clip_report['NODATA_PIXEL_COUNT']
+        nb_pix33 = nb_pix3 - nb_pix_nodata3
         nb_0 = len(clip_array[clip_array == 0])
         nb_not_0 = len(clip_array[clip_array != 0])
-        step_feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         step_feedback.pushDebugInfo("nb_pix_old = " + str(nb_pix_old))
         step_feedback.pushDebugInfo("nb_pix2 = " + str(nb_pix2))
         step_feedback.pushDebugInfo("nb_pix_nodata2 = " + str(nb_pix_nodata2))
+        step_feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
+        step_feedback.pushDebugInfo("nb_pix3 = " + str(nb_pix3))
+        step_feedback.pushDebugInfo("nb_pix_nodata3 = " + str(nb_pix_nodata3))
+        step_feedback.pushDebugInfo("nb_pix33 = " + str(nb_pix33))
         step_feedback.pushDebugInfo("nb_0 = " + str(nb_0))
         step_feedback.pushDebugInfo("nb_not_0 = " + str(nb_not_0))
         tot_area = nb_pix * self.pix_area
@@ -440,8 +446,8 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         # Processing
         input_dpr = input.dataProvider()
         nodata = self.nodata
-        # inputFilename = input.source()
-        inputFilename = self.input_clipped
+        inputFilename = input.source()
+        # inputFilename = self.input_clipped
         pix_area = self.pix_area
         feedback.pushDebugInfo("nodata = " + str(nodata))
         # Export label
