@@ -10,7 +10,7 @@
 name=FragScape
 qgisMinimumVersion=3.4
 description=Plugin to compute landscape fragmentation metrics (effective mesh size)
-version=2.0.1
+version=2.0.2
 author=Mathieu Chailloux
 email=mathieu@chailloux.org
 
@@ -24,13 +24,10 @@ repository=https://github.com/MathieuChailloux/FragScape
 
 # Uncomment the following line and add your changelog:
 changelog=FragScape changelog:
-    1.0
-        - First stable release
-    2.0
-        - raster mode
-        - algorithm to compare FragScape output layers
-    2.0.1
-        - fix raster CBC mode
+    1.0 : First stable release
+    2.0 : raster mode + algorithm to compare FragScape output layers
+    2.0.1 : fix raster CBC mode
+    2.0.2 : fix issue #7
 
 # Tags are comma separated with spaces allowed
 tags=python,fragmentation,landscape,ecology,effective mesh size,division,metrics,vector
