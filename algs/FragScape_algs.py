@@ -942,6 +942,7 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         # multi_feedback.setCurrentStep(1)
         # Iterate on features
         report_layers = []
+        parameters[MeffVectorGlobal.INPUT] = source
         if nb_feats >= 1:
             for count, report_feat in enumerate(reporting.getFeatures(),start=2):
                 report_id = report_feat.id()
