@@ -796,7 +796,8 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         else:
             clipped_path = params.mkTmpLayerPath(source_name
                 + "_clipped" + suffix + ".gpkg")
-            qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
+            #qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
+            clipped_path = input
             qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
         feedback.setCurrentStep(4)
         input = qgsUtils.loadVectorLayer(out_path)
