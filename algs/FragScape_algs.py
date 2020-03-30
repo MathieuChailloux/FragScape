@@ -717,7 +717,7 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
                 
 class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
     
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self,config=None,clip_flag=False,):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -742,6 +742,12 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
                 self.UNIT,
                 description=self.tr("Report areas unit"),
                 options=self.getUnitOptions()))
+        if clip_flag:
+            self.addParameter(
+                QgsProcessingParameterBoolean(
+                    self.CLIP_FLAG,
+                    self.tr("Clip input layer at reporting boundaries"),
+                    defaultValue=False))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
@@ -793,12 +799,14 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         if self.include_cbc:
             qgsTreatments.selectIntersection(input,reporting,context,feedback)
             qgsTreatments.saveSelectedFeatures(input,out_path,context,feedback)
-        else:
+        elif self.CLIP_FLAG in parameters and parameters[self.CLIP_FLAG]:
             clipped_path = params.mkTmpLayerPath(source_name
                 + "_clipped" + suffix + ".gpkg")
-            #qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
+            qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
             clipped_path = input
             qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
+        else:
+            qgsTreatments.multiToSingleGeom(input,out_path,context,feedback)
         feedback.setCurrentStep(4)
         input = qgsUtils.loadVectorLayer(out_path)
         return (input, reporting)
@@ -873,22 +881,25 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         net_product = 0
         cbc_net_product = 0
         intersecting_area = 0
+        feats_cpt = 0
         for cpt, f in enumerate(source.getFeatures()):
             f_geom = f.geometry()
-            f_area = f_geom.area()
-            sum_ai += f_area
-            intersection = f_geom.intersection(report_geom)
-            intersection_area = intersection.area()
-            intersecting_area += intersection_area
-            net_product += intersection_area * intersection_area
-            cbc_net_product += f_area * intersection_area
+            if f_geom.intersects(report_geom):
+                feats_cpt += 1
+                f_area = f_geom.area()
+                sum_ai += f_area
+                intersection = f_geom.intersection(report_geom)
+                intersection_area = intersection.area()
+                intersecting_area += intersection_area
+                net_product += intersection_area * intersection_area
+                cbc_net_product += f_area * intersection_area
             feedback.setProgress(cpt)
         report_area_sq = report_area * report_area
         # Outputs
         res_dict = { self.REPORT_AREA : report_area,
             self.SUM_AI : sum_ai,
             self.SUM_AI_SQ : net_product,
-            self.NB_PATCHES : nb_feats,
+            self.NB_PATCHES : feats_cpt,
             self.DIVISOR : self.unit_divisor,
         }
         if self.include_cbc:
@@ -910,6 +921,10 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         
     def shortHelpString(self):
         return self.tr("Computes effective mesh size from patch layer for each feature of reporting layer.")
+                
+    
+    def initAlgorithm(self,config=None):
+        super().initAlgorithm(clip_flag=True)
                 
     def processAlgorithm(self,parameters,context,feedback):
         source, reporting = self.prepareInputs(parameters, context, feedback)
