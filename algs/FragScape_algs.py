@@ -717,7 +717,7 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
                 
 class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
     
-    def initAlgorithm(self, config=None):
+    def initAlgorithm(self,config=None,clip_flag=False):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -742,6 +742,12 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
                 self.UNIT,
                 description=self.tr("Report areas unit"),
                 options=self.getUnitOptions()))
+        if clip_flag:
+            self.addParameter(
+                QgsProcessingParameterBoolean(
+                    self.CLIP_FLAG,
+                    self.tr("Clip input layer at reporting boundaries"),
+                    defaultValue=False))
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
