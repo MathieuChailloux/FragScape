@@ -799,13 +799,16 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         if self.include_cbc:
             qgsTreatments.selectIntersection(input,reporting,context,feedback)
             qgsTreatments.saveSelectedFeatures(input,out_path,context,feedback)
-        elif self.CLIP_FLAG in parameters and parameters[self.CLIP_FLAG]:
+        elif self.CLIP_FLAG in parameters and not parameters[self.CLIP_FLAG]:
+            clipped_path = params.mkTmpLayerPath(source_name
+                + "_intersected" + suffix + ".gpkg")
+            qgsTreatments.applyIntersection(input,reporting,clipped_path,context,feedback)
+            qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
+        else:
             clipped_path = params.mkTmpLayerPath(source_name
                 + "_clipped" + suffix + ".gpkg")
             qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
             qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
-        else:
-            qgsTreatments.multiToSingleGeom(input,out_path,context,feedback)
         feedback.setCurrentStep(4)
         input = qgsUtils.loadVectorLayer(out_path)
         return (input, reporting)
@@ -830,6 +833,7 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         feedback.pushDebugInfo("Start " + str(self.name()))
         # Parameters
         source, boundary = self.prepareInputs(parameters, context, feedback)
+        output = parameters[self.OUTPUT]
         # CRS reprojection
         # source_crs = source.crs().authid()
         # boundary_crs = boundary.crs().authid()
@@ -904,7 +908,7 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         if self.include_cbc:
             res_dict[self.SUM_AI_SQ_CBC] = cbc_net_product
         res_layer, res_val = self.mkOutputs(parameters,res_dict,context)
-        return {self.OUTPUT: res_layer, self.OUTPUT_VAL : res_val}
+        return {self.OUTPUT: output, self.OUTPUT_VAL : res_val}
 
    
 
@@ -958,7 +962,9 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         # Iterate on features
         report_layers = []
         parameters[MeffVectorGlobal.INPUT] = source
-        if nb_feats >= 1:
+        source_nb_feats = source.featureCount()
+        feedback.pushDebugInfo("source_nb_feats = " + str(source_nb_feats))
+        if source_nb_feats >= 1:
             for count, report_feat in enumerate(reporting.getFeatures(),start=2):
                 report_id = report_feat.id()
                 reporting.selectByIds([report_id])
