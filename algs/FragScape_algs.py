@@ -404,23 +404,73 @@ class MeffAlgUtils:
 
     # Output layer fields
     ID = "fid"
-    NB_PATCHES = "nb_patches"
-    REPORT_AREA = "report_area"
-    INTERSECTING_AREA = "intersecting_area"
+    NB_PATCHES = "patches"
+    REPORT_AREA = "At"
+    INTERSECTING_AREA = "sum_Ai"
     # Main measures
-    MESH_SIZE = "effective_mesh_size"
-    CBC_MESH_SIZE = "CBC_effective_mesh_size"
-    DIVI = "landscape_division"
-    SPLITTING_INDEX = "splitting_index"
+    MESH_SIZE = "MSIZ"
+    CBC_MESH_SIZE = "CBC_MSIZ"
+    DIVI = "DIVI"
+    SPLITTING_INDEX = "SPLI"
     # Auxiliary measures
-    COHERENCE = "coherence"
-    SPLITTING_DENSITY = "splitting_density"
-    NET_PRODUCT = "net_product"
-    CBC_NET_PRODUCT = "CBC_net_product"
+    COHERENCE = "COH"
+    SPLITTING_DENSITY = "SDEN"
+    NET_PRODUCT = "NPRO"
+    CBC_NET_PRODUCT = "CBC_NPRO"
+    
+    FIELDS_V1 = {
+        ID : "fid",
+        NB_PATCHES : "nb_patches",
+        REPORT_AREA : "report_area",
+        INTERSECTING_AREA : "intersecting_area",
+        MESH_SIZE : "effective_mesh_size",
+        CBC_MESH_SIZE : "CBC_effective_mesh_size",
+        DIVI : "landscape_division",
+        SPLITTING_INDEX : "splitting_index",
+        COHERENCE : "coherence",
+        SPLITTING_DENSITY : "splitting_density",
+        NET_PRODUCT : "net_product",
+        CBC_NET_PRODUCT : "CBC_net_product" }
+    FIELDS_V1_SHP = {
+        ID : "fid",
+        NB_PATCHES : "nb_patches",
+        REPORT_AREA : "report_are",
+        INTERSECTING_AREA : "intersecti",
+        MESH_SIZE : "effective_",
+        CBC_MESH_SIZE : "CBC_effect",
+        DIVI : "landscape_",
+        SPLITTING_INDEX : "splitting_",
+        COHERENCE : "coherence",
+        SPLITTING_DENSITY : "splittin_1",
+        NET_PRODUCT : "net_produc",
+        CBC_NET_PRODUCT : "CBC_net_pr" }
+    FIELDS_V2 = {
+        ID : "fid",
+        NB_PATCHES : "patches",
+        REPORT_AREA : "At",
+        INTERSECTING_AREA : "sum_Ai",
+        MESH_SIZE : "MSIZ",
+        CBC_MESH_SIZE : "CBC_MSIZ",
+        DIVI : "DIVI",
+        SPLITTING_INDEX : "SPLI",
+        COHERENCE : "COH",
+        SPLITTING_DENSITY : "SDEN",
+        NET_PRODUCT : "NPRO",
+        CBC_NET_PRODUCT : "CBC_NPRO" }
     
     UNIT_DIVISOR = [1, 100, 10000, 1000000]
     
     DEFAULT_CRS = QgsCoordinateReferenceSystem("epsg:2154")
+    
+    def getFieldSet(self,fields):
+        if "report_area" in fields:
+            return self.FIELDS_V1
+        elif "report_are" in fields:
+            return self.FIELDS_V1_SHP
+        elif "At" in fields:
+            return self.FIELDS_V2
+        else:
+            raise QgsProcessingException("Unexpected fields : " + str(fields))
     
     def getUnitOptions(self):
         return [self.tr("m² (square meters)"),
@@ -489,7 +539,7 @@ class MeffAlgUtils:
         res_feat[self.REPORT_AREA] = report_area
         res_feat[self.INTERSECTING_AREA] = sum_ai
         res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
-        res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai if sum_ai > 0 else 0
+        res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai_sq if sum_ai > 0 else 0
         res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS) if report_area > 0 else 0
         res_feat[self.SPLITTING_INDEX] = report_area_sq / sum_ai_sq if sum_ai_sq > 0 else 0
         res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
@@ -621,10 +671,13 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
                 str(a_crs) + " vs " + str(b_crs))
         nb_feats_a, nb_feats_b = layer_a.featureCount(), layer_b.featureCount()
         if nb_feats_a != nb_feats_b:
-            raise QgsProcessingException("Layers do not have same number of features (" + str(nb_feats_a) + " vs " + str(nb_feats_b) + ")")
+            raise QgsProcessingException("Layers do not have same number of features ("
+                                         + str(nb_feats_a) + " vs " + str(nb_feats_b) + ")")
         a_fields, b_fields = layer_a.fields().names(), layer_b.fields().names()
-        include_cbc_a = self.CBC_MESH_SIZE in a_fields
-        include_cbc_b = self.CBC_MESH_SIZE in b_fields
+        a_field_set, b_field_set = self.getFieldSet(a_fields), self.getFieldSet(b_fields)
+        
+        include_cbc_a = a_field_set[self.CBC_MESH_SIZE] in a_fields
+        include_cbc_b = a_field_set[self.CBC_MESH_SIZE] in b_fields
         # include_cbc = include_cbc_a or include_cbc_b
         if include_cbc_a != include_cbc_b:
             feedback.pushInfo("Comparing CBC with CUT")
@@ -642,7 +695,8 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         diff_fields_divisor = [self.REPORT_AREA, 
             self.INTERSECTING_AREA, self.NET_PRODUCT]
         # diff_fields_divisor_sq = [self.NET_PRODUCT]
-        same_fields = [self.ID]
+        # same_fields = [self.ID]
+        same_fields = []
         if include_cbc_a:
             a_meff_field, a_np_field = self.CBC_MESH_SIZE, self.CBC_NET_PRODUCT
         else:
@@ -659,6 +713,10 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         # Join layers A and B
         predicates = [2] # 2 <=> join on equal geometries
         joined_path = QgsProcessingUtils.generateTempFilename("joined.gpkg")
+        # if qgsUtils.getMaxFid(layer_a) == 1:
+            # qgsUtils.normFids(layer_a)
+        # if qgsUtils.getMaxFid(layer_b) == 1:
+            # qgsUtils.normFids(layer_b)
         joined = qgsTreatments.joinByLoc(layer_a,layer_b,predicates=predicates,
             out_path=joined_path,fields=fields_names,prefix=self.PREFIX,
             context=context,feedback=feedback)
@@ -679,9 +737,12 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
             new_feat = QgsFeature(qgs_fields)
             new_feat.setGeometry(feat.geometry())
             for fname in same_fields:
-                new_feat[fname] = feat[fname]
+                fname_fix = a_field_set[fname]
+                new_feat[fname_fix] = feat[fname_fix]
             for fname in diff_fields:
-                a_val, b_val = feat[fname], feat[self.PREFIX + fname]
+                a_fname = a_field_set[fname]
+                b_fname = self.PREFIX + b_field_set[fname]
+                a_val, b_val = feat[a_fname], feat[b_fname]
                 new_feat[fname] = b_val - a_val
             # Divisor
             if self.DIVISOR in a_fields and self.DIVISOR in b_fields:
@@ -695,17 +756,20 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
             # factor_sq = factor * factor
             for fname in diff_fields_divisor:
                 feedback.pushDebugInfo("fname = " + str(fname))
-                a_val, b_val = feat[fname], feat[self.PREFIX + fname]
+                a_val = feat[a_field_set[fname]]
+                b_val = feat[self.PREFIX + b_field_set[fname]]
                 diff_val, sum_vals, divi = self.mkDiff(a_val,b_val,a_divi,b_divi,feedback)
                 new_feat[fname] = diff_val
                 new_feat[self.DIVISOR] = divi
             # NET PRODUCT
-            a_np_val, b_np_val = feat[a_np_field], feat[self.PREFIX + b_np_field]
+            a_np_val = feat[a_field_set[a_np_field]]
+            b_np_val = feat[self.PREFIX + b_field_set[b_np_field]]
             diff_np_val, sum_vals, divi = self.mkDiff(a_np_val,b_np_val,a_divi,b_divi,
                 feedback,sq_factor=True)
             new_feat[self.NET_PRODUCT] = diff_np_val
             # MESH SIZE
-            a_meff_val, b_meff_val = feat[a_meff_field], feat[self.PREFIX + b_meff_field]
+            a_meff_val = feat[a_field_set[a_meff_field]]
+            b_meff_val = feat[self.PREFIX + b_field_set[b_meff_field]]
             diff_meff_val, sum_vals, divi = self.mkDiff(
                 a_meff_val,b_meff_val,a_divi,b_divi,feedback)
             new_feat[self.MESH_SIZE] = diff_meff_val
@@ -965,8 +1029,12 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
         source_nb_feats = source.featureCount()
         feedback.pushDebugInfo("source_nb_feats = " + str(source_nb_feats))
         if source_nb_feats >= 1:
+            all_ids = set()
             for count, report_feat in enumerate(reporting.getFeatures(),start=2):
                 report_id = report_feat.id()
+                if report_id in all_ids:
+                    raise QgsProcessingException("Identifier of reporting layer not unique : "
+                        + str(report_id))
                 reporting.selectByIds([report_id])
                 select_path = params.mkTmpLayerPath("reportingSelection"
                     + str(report_feat.id()) + ".gpkg")
