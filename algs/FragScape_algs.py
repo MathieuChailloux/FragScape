@@ -494,7 +494,7 @@ class MeffAlgUtils:
             cbc_mesh_size_field = QgsField(self.CBC_MESH_SIZE, QVariant.Double)
             cbc_net_product_field = QgsField(self.CBC_NET_PRODUCT, QVariant.Double)
         output_fields = QgsFields()
-        output_fields.append(report_id_field)
+        # output_fields.append(report_id_field)
         if include_cbc:
             output_fields.append(cbc_mesh_size_field)
         output_fields.append(mesh_size_field)
@@ -519,7 +519,7 @@ class MeffAlgUtils:
         output_fields = self.mkReportFields(include_cbc)
         res_feat = QgsFeature(output_fields)
         res_feat.setGeometry(report_feat.geometry())
-        res_feat[self.ID] = report_feat.id()
+        # res_feat[self.ID] = report_feat.id()
         return res_feat
         
     def fillResFeat(self,res_feat,res_dict):
@@ -539,7 +539,7 @@ class MeffAlgUtils:
         res_feat[self.REPORT_AREA] = report_area
         res_feat[self.INTERSECTING_AREA] = sum_ai
         res_feat[self.COHERENCE] = sum_ai_sq / report_area_sq if report_area_sq > 0 else 0
-        res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai_sq if sum_ai > 0 else 0
+        res_feat[self.SPLITTING_DENSITY] = report_area / sum_ai_sq if sum_ai_sq > 0 else 0
         res_feat[self.MESH_SIZE] = round(sum_ai_sq / report_area, NB_DIGITS) if report_area > 0 else 0
         res_feat[self.SPLITTING_INDEX] = report_area_sq / sum_ai_sq if sum_ai_sq > 0 else 0
         res_feat[self.DIVI] = 1 - res_feat[self.COHERENCE]
@@ -686,12 +686,12 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         if self.DIVISOR not in a_fields or self.DIVISOR not in b_fields:
             raise QgsProcessingException("Missing field 'divisor'")
         qgs_fields = self.mkReportFields()
-        qgs_fields.remove(5)
-        qgs_fields.remove(5)
-        qgs_fields.remove(5)
-        qgs_fields.remove(5)
-        diff_fields = [self.NB_PATCHES]
-            # , self.DIVI,self.SPLITTING_INDEX,self.COHERENCE,self.SPLITTING_DENSITY]
+        # qgs_fields.remove(4)
+        # qgs_fields.remove(4)
+        # qgs_fields.remove(4)
+        # qgs_fields.remove(4)
+        diff_fields = [self.NB_PATCHES,self.DIVI,self.SPLITTING_INDEX,
+            self.COHERENCE,self.SPLITTING_DENSITY]
         diff_fields_divisor = [self.REPORT_AREA, 
             self.INTERSECTING_AREA, self.NET_PRODUCT]
         # diff_fields_divisor_sq = [self.NET_PRODUCT]
@@ -781,7 +781,7 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
                 
 class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
     
-    def initAlgorithm(self,config=None,clip_flag=False):
+    def initAlgorithm(self,config=None,clip_flag=False,out_sink=True):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.INPUT,
@@ -812,10 +812,17 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
                     self.CLIP_FLAG,
                     self.tr("Clip input layer at reporting boundaries"),
                     defaultValue=False))
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                self.OUTPUT,
-                self.tr("Output layer")))
+        if out_sink:
+            self.addParameter(
+                QgsProcessingParameterFeatureSink(
+                    self.OUTPUT,
+                    self.tr("Output layer")))
+        else:
+            self.addParameter(
+                QgsProcessingParameterVectorDestination(
+                    self.OUTPUT,
+                    self.tr("Output layer")))
+            
                 
     def prepareInputs(self,parameters,context,feedback):
         feedbacks.setSubText("Prepare inputs")
@@ -964,7 +971,7 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         report_area_sq = report_area * report_area
         # Outputs
         res_dict = { self.REPORT_AREA : report_area,
-            self.SUM_AI : sum_ai,
+            self.SUM_AI : intersecting_area,
             self.SUM_AI_SQ : net_product,
             self.NB_PATCHES : feats_cpt,
             self.DIVISOR : self.unit_divisor,
@@ -991,11 +998,22 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
                 
     
     def initAlgorithm(self,config=None):
-        super().initAlgorithm(clip_flag=True)
+        super().initAlgorithm(clip_flag=True,out_sink=False)
                 
     def processAlgorithm(self,parameters,context,feedback):
         source, reporting = self.prepareInputs(parameters, context, feedback)
         output = parameters[self.OUTPUT]
+        out = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        # report_fields = self.mkReportFields(self.include_cbc)
+        # wkb_type = reporting.wkbType()
+        # report_crs = reporting.sourceCrs()
+        # sink, dest_id = self.parameterAsSink(
+            # parameters,
+            # self.OUTPUT,
+            # context,
+            # report_fields,
+            # wkb_type,
+            # report_crs)
         # Algorithm
         # progress step
         nb_feats = reporting.featureCount()
@@ -1049,6 +1067,17 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
                                                  parameters,context,multi_feedback)
                 report_layers.append(report_computed_path)
                 multi_feedback.setCurrentStep(count)
-            qgsTreatments.mergeVectorLayers(report_layers,self.crs,output)
-        return {self.OUTPUT: output}#, self.OUTPUT_VAL : global_res[self.OUTPUT_VAL] }
+            # merged_path = params.mkTmpLayerPath("reportingMerged.gpkg")
+            feedback.pushDebugInfo("output = " + str(output))
+            feedback.pushDebugInfo("output class = " + str(output.__class__))
+            qgsTreatments.mergeVectorLayers(report_layers,self.crs,out)
+            # if isinstance(output,str):
+                # out_layer = qgsUtils.loadVectorLayer(output)
+                # out_layer.dataProvider().deleteAttributes([0])
+            # else:
+            feedback.pushDebugInfo("out_layer = " + str(out))
+            out_layer = qgsUtils.loadVectorLayer(out)
+            out_layer.dataProvider().deleteAttributes([0])
+                
+        return { self.OUTPUT: output }#, self.OUTPUT_VAL : global_res[self.OUTPUT_VAL] }
 
