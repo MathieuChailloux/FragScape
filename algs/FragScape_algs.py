@@ -686,17 +686,18 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
         if self.DIVISOR not in a_fields or self.DIVISOR not in b_fields:
             raise QgsProcessingException("Missing field 'divisor'")
         qgs_fields = self.mkReportFields()
-        # qgs_fields.remove(4)
-        # qgs_fields.remove(4)
-        # qgs_fields.remove(4)
-        # qgs_fields.remove(4)
-        diff_fields = [self.NB_PATCHES,self.DIVI,self.SPLITTING_INDEX,
-            self.COHERENCE,self.SPLITTING_DENSITY]
-        diff_fields_divisor = [self.REPORT_AREA, 
-            self.INTERSECTING_AREA, self.NET_PRODUCT]
+        diff_fields = [self.NB_PATCHES]
+        diff_fields_divisor = [self.REPORT_AREA, self.INTERSECTING_AREA, self.NET_PRODUCT]
         # diff_fields_divisor_sq = [self.NET_PRODUCT]
         # same_fields = [self.ID]
         same_fields = []
+        if include_cbc_a or include_cbc_b:
+            qgs_fields.remove(4)
+            qgs_fields.remove(4)
+            qgs_fields.remove(4)
+            qgs_fields.remove(4)
+        else:
+            diff_fields += [self.DIVI,self.SPLITTING_INDEX,self.COHERENCE,self.SPLITTING_DENSITY]
         if include_cbc_a:
             a_meff_field, a_np_field = self.CBC_MESH_SIZE, self.CBC_NET_PRODUCT
         else:
