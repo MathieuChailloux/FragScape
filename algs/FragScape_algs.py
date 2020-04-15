@@ -960,14 +960,15 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
         for cpt, f in enumerate(source.getFeatures()):
             f_geom = f.geometry()
             if f_geom.intersects(report_geom):
-                feats_cpt += 1
-                f_area = f_geom.area()
-                sum_ai += f_area
                 intersection = f_geom.intersection(report_geom)
-                intersection_area = intersection.area()
-                intersecting_area += intersection_area
-                net_product += intersection_area * intersection_area
-                cbc_net_product += f_area * intersection_area
+                f_area = f_geom.area()
+                # sum_ai += f_area
+                for part_geom in intersection.parts():
+                    feats_cpt += 1
+                    part_area = part_geom.area()
+                    intersecting_area += part_area
+                    net_product += part_area * part_area
+                    cbc_net_product += f_area * part_area
             feedback.setProgress(cpt)
         report_area_sq = report_area * report_area
         # Outputs
