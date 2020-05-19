@@ -159,7 +159,7 @@ class FragmModel(abstract_model.DictModel):
         buffer_expr = item.dict[FragmItem.BUFFER]
         name = item.dict[FragmItem.NAME]
         is_fragm = item.dict[FragmItem.FRAGM]
-        burn_val = (1 if is_fragm else 0)
+        burn_val = 0 if is_fragm else 1
         vector_mode = self.fsModel.modeIsVector()
         outVPath = item.getOutputVLayer()
         feedback.pushDebugInfo("outVPath = " + str(outVPath))
@@ -203,7 +203,7 @@ class FragmModel(abstract_model.DictModel):
             calc_path = QgsProcessingUtils.generateTempFilename(name + '_calc.tif')
             # normalized = self.fsModel.paramsModel.normalizeRaster(input,
                 # out_path=normalized_path,context=context,feedback=feedback)
-            expr = 'A / A'
+            expr = '(A / A) * ' + str(burn_val)
             calc = qgsTreatments.applyRasterCalc(clipped,calc_path,expr,
                 out_type=0,nodata_val=255,context=context,feedback=step_feedback)
             step_feedback.setCurrentStep(2)
