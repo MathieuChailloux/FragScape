@@ -34,7 +34,7 @@ from .FragScape_algs import (RasterizeFixAllTouch,
                              ApplyFragmentationAlgorithm,
                              MeffVectorGlobal,
                              MeffVectorReport)
-from .FragScape_raster_algs import MeffRaster, MeffRasterReport, MeffRasterCBC
+from .FragScape_raster_algs import MeffRaster, MeffRasterReport, MeffRasterCBC, TestIMBE
 
 class FragScapeAlgorithmsProvider(QgsProcessingProvider):
 
@@ -48,7 +48,8 @@ class FragScapeAlgorithmsProvider(QgsProcessingProvider):
                         MeffVectorReport(),
                         MeffRaster(),
                         MeffRasterReport(),
-                        MeffRasterCBC()]
+                        MeffRasterCBC(),
+                        TestIMBE()]
         for a in self.alglist:
             a.initAlgorithm()
         super().__init__()

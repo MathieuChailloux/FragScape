@@ -540,6 +540,50 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
                 # params_copy,context,feedback,clip_flag=False)
         return {self.OUTPUT : output_layer, self.OUTPUT_VAL : global_val}
 
-    
-    
-            
+
+class TestIMBE(FragScapeRasterAlgorithm):
+
+    ALG_NAME = "testIMBE"
+        
+    def createInstance(self):
+        return TestIMBE()
+        
+    def displayName(self):
+        return self.tr("Test IMBE")
+        
+    def shortHelpString(self):
+        return self.tr("test imbe")
+        
+    def initAlgorithm(self, config=None, report_opt=True):
+        self.addParameter(QgsProcessingParameterRasterLayer(
+            self.INPUT, "Input raster layer",
+            optional=False))
+        self.addParameter(QgsProcessingParameterNumber(
+            self.CLASS, "Choose Landscape Class",
+            type=QgsProcessingParameterNumber.Integer,
+            defaultValue=1))
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr("Output layer"),
+                optional=True))
+                
+    def filterFunc(self,arr):
+        return ndimage.median(arr)
+                
+    def processAlgorithm(self,parameters,context,feedback):
+        input = self.parameterAsRasterLayer(parameters, self.INPUT, context)
+        cl = self.parameterAsInt(parameters, self.CLASS, context)
+        output = self.parameterAsOutputLayer(parameters,self.OUTPUT,context)
+        if not output:
+            raise QgsProcessingException("No output layer given")
+        in_path = qgsUtils.pathOfLayer(input)
+        classes, array = qgsUtils.getRasterValsAndArray(in_path)
+        feedback.pushDebugInfo("ndim = " + str(array.ndim))
+        feedback.pushDebugInfo("shape = " + str(array.shape))
+        size = (100,100)
+        #size = 3
+        footprint=np.ones((3,3))
+        out_array = ndimage.generic_filter(array,self.filterFunc,size=size)
+        qgsUtils.exportRaster(out_array,in_path,output)
+        return { self.OUTPUT : output }
