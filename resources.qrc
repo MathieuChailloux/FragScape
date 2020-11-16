@@ -1,6 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/FragScape" >
-        <file>icon.png</file>
+    <qresource prefix="/plugins/FragScape">
         <file>icons/vector_grid.svg</file>
         <file>icons/enFlag.svg</file>
         <file>icons/frFlag.svg</file>
@@ -22,6 +21,7 @@
         <file>icons/debug_icon/mActionAnnotation.svg</file>
         <file>icons/debug_icon/mActionContextHelp.png</file>
         <file>icons/logoCRTVB.png</file>
+        <file>icons/logoCRTVBNew.png</file>
         <file>icons/logoIrstea.png</file>
         <file>icons/logoINRAE.png</file>
         <file>icons/logoMTES.png</file>
