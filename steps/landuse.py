@@ -94,6 +94,7 @@ class LanduseModel(abstract_model.DictModel):
         return LanduseFieldItem(v,d,i)
         
     def changeLayer(self,path):
+        utils.debug("changeLayer " + str(path))
         if not path:
             self.landuseLayer = path
             self.setSelectExpr("")

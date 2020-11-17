@@ -104,7 +104,7 @@ class Ui_FragScapeDialogBase(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 678, 713))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 816, 754))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -165,8 +165,11 @@ class Ui_FragScapeDialogBase(object):
         self.aboutButton.setAutoRaise(True)
         self.aboutButton.setObjectName("aboutButton")
         self.gridLayout_6.addWidget(self.aboutButton, 0, 3, 1, 1)
+        self.projectName = QtWidgets.QLabel(self.scrollAreaWidgetContents_2)
+        self.projectName.setObjectName("projectName")
+        self.gridLayout_6.addWidget(self.projectName, 0, 4, 1, 1)
         spacerItem = QtWidgets.QSpacerItem(790, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_6.addItem(spacerItem, 0, 4, 1, 1)
+        self.gridLayout_6.addItem(spacerItem, 0, 5, 1, 1)
         self.langEn = QtWidgets.QToolButton(self.scrollAreaWidgetContents_2)
         self.langEn.setText("")
         icon4 = QtGui.QIcon()
@@ -176,7 +179,7 @@ class Ui_FragScapeDialogBase(object):
         self.langEn.setChecked(True)
         self.langEn.setAutoRaise(True)
         self.langEn.setObjectName("langEn")
-        self.gridLayout_6.addWidget(self.langEn, 0, 5, 1, 1)
+        self.gridLayout_6.addWidget(self.langEn, 0, 6, 1, 1)
         self.langFr = QtWidgets.QToolButton(self.scrollAreaWidgetContents_2)
         icon5 = QtGui.QIcon()
         icon5.addPixmap(QtGui.QPixmap(":/plugins/FragScape/icons/frFlag.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -185,7 +188,7 @@ class Ui_FragScapeDialogBase(object):
         self.langFr.setChecked(False)
         self.langFr.setAutoRaise(True)
         self.langFr.setObjectName("langFr")
-        self.gridLayout_6.addWidget(self.langFr, 0, 6, 1, 1)
+        self.gridLayout_6.addWidget(self.langFr, 0, 7, 1, 1)
         self.mTabWidget = QtWidgets.QTabWidget(self.scrollAreaWidgetContents_2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(2)
@@ -1204,7 +1207,7 @@ class Ui_FragScapeDialogBase(object):
         self.horizontalLayout_2.addWidget(self.logClear)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.mTabWidget.addTab(self.logTab, "")
-        self.gridLayout_6.addWidget(self.mTabWidget, 1, 0, 1, 7)
+        self.gridLayout_6.addWidget(self.mTabWidget, 1, 0, 1, 8)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents_2)
         self.textShortHelp = QtWidgets.QTextBrowser(self.splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -1235,10 +1238,11 @@ class Ui_FragScapeDialogBase(object):
         self.saveProjectAs.setToolTip(_translate("FragScapeDialogBase", "Save FragScape project as"))
         self.saveProject.setToolTip(_translate("FragScapeDialogBase", "Save FragScape project"))
         self.aboutButton.setToolTip(_translate("FragScapeDialogBase", "About"))
+        self.projectName.setText(_translate("FragScapeDialogBase", "No project loaded"))
         self.langEn.setToolTip(_translate("FragScapeDialogBase", "English"))
         self.langFr.setToolTip(_translate("FragScapeDialogBase", "Français"))
         self.langFr.setText(_translate("FragScapeDialogBase", "..."))
-        self.label_11.setText(_translate("FragScapeDialogBase", "<html><head/><body><p>Welcome to FragScape 2.0 !</p><p>This plugin computes fragmentation metrics of a territory in 4 steps : <br/>1) General parameters definition<br/>2) Land cover classification (binary classification according to fragmentation status)<br/>3) Additional data (roads, rivers, ...) integration<br/>4) Fragmentation metrics (such as effective mesh size) computation</p><p><span style=\" font-weight:600;\">Configuration should be frequently saved (buttons </span><img src=\":/plugins/FragScape/icons/mActionFileSaveAs.svg\" width=\"20\" height=\"20\"/><span style=\" font-weight:600;\">, </span><img src=\":/plugins/FragScape/icons/mActionFileSave.svg\" width=\"20\" height=\"20\"/><span style=\" font-weight:600;\"> in top left corner).</span></p><p>Homepage: <a href=\"https://github.com/MathieuChailloux/FragScape/blob/master/README.md\"><span style=\" text-decoration: underline; color:#0000ff;\">https://github.com/MathieuChailloux/FragScape/blob/master/README.md</span></a></p><p>Video tutorials: WORK IN PROGRESS</p></body></html>"))
+        self.label_11.setText(_translate("FragScapeDialogBase", "<html><head/><body><p>Welcome to FragScape 2.0.5 !</p><p>This plugin computes fragmentation metrics of a territory in 4 steps : <br/>1) General parameters definition<br/>2) Land cover classification (binary classification according to fragmentation status)<br/>3) Additional data (roads, rivers, ...) integration<br/>4) Fragmentation metrics (such as effective mesh size) computation</p><p><span style=\" font-weight:600;\">Configuration should be frequently saved (buttons </span><img src=\":/plugins/FragScape/icons/mActionFileSaveAs.svg\" width=\"20\" height=\"20\"/><span style=\" font-weight:600;\">, </span><img src=\":/plugins/FragScape/icons/mActionFileSave.svg\" width=\"20\" height=\"20\"/><span style=\" font-weight:600;\"> in top left corner).</span></p><p>Homepage: <a href=\"https://github.com/MathieuChailloux/FragScape/blob/master/README.md\"><span style=\" text-decoration: underline; color:#0000ff;\">https://github.com/MathieuChailloux/FragScape/blob/master/README.md</span></a></p><p>Video tutorials: <a href=\"https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p\"><span style=\" text-decoration: underline; color:#0000ff;\">https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p</span></a></p></body></html>"))
         self.paramlabel.setText(_translate("FragScapeDialogBase", "Global parameters"))
         self.workspaceLabel.setText(_translate("FragScapeDialogBase", "Workspace"))
         self.workspace.setToolTip(_translate("FragScapeDialogBase", "<html><head/><body><p><span style=\" font-weight:600;\">Workspace</span></p><p>Contains FragScape output layers. Relative paths are built from this directory.</p></body></html>"))
@@ -1311,18 +1315,18 @@ class Ui_FragScapeDialogBase(object):
         self.textShortHelp.setHtml(_translate("FragScapeDialogBase", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600;\">Nom étape</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Description générale</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Ceci est une description générale</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Description détaillée</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600;\">  </span><span style=\" font-size:8pt; font-style:italic;\">param1</span><span style=\" font-size:8pt;\"> : description du param 1</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600;\">  </span><span style=\" font-size:8pt; font-style:italic;\">param2</span><span style=\" font-size:8pt;\"> : description du param 2</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:14pt; font-weight:600;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Ceci est un test</span></p></body></html>"))
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:600;\">Nom étape</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:10pt; font-weight:600;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt; font-weight:600;\">Description générale</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:10pt; font-weight:600;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Ceci est une description générale</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:10pt; font-weight:600;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt; font-weight:600;\">Description détaillée</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:600;\">  </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-style:italic;\">param1</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> : description du param 1</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:600;\">  </span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-style:italic;\">param2</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> : description du param 2</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:600;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Ceci est un test</span></p></body></html>"))
 
 from qgis import gui
 from qgis.gui import QgsScrollArea

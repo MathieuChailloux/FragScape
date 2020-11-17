@@ -60,6 +60,7 @@ archive:
 	echo "\nqgis_lib_mc commit number "  >> $(COMMIT_FILE)
 	echo $(LIB_COMMIT) >> $(COMMIT_FILE)
 	zip -r $(ARCHIVE_NAME) $(ARCHIVE_DIR)
+	rm -rf $(ARCHIVE_DIR)
 
 ui:
 	pyuic5 -o FragScape_dialog_base.py FragScape_dialog_base.ui
