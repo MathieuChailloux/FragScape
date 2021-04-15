@@ -54,23 +54,17 @@ from ..steps import params
 from .FragScape_algs import MeffAlgUtils
 
 
-class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
+class FragScapeRasterAlgorithm(qgsUtils.BaseProcessingAlgorithm,MeffAlgUtils):
     
     def __init__(self):
         self.curr_suffix = ""
         QgsProcessingAlgorithm.__init__(self)
-            
-    def createInstance(self):
-        assert(False)
     
     def displayName(self):
         assert(False)
         
     def shortHelpString(self):
         assert(False)
-        
-    def name(self):
-        return self.ALG_NAME
     
     def group(self):
         return "Raster"
@@ -214,9 +208,6 @@ class FragScapeRasterAlgorithm(QgsProcessingAlgorithm,MeffAlgUtils):
 class MeffRaster(FragScapeRasterAlgorithm):
 
     ALG_NAME = "meffRaster"
-            
-    def createInstance(self):
-        return MeffRaster()
         
     def displayName(self):
         return self.tr("Raster Effective Mesh Size")
@@ -257,9 +248,6 @@ class MeffRaster(FragScapeRasterAlgorithm):
 class MeffRasterReport(FragScapeRasterAlgorithm):
 
     ALG_NAME = "meffRasterReport"
-            
-    def createInstance(self):
-        return MeffRasterReport()
     
     def displayName(self):
         return self.tr("Raster Effective Mesh Size per feature")

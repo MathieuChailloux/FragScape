@@ -53,7 +53,7 @@ from ..steps import params
             
 NB_DIGITS = 5
             
-class FragScapeVectorAlgorithm(QgsProcessingAlgorithm):
+class FragScapeVectorAlgorithm(qgsUtils.BaseProcessingAlgorithm):
     
     def group(self):
         return "Vector"
@@ -61,31 +61,16 @@ class FragScapeVectorAlgorithm(QgsProcessingAlgorithm):
     def groupId(self):
         return "fsVect"
         
-    def name(self):
-        return self.ALG_NAME
-        
-    def createInstance(self):
-        assert(False)
-        
     def displayName(self):
         assert(False)
         
     def shortHelpString(self):
         assert(False)
-        
-    def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
             
 
-class RasterizeFixAllTouch(rasterize):
+class RasterizeFixAllTouch(qgsUtils.BaseProcessingAlgorithm,rasterize):
 
     ALG_NAME = 'rasterizefixalltouch'
-
-    def createInstance(self):
-        return RasterizeFixAllTouch()
-        
-    def name(self):
-        return self.ALG_NAME
         
     def displayName(self):
         return self.tr('Rasterize (with ALL_TOUCH fix)')
@@ -149,9 +134,6 @@ class PrepareLanduseAlgorithm(FragScapeVectorAlgorithm):
     CLIP_LAYER = "CLIP_LAYER"
     SELECT_EXPR = "SELECT_EXPR"
     OUTPUT = "OUTPUT"
-        
-    def createInstance(self):
-        return PrepareLanduseAlgorithm()
         
     def displayName(self):
         return self.tr("Prepare land cover data")
@@ -224,9 +206,6 @@ class PrepareFragmentationAlgorithm(FragScapeVectorAlgorithm):
     BUFFER = "BUFFER_EXPR"
     NAME = "NAME"
     OUTPUT = "OUTPUT"
-        
-    def createInstance(self):
-        return PrepareFragmentationAlgorithm()
         
     def displayName(self):
         return self.tr("Prepare vector data")
@@ -318,9 +297,6 @@ class ApplyFragmentationAlgorithm(FragScapeVectorAlgorithm):
     FRAGMENTATION = "FRAGMENTATION"
     CRS = "CRS"
     OUTPUT = "OUTPUT"
-        
-    def createInstance(self):
-        return ApplyFragmentationAlgorithm()
         
     def displayName(self):
         return self.tr("Integrates vector data to land cover")
@@ -589,15 +565,9 @@ class MeffAlgUtils:
                 res_val = 0
         res_val = round(res_val, self.NB_DIGITS)
         return (res_layer, res_val)
-    
-    def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
-        
-    def name(self):
-        return self.ALG_NAME
 
 
-class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
+class ResultsDiffAlgorithm(MeffAlgUtils,qgsUtils.BaseProcessingAlgorithm):
 
     ALG_NAME = 'diffResults'
     
@@ -606,12 +576,6 @@ class ResultsDiffAlgorithm(MeffAlgUtils,QgsProcessingAlgorithm):
     
     PREFIX = "B_"
     VARIATION = 'variation'
-
-    def createInstance(self):
-        return ResultsDiffAlgorithm()
-        
-    def name(self):
-        return self.ALG_NAME
         
     def displayName(self):
         return self.tr('Compare results layer')
@@ -892,9 +856,6 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
     
     # OUTPUT_GLOBAL_MEFF = "GLOBAL_MEFF"
         
-    def createInstance(self):
-        return MeffVectorGlobal()
-        
     def displayName(self):
         return self.tr("Vector Effective Mesh Size (Global)")
         
@@ -988,9 +949,6 @@ class MeffVectorGlobal(FragScapeMeffVectorAlgorithm):
 class MeffVectorReport(FragScapeMeffVectorAlgorithm):
 
     ALG_NAME = "meffVectorReport"
-        
-    def createInstance(self):
-        return MeffVectorReport()
         
     def displayName(self):
         return self.tr("Vector Effective Mesh Size per feature")

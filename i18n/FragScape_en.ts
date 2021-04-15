@@ -4,32 +4,32 @@
 <context>
     <name>ApplyFragmentationAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="329"/>
+        <location filename="../algs/FragScape_algs.py" line="305"/>
         <source>This algorithm builds a layer of patches from a land cover layer and fragmentation layers. Overlaying geometries are removed and remaining ones are cast to single geometry type.</source>
         <translation>This algorithm builds a layer of patches from a land cover layer and fragmentation layers. Overlaying geometries are removed and remaining ones are cast to single geometry type.</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="332"/>
+        <location filename="../algs/FragScape_algs.py" line="308"/>
         <source>Land cover layer</source>
         <translation>Land cover layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="337"/>
+        <location filename="../algs/FragScape_algs.py" line="313"/>
         <source>Fragmentation layers</source>
         <translation>Fragmentation layers</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="342"/>
+        <location filename="../algs/FragScape_algs.py" line="318"/>
         <source>Output CRS</source>
         <translation>Output CRS</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="347"/>
+        <location filename="../algs/FragScape_algs.py" line="323"/>
         <source>Output layer</source>
         <translation>Output layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="326"/>
+        <location filename="../algs/FragScape_algs.py" line="302"/>
         <source>Integrates vector data to land cover</source>
         <translation>Integrates vector data to land cover</translation>
     </message>
@@ -37,7 +37,7 @@
 <context>
     <name>FragScape</name>
     <message>
-        <location filename="../FragScape.py" line="204"/>
+        <location filename="../FragScape.py" line="209"/>
         <source>&amp;FragScape</source>
         <translation>&amp;FragScape</translation>
     </message>
@@ -592,37 +592,37 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>FragScapeMeffVectorAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="786"/>
+        <location filename="../algs/FragScape_algs.py" line="750"/>
         <source>Input layer</source>
         <translation>Input layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="791"/>
+        <location filename="../algs/FragScape_algs.py" line="755"/>
         <source>Reporting layer</source>
         <translation>Reporting layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="796"/>
+        <location filename="../algs/FragScape_algs.py" line="760"/>
         <source>Output CRS</source>
         <translation>Output CRS</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="801"/>
+        <location filename="../algs/FragScape_algs.py" line="765"/>
         <source>Include Cross-boundary connection metrics</source>
         <translation>Include Cross-boundary connection metrics</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="805"/>
+        <location filename="../algs/FragScape_algs.py" line="769"/>
         <source>Report areas unit</source>
         <translation>Report areas unit</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="822"/>
+        <location filename="../algs/FragScape_algs.py" line="786"/>
         <source>Output layer</source>
         <translation>Output layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="811"/>
+        <location filename="../algs/FragScape_algs.py" line="775"/>
         <source>Clip input layer at reporting boundaries</source>
         <translation>Clip input layer at reporting boundaries</translation>
     </message>
@@ -630,17 +630,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>FragScapeRasterAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="91"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="85"/>
         <source>Clip layer (boundary)</source>
         <translation>Clip layer (boundary)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="97"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="91"/>
         <source>Report areas unit</source>
         <translation>Report areas unit</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="103"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="97"/>
         <source>Output layer</source>
         <translation>Output layer</translation>
     </message>
@@ -656,22 +656,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffAlgUtils</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="476"/>
+        <location filename="../algs/FragScape_algs.py" line="452"/>
         <source>mÂ² (square meters)</source>
         <translation>m² (square meters)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="477"/>
+        <location filename="../algs/FragScape_algs.py" line="453"/>
         <source>dmÂ² (square decimeters / ares)</source>
         <translation>dm² (square decimeters / ares)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="478"/>
+        <location filename="../algs/FragScape_algs.py" line="454"/>
         <source>hmÂ² (square hectometers / hectares)</source>
         <translation>hm² (square hectometers / hectares)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="479"/>
+        <location filename="../algs/FragScape_algs.py" line="455"/>
         <source>kmÂ² (square kilometers)</source>
         <translation>km² (square kilometers)</translation>
     </message>
@@ -679,12 +679,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffRaster</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="224"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="215"/>
         <source>Raster Effective Mesh Size</source>
         <translation>Raster Effective Mesh Size</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="227"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="218"/>
         <source>Computes effective mesh size on a raster layer</source>
         <translation>Computes effective mesh size on a raster layer</translation>
     </message>
@@ -692,12 +692,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffRasterCBC</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="330"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="318"/>
         <source>Raster Effective Mesh Size (Cross-Boundary Connection)</source>
         <translation>Raster Effective Mesh Size (Cross-Boundary Connection)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="333"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="321"/>
         <source>Computes effective mesh size on a raster layer</source>
         <translation>Computes effective mesh size on a raster layer</translation>
     </message>
@@ -705,12 +705,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffRasterReport</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="267"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="255"/>
         <source>Raster Effective Mesh Size per feature</source>
         <translation>Raster Effective Mesh Size per feature</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="270"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="258"/>
         <source>Computes effective mesh size on a raster layer</source>
         <translation>Computes effective mesh size on a raster layer</translation>
     </message>
@@ -718,12 +718,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffVectorGlobal</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="900"/>
+        <location filename="../algs/FragScape_algs.py" line="861"/>
         <source>Vector Effective Mesh Size (Global)</source>
         <translation>Vector Effective Mesh Size (Global)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="903"/>
+        <location filename="../algs/FragScape_algs.py" line="864"/>
         <source>Computes effective mesh size from patch layer and boundary of reporting layer (features are dissolved if needed)</source>
         <translation>Computes effective mesh size from patch layer and boundary of reporting layer (features are dissolved if needed)</translation>
     </message>
@@ -736,12 +736,12 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Vector Effective Mesh Size (Reporting)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="1000"/>
+        <location filename="../algs/FragScape_algs.py" line="958"/>
         <source>Computes effective mesh size from patch layer for each feature of reporting layer.</source>
         <translation>Computes effective mesh size from patch layer for each feature of reporting layer.</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="997"/>
+        <location filename="../algs/FragScape_algs.py" line="955"/>
         <source>Vector Effective Mesh Size per feature</source>
         <translation>Vector Effective Mesh Size per feature</translation>
     </message>
@@ -790,42 +790,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PrepareFragmentationAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="238"/>
+        <location filename="../algs/FragScape_algs.py" line="217"/>
         <source>Input layer</source>
         <translation>Input layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="243"/>
+        <location filename="../algs/FragScape_algs.py" line="222"/>
         <source>Clip layer</source>
         <translation>Clip layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="249"/>
+        <location filename="../algs/FragScape_algs.py" line="228"/>
         <source>Selection expression</source>
         <translation>Selection expression</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="255"/>
+        <location filename="../algs/FragScape_algs.py" line="234"/>
         <source>Buffer expression</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="261"/>
+        <location filename="../algs/FragScape_algs.py" line="240"/>
         <source>Identifier</source>
         <translation>Identifier</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="266"/>
+        <location filename="../algs/FragScape_algs.py" line="245"/>
         <source>Output layer</source>
         <translation>Output layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="232"/>
+        <location filename="../algs/FragScape_algs.py" line="211"/>
         <source>Prepare vector data</source>
         <translation>Prepare vector data</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="235"/>
+        <location filename="../algs/FragScape_algs.py" line="214"/>
         <source>This algorithm prepares a vector layer by applying clip, selection and buffer</source>
         <translation>This algorithm prepares a vector layer by applying clip, selection and buffer</translation>
     </message>
@@ -833,32 +833,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PrepareLanduseAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="160"/>
+        <location filename="../algs/FragScape_algs.py" line="142"/>
         <source>This algorithms prepares land cover data by applying selection (from expression) and dissolving geometries</source>
         <translation>This algorithms prepares land cover data by applying selection (from expression) and dissolving geometries</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="163"/>
+        <location filename="../algs/FragScape_algs.py" line="145"/>
         <source>Input layer</source>
         <translation>Input layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="168"/>
+        <location filename="../algs/FragScape_algs.py" line="150"/>
         <source>Clip layer</source>
         <translation>Clip layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="174"/>
+        <location filename="../algs/FragScape_algs.py" line="156"/>
         <source>Selection expression</source>
         <translation>Selection expression</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="180"/>
+        <location filename="../algs/FragScape_algs.py" line="162"/>
         <source>Output layer</source>
         <translation>Output layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="157"/>
+        <location filename="../algs/FragScape_algs.py" line="139"/>
         <source>Prepare land cover data</source>
         <translation>Prepare land cover data</translation>
     </message>
@@ -866,12 +866,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RasterizeFixAllTouch</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="91"/>
+        <location filename="../algs/FragScape_algs.py" line="76"/>
         <source>Rasterize (with ALL_TOUCH fix)</source>
         <translation>Rasterize (with ALL_TOUCH fix)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="100"/>
+        <location filename="../algs/FragScape_algs.py" line="85"/>
         <source>Wrapper for gdal:rasterize algorithm allowing to use ALL_TOUCH option (every pixel touching input geometry are rasterized).</source>
         <translation>Wrapper for gdal:rasterize algorithm allowing to use ALL_TOUCH option (every pixel touching input geometry are rasterized).</translation>
     </message>
@@ -879,22 +879,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ResultsDiffAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="617"/>
+        <location filename="../algs/FragScape_algs.py" line="581"/>
         <source>Compare results layer</source>
         <translation>Compare results layer</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="625"/>
+        <location filename="../algs/FragScape_algs.py" line="589"/>
         <source>Layer A</source>
         <translation>Layer A</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="630"/>
+        <location filename="../algs/FragScape_algs.py" line="594"/>
         <source>Layer B</source>
         <translation>Layer B</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="635"/>
+        <location filename="../algs/FragScape_algs.py" line="599"/>
         <source>Output layer</source>
         <translation>Output layer</translation>
     </message>

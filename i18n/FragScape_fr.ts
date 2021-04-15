@@ -4,32 +4,32 @@
 <context>
     <name>ApplyFragmentationAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="329"/>
+        <location filename="../algs/FragScape_algs.py" line="305"/>
         <source>This algorithm builds a layer of patches from a land cover layer and fragmentation layers. Overlaying geometries are removed and remaining ones are cast to single geometry type.</source>
         <translation>Création d&apos;une couche de patchs depuis une occupation du sol et des couches de fragmentation.</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="332"/>
+        <location filename="../algs/FragScape_algs.py" line="308"/>
         <source>Land cover layer</source>
         <translation>Couche d&apos;occupation du sol</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="337"/>
+        <location filename="../algs/FragScape_algs.py" line="313"/>
         <source>Fragmentation layers</source>
         <translation>Couches de fragmentation</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="342"/>
+        <location filename="../algs/FragScape_algs.py" line="318"/>
         <source>Output CRS</source>
         <translation>SCR de destination</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="347"/>
+        <location filename="../algs/FragScape_algs.py" line="323"/>
         <source>Output layer</source>
         <translation>Couche de sortie</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="326"/>
+        <location filename="../algs/FragScape_algs.py" line="302"/>
         <source>Integrates vector data to land cover</source>
         <translation>Intégrer des données vecteur à l&apos;occupation du sol</translation>
     </message>
@@ -37,7 +37,7 @@
 <context>
     <name>FragScape</name>
     <message>
-        <location filename="../FragScape.py" line="204"/>
+        <location filename="../FragScape.py" line="209"/>
         <source>&amp;FragScape</source>
         <translation></translation>
     </message>
@@ -536,6 +536,11 @@
         <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bienvenue dans FragScape 2.0.5 !&lt;/p&gt;&lt;p&gt;Ce plugin permet de calculer la taille effective de maille d&apos;un territoire en 4 étapes :&lt;br/&gt;1) Définition des paramètres généraux&lt;br/&gt;2) Sélection des éléments naturels et semi-naturels de l&apos;occupation du sol&lt;br/&gt;3) Intégration des données complémentaires (routes, rivières, ...)&lt;br/&gt;4) Calcul des indicateurs de fragmentation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pensez à sauvegarder régulièrement la configuration du plugin (boutons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; en haut à gauche de l&apos;interface).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Page web : &lt;a href=&quot;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Tutoriels vidéo: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLh9oFe6PuPCXgsR9DAxP9uyhp9BEu8X3c&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PLh9oFe6PuPCXgsR9DAxP9uyhp9BEu8X3c&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
+        <location filename="../FragScape_dialog_base.py" line="1245"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 2.0.5 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification (binary classification according to fragmentation status)&lt;br/&gt;3) Additional data (roads, rivers, ...) integration&lt;br/&gt;4) Fragmentation metrics (such as effective mesh size) computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot; width=&quot;20&quot; height=&quot;20&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot; width=&quot;20&quot; height=&quot;20&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href=&quot;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Video tutorials: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bienvenue dans FragScape 2.0.5 !&lt;/p&gt;&lt;p&gt;Ce plugin permet de calculer la taille effective de maille d&apos;un territoire en 4 étapes :&lt;br/&gt;1) Définition des paramètres généraux&lt;br/&gt;2) Sélection des éléments naturels et semi-naturels de l&apos;occupation du sol&lt;br/&gt;3) Intégration des données complémentaires (routes, rivières, ...)&lt;br/&gt;4) Calcul des indicateurs de fragmentation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pensez à sauvegarder régulièrement la configuration du plugin (boutons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; en haut à gauche de l&apos;interface).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Page web : &lt;a href=&quot;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Tutoriels vidéo: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
         <location filename="../FragScape_dialog_base.py" line="1315"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -554,46 +559,41 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt;&quot;&gt;Ceci est un test&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../FragScape_dialog_base.py" line="1245"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to FragScape 2.0.5 !&lt;/p&gt;&lt;p&gt;This plugin computes fragmentation metrics of a territory in 4 steps : &lt;br/&gt;1) General parameters definition&lt;br/&gt;2) Land cover classification (binary classification according to fragmentation status)&lt;br/&gt;3) Additional data (roads, rivers, ...) integration&lt;br/&gt;4) Fragmentation metrics (such as effective mesh size) computation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuration should be frequently saved (buttons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot; width=&quot;20&quot; height=&quot;20&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot; width=&quot;20&quot; height=&quot;20&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; in top left corner).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href=&quot;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Video tutorials: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bienvenue dans FragScape 2.0.5 !&lt;/p&gt;&lt;p&gt;Ce plugin permet de calculer la taille effective de maille d&apos;un territoire en 4 étapes :&lt;br/&gt;1) Définition des paramètres généraux&lt;br/&gt;2) Sélection des éléments naturels et semi-naturels de l&apos;occupation du sol&lt;br/&gt;3) Intégration des données complémentaires (routes, rivières, ...)&lt;br/&gt;4) Calcul des indicateurs de fragmentation&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pensez à sauvegarder régulièrement la configuration du plugin (boutons &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSaveAs.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;, &lt;/span&gt;&lt;img src=&quot;:/plugins/FragScape/icons/mActionFileSave.svg&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt; en haut à gauche de l&apos;interface).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Page web : &lt;a href=&quot;https://github.com/MathieuChailloux/FragScape/blob/master/README.md&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.umr-tetis.fr/index.php/fr/production/donnees-et-plateformes/plateformes/426-fragscape&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Tutoriels vidéo: &lt;a href=&quot;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://www.youtube.com/playlist?list=PLh9oFe6PuPCWe0pxV6i-Sd57coMfo_37p&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
 </context>
 <context>
     <name>FragScapeMeffVectorAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="786"/>
+        <location filename="../algs/FragScape_algs.py" line="750"/>
         <source>Input layer</source>
         <translation>Couche d&apos;entrée</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="791"/>
+        <location filename="../algs/FragScape_algs.py" line="755"/>
         <source>Reporting layer</source>
         <translation>Couche de rapportage</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="796"/>
+        <location filename="../algs/FragScape_algs.py" line="760"/>
         <source>Output CRS</source>
         <translation>SCR de destination</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="801"/>
+        <location filename="../algs/FragScape_algs.py" line="765"/>
         <source>Include Cross-boundary connection metrics</source>
         <translation>Inclure les métriques &quot;Cross-Boundary Connection&quot;</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="805"/>
+        <location filename="../algs/FragScape_algs.py" line="769"/>
         <source>Report areas unit</source>
         <translation>Unité de surface</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="822"/>
+        <location filename="../algs/FragScape_algs.py" line="786"/>
         <source>Output layer</source>
         <translation>Couche de sortie</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="811"/>
+        <location filename="../algs/FragScape_algs.py" line="775"/>
         <source>Clip input layer at reporting boundaries</source>
         <translation>Découper la couche d&apos;entrée aux limites de la couche de rapportage</translation>
     </message>
@@ -601,17 +601,17 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>FragScapeRasterAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="91"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="85"/>
         <source>Clip layer (boundary)</source>
         <translation>Couche de découpage</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="97"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="91"/>
         <source>Report areas unit</source>
         <translation>Unité de surface</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="103"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="97"/>
         <source>Output layer</source>
         <translation>Couche de sortie</translation>
     </message>
@@ -627,22 +627,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffAlgUtils</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="476"/>
+        <location filename="../algs/FragScape_algs.py" line="452"/>
         <source>mÂ² (square meters)</source>
         <translation>m² (mètres carrés)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="477"/>
+        <location filename="../algs/FragScape_algs.py" line="453"/>
         <source>dmÂ² (square decimeters / ares)</source>
         <translation>dm² (décimètres carrés)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="478"/>
+        <location filename="../algs/FragScape_algs.py" line="454"/>
         <source>hmÂ² (square hectometers / hectares)</source>
         <translation>hm² (hectomètres carrés)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="479"/>
+        <location filename="../algs/FragScape_algs.py" line="455"/>
         <source>kmÂ² (square kilometers)</source>
         <translation>km² (kilomètres carrés)</translation>
     </message>
@@ -650,12 +650,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffRaster</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="224"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="215"/>
         <source>Raster Effective Mesh Size</source>
         <translation>Taille effective de maille (Raster)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="227"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="218"/>
         <source>Computes effective mesh size on a raster layer</source>
         <translation>Calcule la taille effective de maille depuis une couche raster</translation>
     </message>
@@ -663,12 +663,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffRasterCBC</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="330"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="318"/>
         <source>Raster Effective Mesh Size (Cross-Boundary Connection)</source>
         <translation>Taille effective de maille (Raster, Cross-Boundary Connection)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="333"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="321"/>
         <source>Computes effective mesh size on a raster layer</source>
         <translation>Calcule la taille effective de maille depuis une couche raster</translation>
     </message>
@@ -676,12 +676,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffRasterReport</name>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="267"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="255"/>
         <source>Raster Effective Mesh Size per feature</source>
         <translation>Taille effective de maille par entité (Raster)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_raster_algs.py" line="270"/>
+        <location filename="../algs/FragScape_raster_algs.py" line="258"/>
         <source>Computes effective mesh size on a raster layer</source>
         <translation>Calcule la taille effective de maille depuis une couche raster</translation>
     </message>
@@ -689,12 +689,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>MeffVectorGlobal</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="900"/>
+        <location filename="../algs/FragScape_algs.py" line="861"/>
         <source>Vector Effective Mesh Size (Global)</source>
         <translation>Taille effective de maille globale(Vecteur)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="903"/>
+        <location filename="../algs/FragScape_algs.py" line="864"/>
         <source>Computes effective mesh size from patch layer and boundary of reporting layer (features are dissolved if needed)</source>
         <translation>Calcule la taille effective de maille depuis une couche de patches (vecteur) et les frontières d&apos;une couche de rapportage (les entitées sont regroupées si nécessaire)</translation>
     </message>
@@ -707,14 +707,14 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Taille effective de maille par entité (Vecteur)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="1000"/>
+        <location filename="../algs/FragScape_algs.py" line="958"/>
         <source>Computes effective mesh size from patch layer for each feature of reporting layer.</source>
         <translation>Calcule la taille effective de maille depuis une couche de patches (vecteur) et pour chaque entité d&apos;une couche de rapportage (couche de communes par exemple)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="997"/>
+        <location filename="../algs/FragScape_algs.py" line="955"/>
         <source>Vector Effective Mesh Size per feature</source>
-        <translation>Taille Effective de Maille par entité</translation>
+        <translation>Taille effective de maille par entité (Vecteur)</translation>
     </message>
 </context>
 <context>
@@ -761,42 +761,42 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PrepareFragmentationAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="238"/>
+        <location filename="../algs/FragScape_algs.py" line="217"/>
         <source>Input layer</source>
         <translation>Couche d&apos;entrée</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="243"/>
+        <location filename="../algs/FragScape_algs.py" line="222"/>
         <source>Clip layer</source>
         <translation>Couche de découpage</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="249"/>
+        <location filename="../algs/FragScape_algs.py" line="228"/>
         <source>Selection expression</source>
         <translation>Expression de sélection</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="255"/>
+        <location filename="../algs/FragScape_algs.py" line="234"/>
         <source>Buffer expression</source>
         <translation>Tampon (expression)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="261"/>
+        <location filename="../algs/FragScape_algs.py" line="240"/>
         <source>Identifier</source>
         <translation>Identifiant</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="266"/>
+        <location filename="../algs/FragScape_algs.py" line="245"/>
         <source>Output layer</source>
         <translation>Couche de sortie</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="232"/>
+        <location filename="../algs/FragScape_algs.py" line="211"/>
         <source>Prepare vector data</source>
         <translation>Préparer des données vecteur</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="235"/>
+        <location filename="../algs/FragScape_algs.py" line="214"/>
         <source>This algorithm prepares a vector layer by applying clip, selection and buffer</source>
         <translation>Cet algorithme prépare des données vecteur en appliquant découpage, sélection et zone tampon</translation>
     </message>
@@ -804,32 +804,32 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PrepareLanduseAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="160"/>
+        <location filename="../algs/FragScape_algs.py" line="142"/>
         <source>This algorithms prepares land cover data by applying selection (from expression) and dissolving geometries</source>
         <translation>Prépare les données d&apos;occupation du sol par sélection (depuis une expression) et en regroupant les géométries</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="163"/>
+        <location filename="../algs/FragScape_algs.py" line="145"/>
         <source>Input layer</source>
         <translation>Couche d&apos;entrée</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="168"/>
+        <location filename="../algs/FragScape_algs.py" line="150"/>
         <source>Clip layer</source>
         <translation>Couche de découpage</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="174"/>
+        <location filename="../algs/FragScape_algs.py" line="156"/>
         <source>Selection expression</source>
         <translation>Expression de sélection</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="180"/>
+        <location filename="../algs/FragScape_algs.py" line="162"/>
         <source>Output layer</source>
         <translation>Couche de sortie</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="157"/>
+        <location filename="../algs/FragScape_algs.py" line="139"/>
         <source>Prepare land cover data</source>
         <translation>Préparer des données d&apos;occupation du sol</translation>
     </message>
@@ -837,12 +837,12 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>RasterizeFixAllTouch</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="91"/>
+        <location filename="../algs/FragScape_algs.py" line="76"/>
         <source>Rasterize (with ALL_TOUCH fix)</source>
         <translation>Rastérisation (avec option ALL_TOUCH)</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="100"/>
+        <location filename="../algs/FragScape_algs.py" line="85"/>
         <source>Wrapper for gdal:rasterize algorithm allowing to use ALL_TOUCH option (every pixel touching input geometry are rasterized).</source>
         <translation>Surcouche de gdal:rasterize pour utiliser l&apos;option ALL_TOUCH (-at) qui permet de rastériser tous les pixels touchant la géométrie en entrée. Depuis la version 3.11, il est possible de passer par l&apos;argument EXTRA.</translation>
     </message>
@@ -850,22 +850,22 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>ResultsDiffAlgorithm</name>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="617"/>
+        <location filename="../algs/FragScape_algs.py" line="581"/>
         <source>Compare results layer</source>
-        <translation>Compare les couches de résultats</translation>
+        <translation>Comparer les couches de résultats</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="625"/>
+        <location filename="../algs/FragScape_algs.py" line="589"/>
         <source>Layer A</source>
         <translation>Couche A</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="630"/>
+        <location filename="../algs/FragScape_algs.py" line="594"/>
         <source>Layer B</source>
         <translation>Couche B</translation>
     </message>
     <message>
-        <location filename="../algs/FragScape_algs.py" line="635"/>
+        <location filename="../algs/FragScape_algs.py" line="599"/>
         <source>Output layer</source>
         <translation>Couche de sortie</translation>
     </message>

@@ -191,6 +191,11 @@ class FragScape:
             
         self.dlgVect.initTabs()
         self.dlgVect.initGui()
+        locale = QSettings().value('locale/userLocale')[0:2]
+        if locale.startswith('fr'):
+            self.dlgVect.switchLangFr()
+        else:
+            self.dlgVect.switchLangEn()
         self.dlgVect.connectComponents()
         
         # self.dlgRast.initTabs()
