@@ -24,10 +24,11 @@
 
 import csv
 
-from qgis.core import (QgsMapLayerProxyModel,
-                        QgsProcessingException,
-                        QgsFieldProxyModel,
-                        QgsVectorLayer)
+from qgis.core import (Qgis,
+                       QgsMapLayerProxyModel,
+                       QgsProcessingException,
+                       QgsFieldProxyModel,
+                       QgsVectorLayer)
 from ..qgis_lib_mc import utils, abstract_model, qgsUtils, feedbacks, qgsTreatments
 from ..algs import FragScape_algs 
 from . import params
