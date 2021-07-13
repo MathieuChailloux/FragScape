@@ -232,26 +232,13 @@ class LanduseModel(abstract_model.DictModel):
             qgsTreatments.classifByExpr(clipped_layer,expr,selected_path,'landuseSelection')
             res = qgsTreatments.applyRasterization(selected_path,output,
                 extent=extent,resolution=resolution,
-                out_type=0,nodata_val=255,field='Value',
+                out_type=Qgis.Byte,nodata_val=255,field='Value',
                 all_touch=False,context=context,feedback=step_feedback)
-            # if expr:
-                # not_expr = "NOT (" + expr + ")"
-                # selected_path = params.mkTmpLayerPath('landuseSelection2.gpkg')
-                # qgsTreatments.selectGeomByExpression(clipped_layer,not_expr,selected_path,'landuseSelection2')
-                # res0 = qgsTreatments.applyRasterization(selected_path,output,
-                    # extent=extent,resolution=resolution,
-                    # out_type=0,nodata_val=255,burn_val=0,
-                    # all_touch=False,context=context,feedback=step_feedback)
-                # res = qgsTreatments.applyMergeRaster([res1,res0],output,
-                    # nodata_val=255,out_type=0,nodata_input=255,
-                    # context=context,feedback=feedback)
-            # else:
-                # res = res1
         else:
             selected_path = params.mkTmpLayerPath('landuseSelection.tif')
             formula = self.mkRasterFormula(step_feedback)
             qgsTreatments.applyRasterCalc(clipped_layer,selected_path,formula,
-                nodata_val=255,out_type=0,context=context,feedback=step_feedback)
+                nodata_val=255,out_type=Qgis.Byte,context=context,feedback=step_feedback)
             step_feedback.setCurrentStep(2)
             if vector_mode:
                 raise QgsProcessingException("Raster mode with vector input not yet implemented")

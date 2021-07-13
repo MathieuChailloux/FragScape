@@ -25,7 +25,8 @@
 import os.path
 import time
 
-from qgis.core import (QgsMapLayerProxyModel,
+from qgis.core import (Qgis,
+                       QgsMapLayerProxyModel,
                        QgsWkbTypes)
 import processing
 from processing import QgsProcessingUtils
@@ -193,7 +194,7 @@ class FragmModel(abstract_model.DictModel):
                 crs, extent, resolution = self.fsModel.getRasterParams()
                 burn_val = 0 if is_fragm else 1
                 res = FragScape_algs.applyRasterizationFixAllTouch(prepared,outRPath,
-                    extent,resolution,out_type=0,nodata_val=255,burn_val=burn_val,
+                    extent,resolution,out_type=Qgis.Byte,nodata_val=255,burn_val=burn_val,
                     all_touch=True,context=context,feedback=step_feedback)
         elif vector_mode:
             utils.internal_error("Not implemented yet : Raster to Vector")
@@ -205,7 +206,7 @@ class FragmModel(abstract_model.DictModel):
                 # out_path=normalized_path,context=context,feedback=feedback)
             expr = '(A / A) * ' + str(burn_val)
             calc = qgsTreatments.applyRasterCalc(clipped,calc_path,expr,
-                out_type=0,nodata_val=255,context=context,feedback=step_feedback)
+                out_type=Qgis.Byte,nodata_val=255,context=context,feedback=step_feedback)
             step_feedback.setCurrentStep(2)
             crs, extent, resolution = self.fsModel.getRasterParams()
             res = qgsTreatments.applyWarpReproject(calc_path,outRPath,
@@ -286,7 +287,7 @@ class FragmModel(abstract_model.DictModel):
         else:
             prepared_layers.insert(0,landuseLayer)
             res = qgsTreatments.applyMergeRaster(prepared_layers,res_path,
-                nodata_val=255,out_type=0,nodata_input=255,
+                nodata_val=255,out_type=Qgis.Byte,nodata_input=255,
                 context=context,feedback=step_feedback)
         step_feedback.setCurrentStep(nb_steps)
         # res = self.fsModel.paramsModel.clipByExtent(tmp_path,

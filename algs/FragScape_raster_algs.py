@@ -449,16 +449,6 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         self.nodata = label_nodata
         labeled_path = QgsProcessingUtils.generateTempFilename("labeled.tif")
         self.labeled_path = labeled_path
-        # if math.isnan(nodata):
-            # out_nodata = -1
-            # out_type = 6
-        # else:
-            # out_nodata = nodata
-            # out_type = 0
-        out_nodata = -1
-        # type = 0 <=> input data type
-        # type = 6 <=> Int32
-        out_type = 6
         qgsUtils.exportRaster(labeled_array,inputFilename,labeled_path,
             nodata=label_nodata,type=label_out_type)
         
