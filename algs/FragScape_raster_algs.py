@@ -141,7 +141,7 @@ class FragScapeRasterAlgorithm(qgsUtils.BaseProcessingAlgorithm,MeffAlgUtils):
                 "input_clipped" + suffix + ".tif")
             clipped = qgsTreatments.clipRasterFromVector(inputFilename,report_layer,
                 input_clipped_path,crop_cutline=True,nodata=nodata,
-                data_type=0,context=context, feedback=feedback)
+                data_type=qgsTreatments.USE_INPUT_TYPE,context=context, feedback=feedback)
             clipped = input_clipped_path
             # clipped = qgsTreatments.clipRasterAllTouched(inputFilename,report_layer,
                 # input_crs,out_path=input_clipped_path,nodata=nodata,
@@ -188,21 +188,6 @@ class FragScapeRasterAlgorithm(qgsUtils.BaseProcessingAlgorithm,MeffAlgUtils):
         feedback.pushDebugInfo("nb_pix = " + str(nb_pix))
         return (labeled_array, nb_patches, patches_len, nb_pix)
         
-    def getGDALType(self,max_val):
-        if max_val < 256:
-            return gdal.GDT_Byte
-        elif max_val < 65536:
-            return gdal.GDT_UInt16
-        else:
-            return gdal.GDT_UInt32
-  
-    def getGDALTypeAndND(self,max_val):
-        if max_val < 255:
-            return gdal.GDT_Byte, 255
-        elif max_val < 65535:
-            return gdal.GDT_UInt16, 65536
-        else:
-            return gdal.GDT_UInt32, sys.maxsize
 
 
 class MeffRaster(FragScapeRasterAlgorithm):
@@ -326,7 +311,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         clipped_path = QgsProcessingUtils.generateTempFilename(
             "labeled_clipped" + self.curr_suffix + ".tif")
         clipped = qgsTreatments.clipRasterFromVector(self.labeled_path,self.report_layer,
-            clipped_path,crop_cutline=True,nodata=self.nodata,data_type=self.label_out_type,
+            clipped_path,crop_cutline=True,nodata=self.nodata,data_type=qgsTreatments.USE_INPUT_TYPE,
             context=context,feedback=step_feedback)
         # clipped = qgsTreatments.clipRasterAllTouched(self.labeled_path,self.report_layer,
             # self.input_crs,out_path=clipped_path,nodata=self.nodata,
@@ -340,7 +325,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
             input_clipped_path = QgsProcessingUtils.generateTempFilename(
                 "input_clipped_clipped" + self.curr_suffix + ".tif")
             input_clipped = qgsTreatments.clipRasterFromVector(self.input_clipped,self.report_layer,
-                input_clipped_path,crop_cutline=True,data_type=0,nodata=255,
+                input_clipped_path,crop_cutline=True,data_type=qgsTreatments.USE_INPUT_TYPE,nodata=255,
                 context=context,feedback=step_feedback)
         else:
             input_clipped_path = self.input_clipped
@@ -444,7 +429,7 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
         self.patches_len = patches_len
         max_label = nb_patches + 1
         labels = list(range(1,max_label))
-        label_out_type, label_nodata = self.getGDALTypeAndND(max_label)
+        label_out_type, label_nodata = qgsUtils.getGDALUnsignedTypeAndND(max_label)
         self.label_out_type = label_out_type
         self.nodata = label_nodata
         labeled_path = QgsProcessingUtils.generateTempFilename("labeled.tif")
