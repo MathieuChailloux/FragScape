@@ -280,7 +280,7 @@ class MeffRasterReport(FragScapeRasterAlgorithm):
                     parameters, context,multi_feedback)
                 report_layers.append(report_computed_path)
             feedback.pushDebugInfo("report_layers = " + str(report_layers))
-            qgsTreatments.mergeVectorLayers(report_layers,crs,output)
+            qgsTreatments.mergeVectorLayers(report_layers,crs,output,feedback=feedback)
         # Global
         else:
             parameters[self.CLIP_FLAG] = False
@@ -475,10 +475,10 @@ class MeffRasterCBC(FragScapeRasterAlgorithm):
                     # parameters, context,multi_feedback)
                 report_layers.append(report_feat_res_layer)
             feedback.pushDebugInfo("report_layers = " + str(report_layers))
-            qgsTreatments.mergeVectorLayers(report_layers,crs,output_layer)
+            qgsTreatments.mergeVectorLayers(report_layers,crs,output_layer,feedback=feedback)
         # Global
         dissolved_path = params.mkTmpLayerPath('reportingDissolved.gpkg')
-        qgsTreatments.dissolveLayer(init_layer,dissolved_path,context,feedback)
+        qgsTreatments.dissolveLayer(init_layer,dissolved_path,context=context,feedback=feedback)
         self.report_layer = qgsUtils.loadVectorLayer(dissolved_path)
         if nb_feats == 1:
             params_copy[self.OUTPUT] = output_layer

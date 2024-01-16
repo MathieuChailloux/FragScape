@@ -79,10 +79,10 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         logConnector.initGui()
         self.feedback =  feedbacks.ProgressFeedback(self)
         feedbacks.progressFeedback = self.feedback
-        utils.debug("progressFeedback = " + str(feedbacks.progressFeedback))
+        self.feedback.pushDebugInfo("progressFeedback = " + str(feedbacks.progressFeedback))
         self.context = QgsProcessingContext()
         self.context.setFeedback(feedbacks.progressFeedback)
-        self.fsModel = FragScapeModel(self.context,feedbacks.progressFeedback)
+        self.fsModel = FragScapeModel(self.context,self.feedback)
         self.paramsConnector = params.ParamsConnector(self,self.fsModel.paramsModel)
         params.params = self.paramsConnector.model
         self.landuseConnector = landuse.LanduseConnector(self,self.fsModel.landuseModel)
@@ -118,9 +118,9 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     # Displays traceback and error message in log tab.
     # Ignores CustomException : exception raised from FragScape and already displayed.
     def exceptionHook(self,excType, excValue, tracebackobj):
-        utils.debug("bioDispHook")
+        self.feedback.pushDebugInfo("bioDispHook")
         if excType == utils.CustomException:
-            utils.debug("Ignoring custom exception : " + str(excValue))
+            self.feedback.pushDebugInfo("Ignoring custom exception : " + str(excValue))
         else:
             tbinfofile = StringIO()
             traceback.print_tb(tracebackobj, None, tbinfofile)
@@ -129,13 +129,13 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
             errmsg = str(excType.__name__) + " : " + str(excValue)
             separator = '-' * 80
             #sections = [separator, errmsg, separator]
-            #utils.debug(str(sections))
+            #self.feedback.pushDebugInfo(str(sections))
             msg = separator + "\n" + errmsg + "\n" + separator
             #msg = '\n'.join(sections)
-            utils.debug(str(msg))
+            self.feedback.pushDebugInfo(str(msg))
             #final_msg = tbinfo + "\n" + msg
-            utils.warn("Traceback : " + tbinfo)
-            utils.error_msg(msg,prefix="Unexpected error")
+            self.feedback.pushWarning("Traceback : " + tbinfo)
+            self.feedback.error_msg(msg,prefix="Unexpected error")
         self.mTabWidget.setCurrentWidget(self.logTab)
         #feedbacks.progressConnector.clear()
         
@@ -167,19 +167,19 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         
         # Switch language to english.
     def switchLang(self,lang):
-        utils.debug("switchLang " + str(lang))
+        self.feedback.pushDebugInfo("switchLang " + str(lang))
         plugin_dir = os.path.dirname(__file__)
         lang_path = os.path.join(plugin_dir,'i18n','FragScape_' + lang + '.qm')
         if os.path.exists(lang_path):
             self.translator = QTranslator()
             self.translator.load(lang_path)
             if qVersion() > '4.3.3':
-                utils.debug("Installing translator " + str(lang_path))
+                self.feedback.pushDebugInfo("Installing translator " + str(lang_path))
                 QCoreApplication.installTranslator(self.translator)
             else:
-                utils.internal_error("Unexpected qVersion : " + str(qVersion()))
+                self.feedback.internal_error("Unexpected qVersion : " + str(qVersion()))
         else:
-            utils.warn("No translation file : " + str(en_path))
+            self.feedback.pushWarning("No translation file : " + str(en_path))
         self.retranslateUi(self)
         utils.curr_language = lang
         self.connectors["Tabs"].loadHelpFile()
@@ -195,16 +195,20 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         self.langFr.setChecked(True)
         
     def openHelpDialog(self):
-        utils.debug("openHelpDialog")
+        self.feedback.pushDebugInfo("openHelpDialog")
         about_dlg = FragScapeAboutDialog(self)
         about_dlg.show()
         
     
     # Recompute self.parsers in case they have been reloaded
     def recomputeParsers(self):
+        # self.parsers = [self.paramsConnector.model,
+                        # self.landuseConnector.model,
+                        # self.fragmConnector.model,
+                        # self.reportingConnector.model]
         self.parsers = [self.paramsConnector,
                         self.landuseConnector,
-                        self.fragmConnector.model,
+                        self.fragmConnector,
                         self.reportingConnector]
         
         # Return XML string describing project
@@ -218,7 +222,7 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
         xmlStr = self.fsModel.toXML()
         self.paramsConnector.setProjectFile(fname)
         utils.writeFile(fname,xmlStr)
-        utils.info("FragScape model saved into file '" + fname + "'")
+        self.feedback.pushInfo("FragScape model saved into file '" + fname + "'")
         
     def saveModelAsAction(self):
         fname = qgsUtils.saveFileDialog(parent=self,msg="Sauvegarder le projet sous",filter="*.xml")
@@ -233,12 +237,16 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
    
     # Load project from 'fname' if existing
     def loadModel(self,fname):
-        utils.debug("loadModel " + str(fname))
+        self.feedback.pushDebugInfo("loadModel " + str(fname))
         utils.checkFileExists(fname)
         config_parsing.setConfigParsers(self.parsers)
         self.paramsConnector.setProjectFile(fname)
-        config_parsing.parseConfig(fname)
-        utils.info("FragScape model loaded from file '" + fname + "'")
+        config_parsing.parseConfig(fname,feedback=self.feedback)
+        self.feedback.pushInfo("FragScape model loaded from file '" + fname + "'")
+        # Update UI for each tab
+        self.paramsConnector.updateUI()
+        self.landuseConnector.updateUI()
+        self.reportingConnector.updateUI()
         
     def loadModelAction(self):
         fname =qgsUtils.openFileDialog(parent=self,msg="Ouvrir le projet",filter="*.xml")

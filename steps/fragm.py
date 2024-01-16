@@ -23,7 +23,7 @@
 """
 
 import os.path
-import time
+import time, sys
 
 from qgis.core import (Qgis,
                        QgsMapLayerProxyModel,
@@ -47,10 +47,11 @@ class FragmItem(abstract_model.DictItem):
     FIELDS = [INPUT,SELECT_EXPR,BUFFER,NAME,FRAGM]
 
 
-    def __init__(self,dict):
+    def __init__(self,dict,feedback=None):
         if self.FRAGM not in dict:
             dict[self.FRAGM] = True
-        super().__init__(dict,fields=self.FIELDS)
+        # super().__init__(dict,fields=self.FIELDS)
+        super().__init__(dict,feedback=feedback)
         self.selectionLayer = None
         self.bufferLayer = None
         
@@ -98,7 +99,10 @@ class FragmModel(abstract_model.DictModel):
     def __init__(self,fsModel):
         self.parser_name = "FragmModel"
         self.fsModel = fsModel
-        super().__init__(self,self.FIELDS)
+        itemClass = getattr(sys.modules[__name__], FragmItem.__name__)
+        super().__init__(itemClass,
+            feedback=fsModel.feedback,
+            fields=self.FIELDS)
         
     def mkItemFromDict(self,dict):
         if "in_layer" in dict:
@@ -301,7 +305,7 @@ class FragmModel(abstract_model.DictModel):
 class FragmConnector(abstract_model.AbstractConnector):
 
     def __init__(self,dlg,fragmModel):
-        self.parser_name = "FragmConnector"
+        self.parser_name = "FragmModel"
         self.dlg = dlg
         self.onlySelection = False
         # self.fragmFlag = True
@@ -369,5 +373,8 @@ class FragmConnector(abstract_model.AbstractConnector):
                  FragmItem.FRAGM : is_fragm}
         item = FragmItem(dict)
         return item
+        
+    def updateFromXML(self,root,feedback=None):
+        self.model.updateFromXML(root,feedback=feedback)
         
         

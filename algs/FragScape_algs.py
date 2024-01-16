@@ -337,7 +337,7 @@ class ApplyFragmentationAlgorithm(FragScapeVectorAlgorithm):
         # output = parameters[self.OUTPUT]
         # Merge fragmentation layers
         fragm_path = params.mkTmpLayerPath("fragm.gpkg")
-        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,crs,fragm_path)
+        fragm_layer = qgsTreatments.mergeVectorLayers(fragm_layers,crs,fragm_path,feedback=feedback)
         feedback.pushDebugInfo("fragm_layer = " + str(fragm_layer))
         if fragm_layer is None:
             raise QgsProcessingException("Fragmentation layers merge failed")

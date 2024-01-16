@@ -70,15 +70,16 @@ class ParamsModel(abstract_model.NormalizingParamsModel):
         super().__init__()
         self.mode = self.VECTOR_MODE
         self.save_tmp = False
-        self.workspace = None
+        #self.workspace = None
         self.outputDir = None
         self.tmpDir = None
-        self.resolution = 0.0
-        self.projectFile = ""
-        self.crs = defaultCrs
-        fields = [self.WORKSPACE,self.EXTENT_LAYER,
-            self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]
-        super().__init__(fields)
+        #self.resolution = 0.0
+        #self.projectFile = ""
+        #self.crs = defaultCrs
+        #fields = [self.WORKSPACE,self.EXTENT_LAYER,
+        #    self.RESOLUTION,self.PROJECT,self.CRS,self.MODE]
+        # super().__init__(fields)
+        abstract_model.NormalizingParamsModel.__init__(self,feedback=fsModel.feedback)
         
     def getNItem(self,n):
         items = [self.workspace,
@@ -228,8 +229,8 @@ class ParamsConnector:
         self.dlg.workspace.setFilePath(self.model.workspace)
         self.dlg.paramsMode.setCurrentIndex(self.model.mode)
         self.dlg.paramsCrs.setCrs(self.model.crs)
-
-    def fromXMLRoot(self,root):
-        self.model.fromXMLRoot(root)
+        
+    def updateFromXML(self,root,feedback=None):
+        self.model.updateFromXML(root)
         self.updateUI()
         
