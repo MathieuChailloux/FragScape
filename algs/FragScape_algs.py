@@ -825,7 +825,7 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         # Dissolve
         if isinstance(self,MeffVectorGlobal) and reporting.featureCount() > 1:
             reporting_path = params.mkTmpLayerPath(source_name + "_reporting_dissolved.gpkg")
-            qgsTreatments.dissolveLayer(reporting,reporting_path,context,feedback)
+            qgsTreatments.dissolveLayer(reporting,reporting_path,context=context,feedback=feedback)
             reporting = qgsUtils.loadVectorLayer(reporting_path)
             feedback.setCurrentStep(3)
         self.report_layer = reporting
@@ -838,13 +838,13 @@ class FragScapeMeffVectorAlgorithm(FragScapeVectorAlgorithm,MeffAlgUtils):
         elif self.CLIP_FLAG in parameters and not parameters[self.CLIP_FLAG]:
             clipped_path = params.mkTmpLayerPath(source_name
                 + "_intersected" + suffix + ".gpkg")
-            qgsTreatments.applyIntersection(input,reporting,clipped_path,context,feedback)
-            qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
+            qgsTreatments.applyIntersection(input,reporting,clipped_path,context=context,feedback=feedback)
+            qgsTreatments.multiToSingleGeom(clipped_path,out_path,context=context,feedback=feedback)
         else:
             clipped_path = params.mkTmpLayerPath(source_name
                 + "_clipped" + suffix + ".gpkg")
-            qgsTreatments.applyVectorClip(input,reporting,clipped_path,context,feedback)
-            qgsTreatments.multiToSingleGeom(clipped_path,out_path,context,feedback)
+            qgsTreatments.applyVectorClip(input,reporting,clipped_path,context=context,feedback=feedback)
+            qgsTreatments.multiToSingleGeom(clipped_path,out_path,context=context,feedback=feedback)
         feedback.setCurrentStep(4)
         input = qgsUtils.loadVectorLayer(out_path)
         return (input, reporting)
@@ -1030,7 +1030,7 @@ class MeffVectorReport(FragScapeMeffVectorAlgorithm):
             # merged_path = params.mkTmpLayerPath("reportingMerged.gpkg")
             feedback.pushDebugInfo("output = " + str(output))
             feedback.pushDebugInfo("output class = " + str(output.__class__))
-            qgsTreatments.mergeVectorLayers(report_layers,self.crs,out)
+            qgsTreatments.mergeVectorLayers(report_layers,self.crs,out,feedback=multi_feedback)
             # if isinstance(output,str):
                 # out_layer = qgsUtils.loadVectorLayer(output)
                 # out_layer.dataProvider().deleteAttributes([0])
