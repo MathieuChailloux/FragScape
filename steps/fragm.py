@@ -56,6 +56,8 @@ class FragmItem(abstract_model.DictItem):
         self.bufferLayer = None
         
     def equals(self,other):
+        self.feedback.pushDebugInfo("self = {}".format(self.dict))
+        self.feedback.pushDebugInfo("other = {}".format(other))
         return (self.dict[self.NAME] == other.dict[self.NAME])
         
     def getOutputVLayer(self):
@@ -79,6 +81,23 @@ class FragmItem(abstract_model.DictItem):
             name = self.dict[self.NAME]
             self.bufferLayer = params.mkTmpLayerPath(name + "_buf.gpkg")
         return self.bufferLayer
+        
+    @staticmethod
+    def fromDict(dict,feedback=None):
+        if "in_layer" in dict:
+            new_dict = { FragmItem.INPUT : dict["in_layer"],
+                         FragmItem.SELECT_EXPR : dict["expr"],
+                         FragmItem.BUFFER : dict["buffer"],
+                         FragmItem.NAME : dict["name"],
+                         FragmItem.FRAGM : True }
+            return FragmItem(new_dict,feedback=feedback)
+        else:
+            if FragmItem.FRAGM in dict:
+                dict[FragmItem.FRAGM]  = dict[FragmItem.FRAGM] == "True"
+                utils.info("HEHO " + str(dict[FragmItem.FRAGM]))
+            else:
+                dict[FragmItem.FRAGM]  = True
+            return FragmItem(dict,feedback=feedback)
         
         
 class FragmModel(abstract_model.DictModel):
@@ -104,22 +123,22 @@ class FragmModel(abstract_model.DictModel):
             feedback=fsModel.feedback,
             fields=self.FIELDS)
         
-    def mkItemFromDict(self,dict):
-        if "in_layer" in dict:
-            new_dict = { FragmItem.INPUT : dict["in_layer"],
-                         FragmItem.SELECT_EXPR : dict["expr"],
-                         FragmItem.BUFFER : dict["buffer"],
-                         FragmItem.NAME : dict["name"],
-                         FragmItem.FRAGM : True
-                         }
-            return FragmItem(new_dict)
-        else:
-            if FragmItem.FRAGM in dict:
-                dict[FragmItem.FRAGM]  = dict[FragmItem.FRAGM] == "True"
-                utils.info("HEHO " + str(dict[FragmItem.FRAGM]))
-            else:
-                dict[FragmItem.FRAGM]  = True
-            return FragmItem(dict)
+    # def mkItemFromDict(self,dict):
+        # if "in_layer" in dict:
+            # new_dict = { FragmItem.INPUT : dict["in_layer"],
+                         # FragmItem.SELECT_EXPR : dict["expr"],
+                         # FragmItem.BUFFER : dict["buffer"],
+                         # FragmItem.NAME : dict["name"],
+                         # FragmItem.FRAGM : True
+                         # }
+            # return FragmItem(new_dict)
+        # else:
+            # if FragmItem.FRAGM in dict:
+                # dict[FragmItem.FRAGM]  = dict[FragmItem.FRAGM] == "True"
+                # utils.info("HEHO " + str(dict[FragmItem.FRAGM]))
+            # else:
+                # dict[FragmItem.FRAGM]  = True
+            # return FragmItem(dict)
         
     def getSingleGeomLayer(self):
         return self.fsModel.mkOutputFile("landuseFragmSingleGeom.gpkg")

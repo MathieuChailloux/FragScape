@@ -118,7 +118,7 @@ class FragScapeDialog(QtWidgets.QDialog, FORM_CLASS):
     # Displays traceback and error message in log tab.
     # Ignores CustomException : exception raised from FragScape and already displayed.
     def exceptionHook(self,excType, excValue, tracebackobj):
-        self.feedback.pushDebugInfo("bioDispHook")
+        self.feedback.pushDebugInfo("FragScapeHook")
         if excType == utils.CustomException:
             self.feedback.pushDebugInfo("Ignoring custom exception : " + str(excValue))
         else:

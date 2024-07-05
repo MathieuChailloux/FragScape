@@ -50,6 +50,12 @@ class LanduseFieldItem(abstract_model.DictItem):
                  self.TO_SELECT_FIELD : toSelect }
         super().__init__(dict)
         
+    @staticmethod
+    def fromDict(dict,feedback=None):
+        if LanduseFieldItem.DESCR_FIELD not in dict:
+            dict[LanduseFieldItem.DESCR_FIELD] = ""
+        return LanduseFieldItem(dict,feedback=feedback)
+        
     def equals(self,other):
         return (self.dict[self.VALUE_FIELD] == other.dict[self.VALUE_FIELD])
         
@@ -89,8 +95,8 @@ class LanduseModel(abstract_model.DictModel):
             fields=LanduseFieldItem.FIELDS)
         self.parser_name = "Landuse"
                         
-    def mkItemFromDict(self,dict):
-        return LanduseFieldItem(dict)
+    # def mkItemFromDict(self,dict):
+        # return LanduseFieldItem(dict)
         # v = dict[LanduseFieldItem.VALUE_FIELD]
         # if LanduseFieldItem.DESCR_FIELD in dict:
             # d = dict[LanduseFieldItem.DESCR_FIELD]
