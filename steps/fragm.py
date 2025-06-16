@@ -56,8 +56,8 @@ class FragmItem(abstract_model.DictItem):
         self.bufferLayer = None
         
     def equals(self,other):
-        self.feedback.pushDebugInfo("self = {}".format(self.dict))
-        self.feedback.pushDebugInfo("other = {}".format(other))
+        feedbacks.debug("self = {}".format(self.dict))
+        feedbacks.debug("other = {}".format(other))
         return (self.dict[self.NAME] == other.dict[self.NAME])
         
     def getOutputVLayer(self):
@@ -174,9 +174,9 @@ class FragmModel(abstract_model.DictModel):
         self.fsModel.checkWorkspaceInit()
         # self.fsModel.checkExtentInit()
         input_rel = item.dict[FragmItem.INPUT]
-        feedback.pushDebugInfo("input_rel = " + str(input_rel))
+        feedbacks.debug("input_rel = " + str(input_rel))
         input = self.fsModel.getOrigPath(input_rel)
-        feedback.pushDebugInfo("input = " + str(input))
+        feedbacks.debug("input = " + str(input))
         input_layer, input_type = qgsUtils.loadLayerGetType(input)
         input_vector = input_type == 'Vector'
         select_expr = item.dict[FragmItem.SELECT_EXPR]
@@ -186,9 +186,9 @@ class FragmModel(abstract_model.DictModel):
         burn_val = 0 if is_fragm else 1
         vector_mode = self.fsModel.modeIsVector()
         outVPath = item.getOutputVLayer()
-        feedback.pushDebugInfo("outVPath = " + str(outVPath))
+        feedbacks.debug("outVPath = " + str(outVPath))
         outRPath = item.getOutputRLayer()
-        feedback.pushDebugInfo("outRPath = " + str(outRPath))
+        feedbacks.debug("outRPath = " + str(outRPath))
         # Processing
         step_feedback = feedbacks.ProgressMultiStepFeedback(3,feedback)
         clipped = self.fsModel.paramsModel.clipByExtent(input,
@@ -245,7 +245,7 @@ class FragmModel(abstract_model.DictModel):
         # Out layer
         vector_mode = self.fsModel.modeIsVector()
         res_path = self.getFinalLayer()
-        feedback.pushDebugInfo("res_path = " + str(res_path))
+        feedbacks.debug("res_path = " + str(res_path))
         if vector_mode:
             qgsUtils.removeVectorLayer(res_path)
         else:

@@ -68,17 +68,17 @@ class ReportingModel(abstract_model.DictModel):
             fields=self.fields,
             feedback=fsModel.feedback)
         self.parser_name = "Reporting"
-        self.feedback.pushInfo("OK")
+        feedbacks.info("OK")
                 
     def getInputLayer(self):
-        self.feedback.pushDebugInfo("input_layer = " + str(self.input_layer))
+        feedbacks.debug("input_layer = " + str(self.input_layer))
         if not self.input_layer:
             self.input_layer = self.fsModel.fragmModel.getFinalLayer()
-            self.feedback.pushDebugInfo("set input_layer = " + str(self.input_layer))
+            feedbacks.debug("set input_layer = " + str(self.input_layer))
         return self.input_layer
                 
     def setOutLayer(self,layer_path):
-        self.feedback.pushDebugInfo("layer_path = " + str(layer_path))
+        feedbacks.debug("layer_path = " + str(layer_path))
         self.out_layer = layer_path
         
     def getOutLayer(self):
@@ -94,7 +94,7 @@ class ReportingModel(abstract_model.DictModel):
                 
     def runReportingWithContext(self,context,feedback):
         reportingMsg = "Reporting layer computation"
-        feedback.pushDebugInfo("unit = " + str(self.unit))
+        feedbacks.debug("unit = " + str(self.unit))
         feedbacks.beginSection(reportingMsg)
         vector_mode = self.fsModel.modeIsVector()
         nb_steps = 2 if vector_mode or self.reporting_layer else 1
@@ -127,7 +127,7 @@ class ReportingModel(abstract_model.DictModel):
             res2 = qgsTreatments.applyProcessingAlg('FragScape',
                 MeffGlobalV.ALG_NAME,parameters,
                 context=context,feedback=step_feedback,onlyOutput=False)
-            self.feedback.pushWarning("res2 = " + str(res2))
+            feedbacks.warn("res2 = " + str(res2))
             res_layer = res1[MeffReportV.OUTPUT]
             res_val = res2[MeffReportV.OUTPUT_VAL]
         else:
@@ -199,13 +199,13 @@ class ReportingModel(abstract_model.DictModel):
         return xmlStr
         
     def fromXMLAttribs(self,attribs):
-        self.feedback.pushDebugInfo("atribs = {}".format(attribs))
+        feedbacks.debug("atribs = {}".format(attribs))
         if self.INPUT in attribs:
             self.input_layer = self.fsModel.getOrigPath(attribs[self.INPUT])
-            self.feedback.pushDebugInfo("il1 = {}".format(self.input_layer))
+            feedbacks.debug("il1 = {}".format(self.input_layer))
         else:
             self.input_layer = self.fsModel.fragmModel.getFinalLayer()
-            self.feedback.pushDebugInfo("il2 = {}".format(self.input_layer))
+            feedbacks.debug("il2 = {}".format(self.input_layer))
         if self.REPORTING in attribs:
             self.reporting_layer = self.fsModel.getOrigPath(attribs[self.REPORTING])
         if self.METHOD in attribs:
@@ -250,8 +250,8 @@ class ReportingConnector:
         
     def runReporting(self):
         (res_layer, res_val) = self.model.runReportingWithContext(self.dlg.context,self.dlg.feedback)
-        self.feedback.pushDebugInfo("res_layer = " + str(res_layer))
-        self.feedback.pushDebugInfo("res_val = " + str(res_val))
+        feedbacks.debug("res_layer = " + str(res_layer))
+        feedbacks.debug("res_val = " + str(res_val))
         # UI update
         self.dlg.resultsGlobalRes.setText(str(res_val))
         if res_layer:
@@ -273,11 +273,11 @@ class ReportingConnector:
         self.model.includeCBC = boolVal
             
     def setUnit(self,idx):
-        self.feedback.pushDebugInfo("setUnit " + str(idx))
+        feedbacks.debug("setUnit " + str(idx))
         self.model.unit = idx
     
     def setInputLayer(self,layer):
-        self.feedback.pushDebugInfo("setInputLayer to " + str(layer))
+        feedbacks.debug("setInputLayer to " + str(layer))
         # self.unloadResults()
         if layer:
             self.model.input_layer = qgsUtils.pathOfLayer(layer)
@@ -286,17 +286,17 @@ class ReportingConnector:
         self.model.select_expr = expr
         
     def setReportingLayer(self,path):
-        self.feedback.pushDebugInfo("setReportingLayer")
+        feedbacks.debug("setReportingLayer")
         self.model.reporting_layer = path
         
     def updateUI(self):
         abs_input_layer = self.model.getInputLayer()
-        self.feedback.pushDebugInfo("abs_input_layer {}".format(abs_input_layer))
+        feedbacks.debug("abs_input_layer {}".format(abs_input_layer))
         if abs_input_layer and os.path.isfile(abs_input_layer):
             loaded_layer = qgsUtils.loadLayer(abs_input_layer,loadProject=True)
             self.dlg.resultsInputLayer.setLayer(loaded_layer)
         else:
-            self.feedback.pushWarning("Could not find results input layer : " + str(abs_input_layer))
+            feedbacks.warn("Could not find results input layer : " + str(abs_input_layer))
         if self.model.reporting_layer:
             self.dlg.resultsReportingLayer.setFilePath(self.model.reporting_layer)
         if self.model.includeCBC:

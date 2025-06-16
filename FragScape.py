@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import QAction
 from .resources import *
 # Import the code for the dialog
 from .FragScape_dialog import FragScapeDialog
-from .qgis_lib_mc import utils, qgsTreatments
+from .qgis_lib_mc import utils, qgsTreatments, feedbacks
 
 from qgis.core import QgsApplication
 from qgis.utils import qgis_excepthook
@@ -78,6 +78,7 @@ class FragScape:
         self.toolbar = self.iface.addToolBar(u'FragScape')
         self.toolbar.setObjectName(u'FragScape')
         self.provider = None
+        feedbacks.pluginName = "FragScape"
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
